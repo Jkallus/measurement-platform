@@ -13,4 +13,9 @@
     <PackageReference Include="Microsoft.Toolkit.Mvvm" Version="7.1.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\MeasurementUI.Controls\MeasurementUI.Controls.csproj" />
+    <ProjectReference Include="..\MeasurementUI.Core\MeasurementUI.Core.csproj" />
+  </ItemGroup>
+
 </Project>

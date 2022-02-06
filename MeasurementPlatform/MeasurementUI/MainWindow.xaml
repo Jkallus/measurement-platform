@@ -4,10 +4,44 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MeasurementUI"
-        xmlns:views="clr-namespace:MeasurementUI.Views"
+        xmlns:controls="clr-namespace:MeasurementUI.Controls.Views;assembly=MeasurementUI.Controls"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        DataContext="{Binding Path=MainWindowViewModel, Source={StaticResource ViewModelLocator}}"
+        Title="MainWindow" Height="600" Width="1200">
     <Grid>
-        <views:SerialTerminalStub HorizontalAlignment="Right" Margin="0 5 10 0" VerticalAlignment="Top"/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="30"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="400"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="300"/>
+        </Grid.ColumnDefinitions>
+
+        <Menu Grid.Row="0" Grid.ColumnSpan="3">
+            <MenuItem Header="File">
+                <MenuItem Header="Exit"/>
+            </MenuItem>
+            <MenuItem Header="Connection">
+                <MenuItem Header="Connect" Command="{Binding ConnectCommand }"/>
+                <MenuItem Header="Disconnect"/>
+            </MenuItem>
+        </Menu>
+
+        <Canvas Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Background="WhiteSmoke">
+            <WrapPanel VerticalAlignment="Center">
+                <TextBlock Text="Status: Loaded"/>
+            </WrapPanel>
+        </Canvas>
+
+        <controls:SerialTerminalControl Grid.Row="1"  Grid.Column="3"/>
+
+        <StackPanel Grid.Row="1" Grid.Column="0">
+            <controls:StageViewControlStub/>
+            <controls:StageControl  Margin="0 5 0 0"/>
+        </StackPanel>
+        
     </Grid>
 </Window>

@@ -13,16 +13,22 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace MeasurementUI.Views
+namespace MeasurementUI.Controls.Views
 {
     /// <summary>
-    /// Interaction logic for SerialTerminalStub.xaml
+    /// Interaction logic for ConnectionControlStub.xaml
     /// </summary>
-    public partial class SerialTerminalStub : UserControl
+    public partial class ConnectionControlStub : UserControl
     {
-        public SerialTerminalStub()
+        public ConnectionControlStub()
         {
             InitializeComponent();
+        }
+
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            var window = this.Parent as Window;
+            window.DialogResult = true;
         }
     }
 }

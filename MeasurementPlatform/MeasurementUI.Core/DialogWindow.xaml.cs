@@ -1,7 +1,4 @@
-﻿using MeasurementUI.Controls.ViewModels;
-using MeasurementUI.Controls.Views;
-using MeasurementUI.Core.Services;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,21 +10,18 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace MeasurementUI
+namespace MeasurementUI.Core
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for DialogWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class DialogWindow : Window
     {
-        public MainWindow()
+        public DialogWindow()
         {
             InitializeComponent();
-
-            //DialogService.RegisterDialog<ConnectionControlStub, ConnectionControlStubViewModel>();
         }
     }
 }

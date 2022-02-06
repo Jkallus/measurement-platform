@@ -5,6 +5,10 @@ VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MeasurementUI", "MeasurementUI\MeasurementUI.csproj", "{20CE360C-E59B-4BDE-BBCD-E2A5218305EB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MeasurementUI.Controls", "MeasurementUI.Controls\MeasurementUI.Controls.csproj", "{71F4872C-AA39-4FF3-A1E7-6C1BEBE040B4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MeasurementUI.Core", "MeasurementUI.Core\MeasurementUI.Core.csproj", "{3102A736-5571-48AE-A422-D5086539C569}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{20CE360C-E59B-4BDE-BBCD-E2A5218305EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{20CE360C-E59B-4BDE-BBCD-E2A5218305EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{20CE360C-E59B-4BDE-BBCD-E2A5218305EB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{71F4872C-AA39-4FF3-A1E7-6C1BEBE040B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{71F4872C-AA39-4FF3-A1E7-6C1BEBE040B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{71F4872C-AA39-4FF3-A1E7-6C1BEBE040B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{71F4872C-AA39-4FF3-A1E7-6C1BEBE040B4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3102A736-5571-48AE-A422-D5086539C569}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3102A736-5571-48AE-A422-D5086539C569}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3102A736-5571-48AE-A422-D5086539C569}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3102A736-5571-48AE-A422-D5086539C569}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

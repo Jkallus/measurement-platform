@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MeasurementUI.ViewModels
+namespace MeasurementUI.Controls.ViewModels
 {
-    public class SerialTerminalStubViewModel
+    public class SerialTerminalControlStubViewModel
     {
     }
 }
