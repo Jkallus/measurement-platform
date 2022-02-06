@@ -10,4 +10,8 @@
     <PackageReference Include="CommunityToolkit.Mvvm" Version="7.1.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\MeasurementUI.Core\MeasurementUI.Core.csproj" />
+  </ItemGroup>
+
 </Project>

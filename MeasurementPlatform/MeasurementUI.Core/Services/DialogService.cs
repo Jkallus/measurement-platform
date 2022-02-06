@@ -13,14 +13,11 @@ namespace MeasurementUI.Core.Services
     {
         private readonly IServiceProvider serviceProvider;
 
-        
         public DialogService(IServiceProvider serviceProvider)
         {
             this.serviceProvider = serviceProvider;
         }
         
-
-
         static Dictionary<Type, Type> mappings = new Dictionary<Type, Type>();
 
         public static void RegisterDialog<TView, TViewModel>()
@@ -47,19 +44,13 @@ namespace MeasurementUI.Core.Services
             };
             dialog.Closed += closeEventHandler;
 
-
             var content = Activator.CreateInstance(type);
             
             if(vmType != null)
             {
-                //var vm = Activator.CreateInstance(vmType);
                 var vm = serviceProvider.GetService(vmType);
-                //var vm = serviceProvider.GetService(vmType);
-
-                //var vm = Application.Current.Services.GetService<type>();
                 (content as FrameworkElement).DataContext = vm;
             }
-            
             
             dialog.Content = content;
             dialog.ShowDialog();

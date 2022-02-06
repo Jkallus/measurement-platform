@@ -1,17 +1,15 @@
-﻿using MeasurementUI.Controls.ViewModels;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using MeasurementUI.Core.Interfaces;
-using MeasurementUI.Core.Services;
-using Microsoft.Toolkit.Mvvm.ComponentModel;
-using Microsoft.Toolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MeasurementUI.ViewModels
+namespace MeasurementUI.Controls.ViewModels
 {
-    public class MainWindowViewModel: ObservableRecipient
+    public class MainWindowViewModel : ObservableRecipient
     {
         IDialogService dialogService;
 
@@ -21,7 +19,7 @@ namespace MeasurementUI.ViewModels
         public MainWindowViewModel(IDialogService dialogService)
         {
             this.dialogService = dialogService;
-            ConnectCommand = new RelayCommand(Connect);    
+            ConnectCommand = new RelayCommand(Connect);
         }
 
 

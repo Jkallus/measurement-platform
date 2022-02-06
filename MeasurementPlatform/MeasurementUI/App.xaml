@@ -3,8 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:MeasurementUI"
              xmlns:vm="clr-namespace:MeasurementUI.ViewModels"
-             StartupUri="MainWindow.xaml">
+             Startup="OnStartup">
     <Application.Resources>
-        <vm:ViewModelLocator x:Key="ViewModelLocator"/>
     </Application.Resources>
 </Application>

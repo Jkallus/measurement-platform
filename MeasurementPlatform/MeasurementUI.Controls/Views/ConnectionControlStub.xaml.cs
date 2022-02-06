@@ -26,16 +26,7 @@ namespace MeasurementUI.Controls.Views
         public ConnectionControlStub()
         {
             InitializeComponent();
-            //DataContext = 
-                //App.Currrent.Services.GetService<ConnectionControlStubViewModel>();
         }
-
-
-        //public ConnectionControlStub(ConnectionControlStubViewModel vm)
-        //{
-        //    InitializeComponent();
-        //    DataContext = vm;
-        //}
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {

@@ -2,7 +2,6 @@
 using MeasurementUI.Controls.Views;
 using MeasurementUI.Core.Interfaces;
 using MeasurementUI.Core.Services;
-using MeasurementUI.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Toolkit.Mvvm.DependencyInjection;
 using System;
@@ -24,9 +23,14 @@ namespace MeasurementUI
         {
             Services = ConfigureServices();
 
-
-
             DialogService.RegisterDialog<ConnectionControlStub, ConnectionControlStubViewModel>();
+        }
+
+        private void OnStartup(object sender, StartupEventArgs e)
+        {
+            var main = Services.GetService<MainWindow>();
+            main.DataContext = Services.GetService<MainWindowViewModel>();
+            main.Show();
         }
 
         public new static App Current => (App)Application.Current;
@@ -36,6 +40,8 @@ namespace MeasurementUI
         private static IServiceProvider ConfigureServices()
         {
             var services = new ServiceCollection();
+
+            services.AddSingleton<MainWindow>();
 
             services.AddSingleton<SerialTerminalControlStubViewModel>();
             services.AddSingleton<MainWindowViewModel>();
