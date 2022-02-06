@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MeasurementUI.Controls.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,6 +14,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+using MeasurementUI;
+
 namespace MeasurementUI.Controls.Views
 {
     /// <summary>
@@ -23,7 +26,16 @@ namespace MeasurementUI.Controls.Views
         public ConnectionControlStub()
         {
             InitializeComponent();
+            //DataContext = 
+                //App.Currrent.Services.GetService<ConnectionControlStubViewModel>();
         }
+
+
+        //public ConnectionControlStub(ConnectionControlStubViewModel vm)
+        //{
+        //    InitializeComponent();
+        //    DataContext = vm;
+        //}
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {

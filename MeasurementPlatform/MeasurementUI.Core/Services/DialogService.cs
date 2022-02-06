@@ -6,12 +6,21 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
-using MeasurementUI;
 
 namespace MeasurementUI.Core.Services
 {
     public class DialogService : IDialogService
     {
+        private readonly IServiceProvider serviceProvider;
+
+        
+        public DialogService(IServiceProvider serviceProvider)
+        {
+            this.serviceProvider = serviceProvider;
+        }
+        
+
+
         static Dictionary<Type, Type> mappings = new Dictionary<Type, Type>();
 
         public static void RegisterDialog<TView, TViewModel>()
@@ -25,7 +34,8 @@ namespace MeasurementUI.Core.Services
             ShowDialogImpl(type, callback, null);
         }
 
-        private static void ShowDialogImpl(Type type, Action<string> callback, Type vmType)
+        //private static void ShowDialogImpl(Type type, Action<string> callback, Type vmType)
+        private void ShowDialogImpl(Type type, Action<string> callback, Type vmType)
         {
             var dialog = new DialogWindow();
 
@@ -37,16 +47,19 @@ namespace MeasurementUI.Core.Services
             };
             dialog.Closed += closeEventHandler;
 
+
             var content = Activator.CreateInstance(type);
             
-            /*
             if(vmType != null)
             {
-                var vm = Activator.CreateInstance(vmType);
+                //var vm = Activator.CreateInstance(vmType);
+                var vm = serviceProvider.GetService(vmType);
+                //var vm = serviceProvider.GetService(vmType);
+
                 //var vm = Application.Current.Services.GetService<type>();
                 (content as FrameworkElement).DataContext = vm;
             }
-            */
+            
             
             dialog.Content = content;
             dialog.ShowDialog();

@@ -18,9 +18,9 @@ namespace MeasurementUI.ViewModels
         public RelayCommand ConnectCommand { get; }
 
 
-        public MainWindowViewModel()
+        public MainWindowViewModel(IDialogService dialogService)
         {
-            dialogService = new DialogService();
+            this.dialogService = dialogService;
             ConnectCommand = new RelayCommand(Connect);    
         }
 
