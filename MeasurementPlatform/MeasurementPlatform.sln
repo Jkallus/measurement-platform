@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MeasurementUI.Controls", "M
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MeasurementUI.Core", "MeasurementUI.Core\MeasurementUI.Core.csproj", "{3102A736-5571-48AE-A422-D5086539C569}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StageControl", "StageControl\StageControl.csproj", "{F380922A-7890-4FBA-BF86-B62DEB769C13}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StageControlTester", "StageControlTester\StageControlTester.csproj", "{D15910B6-6F7A-4E99-A80F-2993FF229F0A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,14 @@ Global
 		{3102A736-5571-48AE-A422-D5086539C569}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3102A736-5571-48AE-A422-D5086539C569}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3102A736-5571-48AE-A422-D5086539C569}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F380922A-7890-4FBA-BF86-B62DEB769C13}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F380922A-7890-4FBA-BF86-B62DEB769C13}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F380922A-7890-4FBA-BF86-B62DEB769C13}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F380922A-7890-4FBA-BF86-B62DEB769C13}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D15910B6-6F7A-4E99-A80F-2993FF229F0A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D15910B6-6F7A-4E99-A80F-2993FF229F0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D15910B6-6F7A-4E99-A80F-2993FF229F0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D15910B6-6F7A-4E99-A80F-2993FF229F0A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
