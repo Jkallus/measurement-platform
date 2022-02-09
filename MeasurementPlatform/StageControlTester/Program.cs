@@ -1,20 +1,31 @@
 ﻿using System;
 using System.IO.Ports;
 using StageControl;
+using StageControl.Enums;
 
 namespace StageControlTester
 {
     internal class Program
-    {    
-        static void DataReceived(object sender, SerialDataItemReceivedEventArgs e)
+    {
+
+        static FluidNCController? FNC;
+
+        static void StateChanged(object? sender, FNCStateChangedEventArgs e)
         {
-            Console.WriteLine(e.item.ToString());
+            Console.WriteLine(e.State.ToString());
+            if(e.State == LifetimeFNCState.FNCReady && FNC != null)
+            {
+                FNC.RequestStatus();
+            }
         }
 
         static void Main(string[] args)
         {
-            SerialController serialController = new SerialController();
-            serialController.SerialDataItemReceived += DataReceived;
+ 
+
+            FNC = new FluidNCController();
+            FNC.FNCStateChanged += StateChanged;
+            FNC.Connect();
 
             while(true)
             {

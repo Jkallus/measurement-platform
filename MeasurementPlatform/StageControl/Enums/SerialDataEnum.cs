@@ -13,6 +13,7 @@ namespace StageControl.Enums
         MSGINFO,
         MSGDBG,
         FNCEntryPrompt,
-        UnlockPrompt
+        UnlockPrompt,
+        Status
     }
 }

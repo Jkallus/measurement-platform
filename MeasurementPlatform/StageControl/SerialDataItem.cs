@@ -9,7 +9,9 @@ namespace StageControl
 {
     public class SerialDataItem
     {
-        public string Data { get; set; }
+        private static readonly char[] charsToTrim = { '\r', '\n' };
+
+        public string? Data { get; set; }
         public DateTime Time { get; set; }
         public SerialDataType Type { get; set; }
 
@@ -18,6 +20,8 @@ namespace StageControl
             this.Data = data;
             this.Time = time;
             this.Type = type;
+
+            this.Data = this.Data.Trim(charsToTrim);
         }
 
         public SerialDataItem()
@@ -27,9 +31,8 @@ namespace StageControl
 
         public override string ToString()
         {
-            return String.Format("{0}[{1}]: '{2}'", Time.ToString(), Type.ToString(), Data);
+            return String.Format("{0}[{1}]: \'{2}\'", Time.ToString(), Type.ToString(), Data);
         }
-
 
     }
 }
