@@ -14,6 +14,8 @@ namespace StageControl.Enums
         MSGDBG,
         FNCEntryPrompt,
         UnlockPrompt,
-        Status
+        Status,
+        RequestComplete,
+        OutgoingMessage
     }
 }

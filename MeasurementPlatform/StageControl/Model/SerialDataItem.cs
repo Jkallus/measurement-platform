@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace StageControl
+namespace StageControl.Model
 {
     public class SerialDataItem
     {

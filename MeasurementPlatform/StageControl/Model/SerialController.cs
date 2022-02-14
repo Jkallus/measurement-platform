@@ -2,7 +2,7 @@
 using StageControl.Enums;
 using StageControl.Consts;
 
-namespace StageControl
+namespace StageControl.Model
 {
     public class SerialDataItemReceivedEventArgs: EventArgs
     {
@@ -33,15 +33,30 @@ namespace StageControl
             port = new SerialPort("COM3", 115200, Parity.None, 8, StopBits.One);
         }
 
+        private void triggerReboot()
+        {
+            port.RtsEnable = false;
+            port.DtrEnable = true;
+            Thread.Sleep(10);
+            port.RtsEnable = true;
+            port.DtrEnable = false;
+            Thread.Sleep(10);
+            port.RtsEnable = true;
+            port.DtrEnable = true;
+            Thread.Sleep(10);
+        }
+
         public void Connect()
         {
             port.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
+            port.DtrEnable = false;
             port.Open();
+            triggerReboot();
         }
 
         public void SendSerialData(string str)
         {
-            port.Write(str);
+            port.WriteLine(str);
         }
         
         protected virtual void OnSerialDataItemReceived(SerialDataItemReceivedEventArgs e)
@@ -121,10 +136,22 @@ namespace StageControl
                     RaiseSerialDataItemReceivedEvent(item);
                     currentMessage = currentMessage.Remove(0, endIndex);
                 }
+                else if(currentMessage.StartsWith(SerialDataConsts.RequestCompleteMessageMarker) && currentMessage.Contains(SerialDataConsts.LineBreak))
+                {
+                    int endIndex = currentMessage.IndexOf(SerialDataConsts.LineBreak);
+                    SerialDataItem item = new SerialDataItem(currentMessage.Substring(0, endIndex), DateTime.Now, SerialDataType.RequestComplete);
+                    RaiseSerialDataItemReceivedEvent(item);
+                    currentMessage = currentMessage.Remove(0, endIndex + 2);
+                }
+                else if (currentMessage.StartsWith(SerialDataConsts.LineBreak))
+                {
+                    currentMessage = currentMessage.Remove(0, 2);
+                }
                 else // was not able to match any marker so exit look and wait for more serial data to come in
                 {
                     canContinue = false;
                 }
+                
             }
         }
 

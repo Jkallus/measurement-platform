@@ -2,35 +2,48 @@
 using System.IO.Ports;
 using StageControl;
 using StageControl.Enums;
+using StageControl.Model;
 
 namespace StageControlTester
 {
     internal class Program
     {
 
-        static FluidNCController? FNC;
+        //static FluidNCController? FNC;
 
-        static void StateChanged(object? sender, FNCStateChangedEventArgs e)
+        //static void StateChanged(object? sender, FNCStateChangedEventArgs e)
+        //{
+        //    Console.WriteLine(e.State.ToString());
+        //    if(e.State == LifetimeFNCState.FNCReady && FNC != null)
+        //    {
+        //        FNC.RequestStatus();
+        //    }
+        //}
+
+        static async Task Main(string[] args)
         {
-            Console.WriteLine(e.State.ToString());
-            if(e.State == LifetimeFNCState.FNCReady && FNC != null)
+            FNCMachineControl machine = new FNCMachineControl();
+            await machine.Initialize();
+
+            await machine.Home();
+
+            await machine.Home();
+
+            Console.WriteLine("Machine is Homed!");
+
+            while (true) 
             {
-                FNC.RequestStatus();
+                Console.ReadKey();
             }
-        }
 
-        static void Main(string[] args)
-        {
- 
+            //FNC = new FluidNCController();
+            //FNC.FNCStateChanged += StateChanged;
+            //FNC.Connect();
 
-            FNC = new FluidNCController();
-            FNC.FNCStateChanged += StateChanged;
-            FNC.Connect();
+            //while(true)
+            //{
 
-            while(true)
-            {
-
-            }
+            //}
         }
     }
 }

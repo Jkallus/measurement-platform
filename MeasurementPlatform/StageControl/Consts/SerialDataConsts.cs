@@ -18,5 +18,6 @@ namespace StageControl.Consts
         public const string MSGEndMarker = "]";
         public const string StatusStartMessageMarker = "<";
         public const string StatusEndMessageMarker = ">";
+        public const string RequestCompleteMessageMarker = "ok";
     }
 }
