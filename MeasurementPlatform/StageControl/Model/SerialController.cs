@@ -58,6 +58,11 @@ namespace StageControl.Model
         {
             port.WriteLine(str);
         }
+
+        public void SendStatusRequest()
+        {
+            port.Write("?");
+        }
         
         protected virtual void OnSerialDataItemReceived(SerialDataItemReceivedEventArgs e)
         {

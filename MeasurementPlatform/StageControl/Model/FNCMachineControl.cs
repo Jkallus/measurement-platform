@@ -24,6 +24,7 @@ namespace StageControl.Model
             machineState = new MachineState();
 
             controller.FNCStateChanged += StateChanged;
+            controller.ReceivedStatusUpdate += StatusUpdateReceived;
         }
 
         public async Task<bool> Initialize()
@@ -41,6 +42,11 @@ namespace StageControl.Model
         private void StateChanged(object? sender, FNCStateChangedEventArgs e)
         {
             Console.WriteLine(e.State.ToString());
+        }
+
+        private void StatusUpdateReceived(object? sender, StatusUpdateEventArgs e)
+        {
+            Console.WriteLine(e.Update.ToString());
         }
 
         public async Task<bool> Home()

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Timer = System.Timers.Timer;
 
 namespace StageControl.Model
 {
@@ -27,6 +28,17 @@ namespace StageControl.Model
 
     }
 
+    public class StatusUpdateEventArgs
+    {
+        public SerialDataItem Update { get; set; }
+
+        public StatusUpdateEventArgs(SerialDataItem update)
+        {
+            Update = update;
+        }
+
+    }
+
 
     public class FluidNCController
     {
@@ -37,16 +49,15 @@ namespace StageControl.Model
         private readonly List<SerialDataItem> incomingMessages;
         private readonly List<SerialDataItem> outgoingMessages;
         private readonly MachineState machineState;
+        private readonly Timer statusTimer;
 
         private bool initPending;
+        private bool requestPending;
 
         public event EventHandler<FNCStateChangedEventArgs>? FNCStateChanged;
         public event EventHandler<RequestCompleteEventArgs>? RequestComplete;
-        public event EventHandler<EventArgs>? InitializationComplete;
-
-
-
-        private RequestType activeRequest;
+        public event EventHandler<StatusUpdateEventArgs>? ReceivedStatusUpdate;
+        public event EventHandler<EventArgs>? InitializationComplete;        
 
         #endregion
 
@@ -69,9 +80,11 @@ namespace StageControl.Model
             outgoingMessages = new List<SerialDataItem>();
             machineState = new MachineState();
             initPending = false;
-
+            requestPending = false;
+            statusTimer = new Timer();
+            initTimer();
             controllerState = LifetimeFNCState.Unknown;
-            activeRequest = RequestType.NoRequest;
+            
 
         }
         #endregion
@@ -81,19 +94,17 @@ namespace StageControl.Model
         public void Request(RequestType req)
         {
             //activeRequest = req;
+            requestPending = true;
             if(req == RequestType.HomeRequest)
-            {
-                
+            {   
                 serial.SendSerialData("$HX");
                 outgoingMessages.Add(new SerialDataItem("$HX", DateTime.Now, SerialDataType.OutgoingMessage));
-
             }
         }
 
         public void RequestStatus()
         {
-            activeRequest = RequestType.StatusRequest;
-            serial.SendSerialData("?");
+            serial.SendStatusRequest();
         }
 
         public void Connect()
@@ -107,18 +118,33 @@ namespace StageControl.Model
 
         #region Event Handlers
 
+        private void statusTimerTick(object? sender, EventArgs e)
+        {
+            RequestStatus();
+        }
+
         private void DataReceived(object? sender, SerialDataItemReceivedEventArgs e)
         {
             if(e.Item != null)
             {
                 ProcessIncomingSerialDataItem(e.Item);
-                Console.WriteLine(e.Item.ToString());
+                //Console.WriteLine(e.Item.ToString());
             }
         }
 
         #endregion
 
         #region Event Sources
+
+        protected virtual void OnReceivedStatusUpdate(StatusUpdateEventArgs e)
+        {
+            if(ReceivedStatusUpdate != null)
+            {
+                EventHandler<StatusUpdateEventArgs> handler = ReceivedStatusUpdate;
+                handler(this, e);
+            }
+        }
+
         protected virtual void OnInitializationComplete(EventArgs e)
         {
             if(InitializationComplete != null)
@@ -150,8 +176,19 @@ namespace StageControl.Model
 
         #region Private Methods
 
+        private void initTimer()
+        {
+            statusTimer.Interval = 1000;
+            statusTimer.AutoReset = true;
+            statusTimer.Elapsed += statusTimerTick;
+        }
+
         private void ProcessIncomingSerialDataItem(SerialDataItem item)
         {
+            if(controllerState == LifetimeFNCState.FNCReady && item.Type == SerialDataType.Status) // regular status update case, put first because most messages will be this
+            {
+                OnReceivedStatusUpdate(new StatusUpdateEventArgs(item));
+            }
             if(controllerState == LifetimeFNCState.Unknown && item.Type == SerialDataType.ESPFirstBootMessage) // expected transition when starting up
             {
                 controllerState = LifetimeFNCState.FirstBoot;
@@ -186,11 +223,16 @@ namespace StageControl.Model
                     OnInitializationComplete(new EventArgs());
                     initPending = false;
                 }
+                statusTimer.Enabled = true;
                     
             }
             else if(controllerState == LifetimeFNCState.FNCReady && item.Type == SerialDataType.RequestComplete)
             {
-                OnRequestComplete(new RequestCompleteEventArgs());
+                if (requestPending)
+                {
+                    OnRequestComplete(new RequestCompleteEventArgs());
+                    requestPending = false;
+                }
             }
             incomingMessages.Add(item);
             
