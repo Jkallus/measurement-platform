@@ -10,14 +10,19 @@ namespace StageControl.Model
 {
     public class FNCMachineControl: IMachineControl
     {
+        #region Private Members
         private FluidNCController controller;
         private MachineState machineState;
+        #endregion
 
+        #region Public Properties
         public LifetimeFNCState state
         {
             get { return controller.ControllerState; }
         }
+        #endregion
 
+        #region Constructors
         public FNCMachineControl()
         {
             controller = new FluidNCController();
@@ -26,7 +31,9 @@ namespace StageControl.Model
             controller.FNCStateChanged += StateChanged;
             controller.ReceivedStatusUpdate += StatusUpdateReceived;
         }
+        #endregion
 
+        #region Public Methods
         public async Task<bool> Initialize()
         {
             TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
@@ -39,6 +46,13 @@ namespace StageControl.Model
             return await tcs.Task;
         }
 
+        public async Task<bool> Home(HomingAxes axes)
+        {
+            return await Request(new HomingRequest(axes));
+        }
+        #endregion
+
+        #region Private Methods
         private void StateChanged(object? sender, FNCStateChangedEventArgs e)
         {
             Console.WriteLine(e.State.ToString());
@@ -49,7 +63,7 @@ namespace StageControl.Model
             Console.WriteLine(e.Update.ToString());
         }
 
-        public async Task<bool> Home()
+        private async Task<bool> Request(Request req)
         {
             TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
             controller.RequestComplete += (sender, e) =>
@@ -57,9 +71,9 @@ namespace StageControl.Model
                 tcs.TrySetResult(true);
             };
 
-            controller.Request(RequestType.HomeRequest);
+            controller.Request(req);
             return await tcs.Task;
         }
-
+        #endregion
     }
 }

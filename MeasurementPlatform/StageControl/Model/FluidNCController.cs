@@ -91,14 +91,28 @@ namespace StageControl.Model
 
         #region Public Methods
 
-        public void Request(RequestType req)
+        public void Request(Request req)
         {
-            //activeRequest = req;
             requestPending = true;
-            if(req == RequestType.HomeRequest)
+            if(req != null && req is HomingRequest)
             {   
-                serial.SendSerialData("$HX");
-                outgoingMessages.Add(new SerialDataItem("$HX", DateTime.Now, SerialDataType.OutgoingMessage));
+                HomingRequest homingRequest = (HomingRequest)req;
+                if (homingRequest != null)
+                {
+                    string reqText = "";
+                    if (homingRequest.Axes == HomingAxes.X)
+                        reqText = "$HX";
+                    else if (homingRequest.Axes == HomingAxes.Y)
+                        reqText = "$HY";
+                    else if (homingRequest.Axes == HomingAxes.XY)
+                        reqText = "$H";
+                    else
+                    {
+                        throw new Exception();
+                    }
+                    serial.SendSerialData(reqText);
+                    outgoingMessages.Add(new SerialDataItem(reqText, DateTime.Now, SerialDataType.OutgoingMessage));
+                }
             }
         }
 
@@ -178,7 +192,7 @@ namespace StageControl.Model
 
         private void initTimer()
         {
-            statusTimer.Interval = 1000;
+            statusTimer.Interval = 100;
             statusTimer.AutoReset = true;
             statusTimer.Elapsed += statusTimerTick;
         }

@@ -15,6 +15,6 @@ namespace StageControl.Model
         {
             XAxis = new AxisState();
             YAxis = new AxisState();
-        }
+        }       
     }
 }

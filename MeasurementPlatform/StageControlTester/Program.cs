@@ -25,9 +25,12 @@ namespace StageControlTester
             FNCMachineControl machine = new FNCMachineControl();
             await machine.Initialize();
 
-            await machine.Home();
+            
+            await machine.Home(HomingAxes.X);
+            Console.WriteLine("Homed X");
 
-            await machine.Home();
+            await machine.Home(HomingAxes.Y);
+            Console.WriteLine("Homed Y");
 
             Console.WriteLine("Machine is Homed!");
 

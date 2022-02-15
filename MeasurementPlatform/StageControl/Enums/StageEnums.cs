@@ -6,12 +6,11 @@ using System.Threading.Tasks;
 
 namespace StageControl.Enums
 {
-    public enum RequestType
+    public enum HomingAxes
     {
-        NoRequest,
-        StatusRequest,
-        HomeRequest,
-        MoveRequest,
-        RestartRequest
+        X,
+        Y,
+        XY
+
     }
 }
