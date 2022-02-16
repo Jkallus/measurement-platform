@@ -1,0 +1,13 @@
+{
+  "SerialConfig": {
+    "COM": "COM3",
+    "BaudRate": 115200,
+    "Parity": 0,
+    "DataBits": 8,
+    "StopBits": 1
+  },
+  "StageConfig": {
+    "XAxisLength": 100,
+    "YAxisLength": 100
+  }
+}
