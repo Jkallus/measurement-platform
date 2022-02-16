@@ -5,30 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO.Ports;
 using System.Text.Json;
+using StageControl.Core;
 
-namespace MeasurementUI.BusinessLogic
+namespace MeasurementUI.BusinessLogic.Configuration
 {
-    public class SerialConfig
-    {
-        public string COM { get; set; }
-        public int BaudRate { get; set; }
-        public System.IO.Ports.Parity Parity { get; set; }
-        public int DataBits { get; set; }
-        public System.IO.Ports.StopBits StopBits { get; set; }
-
-        public SerialConfig()
-        {
-            this.COM = String.Empty;
-        }
-    }
-
-    public class StageConfig
-    {
-        public double XAxisLength { get; set; }
-        public double YAxisLength { get; set; }
-    }
-
-
     public class MachineConfiguration
     {
         public SerialConfig SerialConfig { get; set; }

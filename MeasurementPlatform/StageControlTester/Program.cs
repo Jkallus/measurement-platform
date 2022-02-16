@@ -3,7 +3,7 @@ using System.IO.Ports;
 using StageControl;
 using StageControl.Enums;
 using StageControl.Model;
-using MeasurementUI.BusinessLogic;
+using MeasurementUI.BusinessLogic.Configuration;
 
 namespace StageControlTester
 {

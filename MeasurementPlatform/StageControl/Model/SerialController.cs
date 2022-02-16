@@ -1,6 +1,7 @@
 ﻿using System.IO.Ports;
 using StageControl.Enums;
 using StageControl.Consts;
+using StageControl.Core;
 
 namespace StageControl.Model
 {
@@ -31,6 +32,13 @@ namespace StageControl.Model
         {
             currentMessage = "";
             port = new SerialPort("COM3", 115200, Parity.None, 8, StopBits.One);
+        }
+
+
+        public SerialController(SerialConfig serialConf)
+        {
+            currentMessage = "";
+            port = new SerialPort(serialConf.COM, serialConf.BaudRate, serialConf.Parity, serialConf.DataBits, serialConf.StopBits);
         }
 
         private void triggerReboot()

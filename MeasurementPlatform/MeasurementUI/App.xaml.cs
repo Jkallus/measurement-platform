@@ -1,4 +1,5 @@
-﻿using MeasurementUI.BusinessLogic;
+﻿using MeasurementUI.BusinessLogic.Configuration;
+using MeasurementUI.BusinessLogic.SystemControl;
 using MeasurementUI.Controls.ViewModels;
 using MeasurementUI.Controls.Views;
 using MeasurementUI.Core.Interfaces;
@@ -9,7 +10,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Toolkit.Mvvm.DependencyInjection;
 using System;
 using System.Collections.Generic;
-//using System.Configuration;
 using System.Data;
 using System.IO;
 using System.Linq;
@@ -63,6 +63,7 @@ namespace MeasurementUI
             services.AddSingleton<IDialogService,DialogService>();
             services.AddSingleton<IConfiguration>(Configuration);
             services.AddSingleton<MachineConfiguration>(MachineConfiguration.LoadConfiguration(Configuration.GetSection("MachineConfigurationLocation").Value));
+            services.AddSingleton<ISystemController, SystemController>();
 
             DialogService.RegisterDialog<ConnectionControlStub, ConnectionControlStubViewModel>();
 

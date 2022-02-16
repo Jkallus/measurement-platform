@@ -1,5 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MeasurementUI.BusinessLogic.Configuration;
+using MeasurementUI.BusinessLogic.SystemControl;
 using MeasurementUI.Core.Interfaces;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -14,14 +16,19 @@ namespace MeasurementUI.Controls.ViewModels
     {
         private readonly IDialogService _dialogService;
         private readonly IConfiguration _configuration;
+        private readonly MachineConfiguration _machineConfiguration;
+        private readonly ISystemController _systemController;
 
         public RelayCommand ConnectCommand { get; }
 
 
-        public MainWindowViewModel(IDialogService dialogService, IConfiguration configuration)
+        public MainWindowViewModel(IDialogService dialogService, IConfiguration configuration, MachineConfiguration machineConf, ISystemController systemController)
         {
             _dialogService = dialogService;
             _configuration = configuration;
+            _machineConfiguration = machineConf;
+            _systemController = systemController;
+            
             ConnectCommand = new RelayCommand(Connect);
 
             test();
@@ -38,7 +45,7 @@ namespace MeasurementUI.Controls.ViewModels
 
         private void test()
         {
-            System.Diagnostics.Debug.WriteLine(_configuration.GetSection("name").Value);
+            System.Diagnostics.Debug.WriteLine(_machineConfiguration.SerialConfig.COM);
         }
     }
 }

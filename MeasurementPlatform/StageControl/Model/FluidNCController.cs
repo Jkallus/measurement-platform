@@ -1,4 +1,5 @@
-﻿using StageControl.Enums;
+﻿using StageControl.Core;
+using StageControl.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -84,8 +85,19 @@ namespace StageControl.Model
             statusTimer = new Timer();
             initTimer();
             controllerState = LifetimeFNCState.Unknown;
-            
+        }
 
+        public FluidNCController(SerialConfig serialConf)
+        {
+            serial = new SerialController(serialConf);
+            incomingMessages = new List<SerialDataItem>();
+            outgoingMessages = new List<SerialDataItem>();
+            machineState = new MachineState();
+            initPending = false;
+            requestPending = false;
+            statusTimer = new Timer();
+            initTimer();
+            controllerState = LifetimeFNCState.Unknown;
         }
         #endregion
 

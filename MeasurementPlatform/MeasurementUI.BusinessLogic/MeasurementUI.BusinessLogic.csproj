@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -12,13 +12,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="machineconfig.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <ProjectReference Include="..\StageControl.Core\StageControl.Core.csproj" />
+    <ProjectReference Include="..\StageControl\StageControl.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Initialization\" />
+    <None Update="Configuration\machineconfig.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using StageControl.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,5 +9,7 @@ namespace StageControl.Interfaces
 {
     public interface IMachineControl
     {
+        public Task<bool> Initialize();
+        public Task<bool> Home(HomingAxes axes);
     }
 }

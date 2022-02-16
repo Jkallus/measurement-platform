@@ -1,10 +1,11 @@
 ﻿using StageControl.Enums;
-using StageControl.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using StageControl.Interfaces;
+using StageControl.Core;
 
 namespace StageControl.Model
 {
@@ -21,6 +22,18 @@ namespace StageControl.Model
             get { return controller.ControllerState; }
         }
         #endregion
+
+
+        public FNCMachineControl(SerialConfig serialConf, StageConfig stageConf)
+        {
+            controller = new FluidNCController(serialConf);
+            machineState = new MachineState();
+
+            controller.FNCStateChanged += StateChanged;
+            controller.ReceivedStatusUpdate += StatusUpdateReceived;
+        }
+
+
 
         #region Constructors
         public FNCMachineControl()
