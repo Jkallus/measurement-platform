@@ -6,6 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using StageControl.Interfaces;
 using StageControl.Core;
+using StageControl.Core.Events;
+using StageControl.Core.Enums;
+using StageControl.Events;
 
 namespace StageControl.Model
 {
@@ -14,25 +17,16 @@ namespace StageControl.Model
         #region Private Members
         private FluidNCController controller;
         private MachineState machineState;
+
         #endregion
 
         #region Public Properties
-        public LifetimeFNCState state
+        public event EventHandler<FNCStateChangedEventArgs>? StateChanged
         {
-            get { return controller.ControllerState; }
+            add { this.controller.FNCStateChanged += value; }
+            remove { this.controller.FNCStateChanged -= value;}
         }
         #endregion
-
-
-        public FNCMachineControl(SerialConfig serialConf, StageConfig stageConf)
-        {
-            controller = new FluidNCController(serialConf);
-            machineState = new MachineState();
-
-            controller.FNCStateChanged += StateChanged;
-            controller.ReceivedStatusUpdate += StatusUpdateReceived;
-        }
-
 
 
         #region Constructors
@@ -41,9 +35,19 @@ namespace StageControl.Model
             controller = new FluidNCController();
             machineState = new MachineState();
 
-            controller.FNCStateChanged += StateChanged;
+            controller.FNCStateChanged += ReceivedStateChanged;
             controller.ReceivedStatusUpdate += StatusUpdateReceived;
         }
+
+        public FNCMachineControl(SerialConfig serialConf, StageConfig stageConf)
+        {
+            controller = new FluidNCController(serialConf);
+            machineState = new MachineState();
+
+            controller.FNCStateChanged += ReceivedStateChanged;
+            controller.ReceivedStatusUpdate += StatusUpdateReceived;
+        }
+
         #endregion
 
         #region Public Methods
@@ -66,14 +70,37 @@ namespace StageControl.Model
         #endregion
 
         #region Private Methods
-        private void StateChanged(object? sender, FNCStateChangedEventArgs e)
+       
+        private void ReceivedStateChanged(object? sender, FNCStateChangedEventArgs e) // event receiving code for inside the module
         {
-            Console.WriteLine(e.State.ToString());
+            //Console.WriteLine(e.State.ToString());
+        }
+
+        public static string ConvertControllerStateToStatus(LifetimeFNCState state)
+        {
+            switch (state)
+            {
+                case LifetimeFNCState.Unknown:
+                    return "Unknown State";
+                case LifetimeFNCState.FirstBoot:
+                    return "Booting Stage 1";
+                case LifetimeFNCState.SecondBoot:
+                    return "Booting Stage 2";
+                case LifetimeFNCState.FNCInitStart:
+                    return "Initialization Start";
+                case LifetimeFNCState.FNCInitFinish:
+                    return "Initialization Finish";
+                case LifetimeFNCState.FNCReady:
+                    return "Online";
+                default:
+                    return "Other";
+
+            }
         }
 
         private void StatusUpdateReceived(object? sender, StatusUpdateEventArgs e)
         {
-            Console.WriteLine(e.Update.ToString());
+            //Console.WriteLine(e.Update.ToString());
         }
 
         private async Task<bool> Request(Request req)

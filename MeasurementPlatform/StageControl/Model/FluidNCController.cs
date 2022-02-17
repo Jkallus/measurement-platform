@@ -1,5 +1,8 @@
 ﻿using StageControl.Core;
+using StageControl.Core.Enums;
+using StageControl.Core.Events;
 using StageControl.Enums;
+using StageControl.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,38 +12,7 @@ using Timer = System.Timers.Timer;
 
 namespace StageControl.Model
 {
-    public class FNCStateChangedEventArgs : EventArgs 
-    {
-        public LifetimeFNCState State { get; set; }
-
-        public FNCStateChangedEventArgs(LifetimeFNCState state)
-        {
-            this.State = state;
-        }
-
-        public FNCStateChangedEventArgs()
-        {
-
-        }
-    }
-
-    public class RequestCompleteEventArgs: EventArgs
-    {
-
-    }
-
-    public class StatusUpdateEventArgs
-    {
-        public SerialDataItem Update { get; set; }
-
-        public StatusUpdateEventArgs(SerialDataItem update)
-        {
-            Update = update;
-        }
-
-    }
-
-
+    
     public class FluidNCController
     {
 

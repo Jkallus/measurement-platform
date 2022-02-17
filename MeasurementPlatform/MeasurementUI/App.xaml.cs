@@ -63,9 +63,10 @@ namespace MeasurementUI
             services.AddSingleton<IDialogService,DialogService>();
             services.AddSingleton<IConfiguration>(Configuration);
             services.AddSingleton<MachineConfiguration>(MachineConfiguration.LoadConfiguration(Configuration.GetSection("MachineConfigurationLocation").Value));
-            services.AddSingleton<ISystemController, SystemController>();
+            services.AddSingleton<SystemController>();
 
             DialogService.RegisterDialog<ConnectionControlStub, ConnectionControlStubViewModel>();
+            DialogService.RegisterDialog<ConnectionControl, ConnectionControlViewModel>();
 
             return services.BuildServiceProvider();
         }
