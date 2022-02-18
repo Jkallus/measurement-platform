@@ -13,7 +13,7 @@ namespace StageControl.Model
     {
         #region Private Members
         private FluidNCController controller;
-        private MachineState machineState;
+        private MachineState state;
 
         #endregion
 
@@ -23,6 +23,18 @@ namespace StageControl.Model
             add { this.controller.FNCStateChanged += value; }
             remove { this.controller.FNCStateChanged -= value;}
         }
+
+        public event EventHandler<PositionChangedEventArgs>? PositionChanged;
+
+        public double XPosition
+        {
+            get { return this.state.XAxis.Position.GetValueOrDefault(); }
+        }
+
+        public double YPosition
+        {
+            get { return this.state.YAxis.Position.GetValueOrDefault(); }
+        }
         #endregion
 
 
@@ -30,7 +42,7 @@ namespace StageControl.Model
         public FNCMachineControl()
         {
             controller = new FluidNCController();
-            machineState = new MachineState();
+            state = new MachineState();
 
             controller.FNCStateChanged += ReceivedStateChanged;
             controller.ReceivedStatusUpdate += StatusUpdateReceived;
@@ -39,7 +51,7 @@ namespace StageControl.Model
         public FNCMachineControl(SerialConfig serialConf, StageConfig stageConf)
         {
             controller = new FluidNCController(serialConf);
-            machineState = new MachineState();
+            state = new MachineState(stageConf);
 
             controller.FNCStateChanged += ReceivedStateChanged;
             controller.ReceivedStatusUpdate += StatusUpdateReceived;
@@ -58,6 +70,11 @@ namespace StageControl.Model
 
             controller.Connect();
             return await tcs.Task;
+        }
+
+        public void Deinitialize()
+        {
+            controller.Disconnect();
         }
 
         public async Task<bool> Home(HomingAxes axes)
@@ -95,9 +112,54 @@ namespace StageControl.Model
             }
         }
 
+
+
+
+        protected virtual void OnPositionChanged(PositionChangedEventArgs e)
+        {
+            if(PositionChanged != null)
+            {
+                EventHandler<PositionChangedEventArgs> handler = PositionChanged;
+                handler?.Invoke(this, e);
+            }
+        }
+
+
+        /*
+         * Possible Strings
+         * <Idle|MPos:2.000,2.000,0.000|FS:0,0>
+         * <Idle|MPos:2.000,2.000,0.000|FS:0,0|Ov:100,100,100>
+         * <Idle|MPos:2.000,2.000,0.000|FS:0,0|WCO:0.000,0.000,0.000>
+         * <Home|MPos:2.000,1.889,0.000|FS:100,0|Ov:100,100,100>
+         * <Home|MPos:2.000,1.736,0.000|FS:100,0|WCO:0.000,0.000,0.000>
+         * <Home|MPos:2.000,-1.922,0.000|FS:100,0|Pn:Y>
+         * <Home|MPos:0.186,0.000,0.000|FS:100,0|Pn:X>
+         * */
+        private void UpdateState(StatusUpdateEventArgs e)
+        {
+            if (e.Update.Data != null)
+            {
+                string data = e.Update.Data;
+                data = data.Trim(new char[] { '<', '>' });
+                string[] parts = data.Split('|');
+                string machineState = parts[0];
+                string MPos = parts[1];
+                string[] coordinateStrings = MPos.Substring(MPos.IndexOf(':') + 1).Split(',');
+                double x = double.Parse(coordinateStrings[0]);
+                double y = double.Parse(coordinateStrings[1]);
+                double z = double.Parse(coordinateStrings[2]);
+                state.XAxis.Position = x;
+                state.YAxis.Position = y;
+
+                PositionChangedEventArgs args = new PositionChangedEventArgs(state.XAxis.Position.GetValueOrDefault(), state.YAxis.Position.GetValueOrDefault());
+                OnPositionChanged(args);
+            }
+        }
+
         private void StatusUpdateReceived(object? sender, StatusUpdateEventArgs e)
         {
             //Console.WriteLine(e.Update.ToString());
+            UpdateState(e);
         }
 
         private async Task<bool> Request(Request req)

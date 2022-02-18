@@ -72,6 +72,11 @@ namespace StageControl.Model
 
         #region Public Methods
 
+        public void Disconnect()
+        {
+            serial.Disconnect();
+        }
+
         public void Request(Request req)
         {
             requestPending = true;

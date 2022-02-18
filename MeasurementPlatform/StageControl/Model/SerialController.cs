@@ -53,6 +53,11 @@ namespace StageControl.Model
             Thread.Sleep(10);
         }
 
+        public void Disconnect()
+        {
+            port.Close();
+        }
+
         public void Connect()
         {
             port.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);

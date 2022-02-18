@@ -25,10 +25,10 @@ namespace MeasurementUI.BusinessLogic.SystemControl
         {
             _machineConfiguration = machineConfiguration;
             MotionController = new FNCMachineControl(_machineConfiguration.SerialConfig, _machineConfiguration.StageConfig);
-            MotionController.StateChanged += MotionControllerStateChanged;
+            MotionController.StateChanged += MotionController_StateChanged;
         }
 
-        private void MotionControllerStateChanged(object? sender, FNCStateChangedEventArgs e)
+        private void MotionController_StateChanged(object? sender, FNCStateChangedEventArgs e)
         {
             MotionControllerStatus = FNCMachineControl.ConvertControllerStateToStatus(e.State);
         }

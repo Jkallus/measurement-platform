@@ -13,6 +13,7 @@ namespace StageControl.Model
         public System.IO.Ports.Parity Parity { get; set; }
         public int DataBits { get; set; }
         public System.IO.Ports.StopBits StopBits { get; set; }
+        
 
         public SerialConfig()
         {

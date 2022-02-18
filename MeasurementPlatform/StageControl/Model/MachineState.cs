@@ -10,11 +10,20 @@ namespace StageControl.Model
     {
         public AxisState XAxis;
         public AxisState YAxis;
+        public StageConfig Config;
 
         public MachineState()
         {
             XAxis = new AxisState();
             YAxis = new AxisState();
-        }       
+            Config = new StageConfig();
+        }
+
+        public MachineState(StageConfig config)
+        {
+            XAxis = new AxisState();
+            YAxis = new AxisState();
+            Config = config;    
+        }
     }
 }
