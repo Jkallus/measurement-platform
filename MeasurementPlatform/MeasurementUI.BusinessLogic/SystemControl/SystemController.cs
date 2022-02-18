@@ -1,4 +1,5 @@
 ﻿using MeasurementUI.BusinessLogic.Configuration;
+using Microsoft.Toolkit.Mvvm.ComponentModel;
 using StageControl.Core.Events;
 using StageControl.Interfaces;
 using StageControl.Model;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace MeasurementUI.BusinessLogic.SystemControl
 {
-    public class SystemController: ISystemController
+    public class SystemController: ObservableObject, ISystemController
     {
         #region Private Members
         private readonly MachineConfiguration _machineConfiguration;
@@ -29,7 +30,7 @@ namespace MeasurementUI.BusinessLogic.SystemControl
 
         private void MotionControllerStateChanged(object? sender, FNCStateChangedEventArgs e)
         {
-            MotionControlStatus = FNCMachineControl.ConvertControllerStateToStatus(e.State);
+            MotionControllerStatus = FNCMachineControl.ConvertControllerStateToStatus(e.State);
         }
         #endregion
 
@@ -42,11 +43,11 @@ namespace MeasurementUI.BusinessLogic.SystemControl
 
         #region Public Properties
 
-        private string _motionControlStatus; 
-        public string MotionControlStatus
+        private string _motionControllerStatus; 
+        public string MotionControllerStatus
         {
-            get { return _motionControlStatus; }
-            private set { _motionControlStatus = value; }
+            get { return _motionControllerStatus; }
+            private set { SetProperty(ref _motionControllerStatus, value); }
         }
 
         #endregion

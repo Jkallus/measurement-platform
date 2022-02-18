@@ -18,21 +18,30 @@ namespace MeasurementUI.Core.Services
             this.serviceProvider = serviceProvider;
         }
         
+        // mapping of Views and ViewModels, key is ViewModel and value is the associated View
         static Dictionary<Type, Type> mappings = new Dictionary<Type, Type>();
 
+        // function to add a pair to the mapping
         public static void RegisterDialog<TView, TViewModel>()
         {
-            mappings.Add(typeof(TViewModel), typeof(TView));
+            mappings.Add(typeof(TViewModel), typeof(TView)); // key is viewmodel, value is view
         }
 
-        public void ShowDialog(string name, Action<string> callback)
+        
+        public void ShowDialog(string name, Action<string> callback) // name is name of view
         {
             var type = Type.GetType($"MeasurementUI.Controls.Views.{name}, MeasurementUI.Controls");
-            ShowDialogImpl(type, callback, null);
+            ShowDialogImpl(type, callback, null); // show dialog with no viewmodel
         }
 
-        //private static void ShowDialogImpl(Type type, Action<string> callback, Type vmType)
-        private void ShowDialogImpl(Type type, Action<string> callback, Type vmType)
+        public void ShowDialog<TViewModel>(Action<string> callback) // main public API, templated with the type of ViewModel to use as key
+        {
+            var type = mappings[typeof(TViewModel)]; // get the view out of the mapping
+            ShowDialogImpl(type, callback, typeof(TViewModel)); // call the implementation providing the types of view and viewmodel
+        }
+
+
+        private void ShowDialogImpl(Type type, Action<string> callback, Type vmType) // type is view type
         {
             var dialog = new DialogWindow();
 
@@ -56,10 +65,6 @@ namespace MeasurementUI.Core.Services
             dialog.ShowDialog();
         }
 
-        public void ShowDialog<TViewModel>(Action<string> callback)
-        {
-            var type = mappings[typeof(TViewModel)];
-            ShowDialogImpl(type, callback, typeof(TViewModel));
-        }
+
     }
 }

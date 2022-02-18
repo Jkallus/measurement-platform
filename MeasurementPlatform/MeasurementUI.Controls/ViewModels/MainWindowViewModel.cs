@@ -22,7 +22,7 @@ namespace MeasurementUI.Controls.ViewModels
         public RelayCommand ConnectCommand { get; }
 
 
-        public MainWindowViewModel(IDialogService dialogService, IConfiguration configuration, MachineConfiguration machineConf, ISystemController systemController)
+        public MainWindowViewModel(IDialogService dialogService, IConfiguration configuration, MachineConfiguration machineConf, SystemController systemController)
         {
             _dialogService = dialogService;
             _configuration = configuration;
@@ -37,7 +37,7 @@ namespace MeasurementUI.Controls.ViewModels
 
         private void Connect()
         {
-            _dialogService.ShowDialog<ConnectionControlStubViewModel>(result =>
+            _dialogService.ShowDialog<ConnectionControlViewModel>(result =>
             {
                 var test = result;
             });

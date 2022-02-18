@@ -8,12 +8,13 @@
              d:DesignHeight="300" d:DesignWidth="400">
     <Grid>
         <WrapPanel HorizontalAlignment="Center" VerticalAlignment="Bottom">
-            <Button Content="Connect to System" Width="150" Height="40" HorizontalAlignment="Center" Margin="10"/>
+            <Button Content="Connect to System" Width="150" Height="40" HorizontalAlignment="Center" Margin="10"
+                    Command="{Binding ConnectCommand}"/>
             <Button Content="Disconnect" Width="150" Height="40" HorizontalAlignment="Center" Margin="10"/>
         </WrapPanel>
 
         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0 20 0 0">
-            <local:ComponentState ComponentName="Motion Controller" ComponentStatus="Initialized"/>
+            <local:ComponentState ComponentName="Motion Controller" ComponentStatus="{Binding MotionControllerStatus}"/>
         </StackPanel>
         
 
