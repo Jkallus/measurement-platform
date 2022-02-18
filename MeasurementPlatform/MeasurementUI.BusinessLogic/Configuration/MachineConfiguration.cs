@@ -5,8 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO.Ports;
 using System.Text.Json;
-using StageControl.Core;
-
+using StageControl;
+using StageControl.Model;
 namespace MeasurementUI.BusinessLogic.Configuration
 {
     public class MachineConfiguration

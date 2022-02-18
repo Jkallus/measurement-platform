@@ -1,6 +1,5 @@
-﻿using StageControl.Core.Enums;
-using StageControl.Core.Events;
-using StageControl.Enums;
+﻿using StageControl.Enums;
+using StageControl.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;

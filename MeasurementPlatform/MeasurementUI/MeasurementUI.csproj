@@ -24,7 +24,6 @@
     <ProjectReference Include="..\MeasurementUI.BusinessLogic\MeasurementUI.BusinessLogic.csproj" />
     <ProjectReference Include="..\MeasurementUI.Controls\MeasurementUI.Controls.csproj" />
     <ProjectReference Include="..\MeasurementUI.Core\MeasurementUI.Core.csproj" />
-    <ProjectReference Include="..\StageControl.Core\StageControl.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>

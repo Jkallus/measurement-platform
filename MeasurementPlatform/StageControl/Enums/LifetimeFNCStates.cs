@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace StageControl.Core.Enums
+namespace StageControl.Enums
 {
     public enum LifetimeFNCState
     {

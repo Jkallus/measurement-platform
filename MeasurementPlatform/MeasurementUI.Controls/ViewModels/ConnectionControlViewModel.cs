@@ -44,7 +44,6 @@ namespace MeasurementUI.Controls.ViewModels
             OnPropertyChanged(e.PropertyName); // assumes property names are same in model and viewmodel and viewmodel is using model as backing
         }
 
-
         private async Task OnConnect()
         {
             await _systemController.Initialize();

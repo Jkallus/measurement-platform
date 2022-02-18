@@ -1,6 +1,6 @@
 ﻿using MeasurementUI.BusinessLogic.Configuration;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
-using StageControl.Core.Events;
+using StageControl.Events;
 using StageControl.Interfaces;
 using StageControl.Model;
 using System;

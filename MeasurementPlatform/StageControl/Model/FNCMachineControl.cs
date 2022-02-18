@@ -5,9 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using StageControl.Interfaces;
-using StageControl.Core;
-using StageControl.Core.Events;
-using StageControl.Core.Enums;
 using StageControl.Events;
 
 namespace StageControl.Model

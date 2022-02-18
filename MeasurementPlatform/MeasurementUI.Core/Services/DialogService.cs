@@ -64,7 +64,5 @@ namespace MeasurementUI.Core.Services
             dialog.Content = content;
             dialog.ShowDialog();
         }
-
-
     }
 }

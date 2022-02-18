@@ -1,7 +1,6 @@
 ﻿using System.IO.Ports;
 using StageControl.Enums;
 using StageControl.Consts;
-using StageControl.Core;
 
 namespace StageControl.Model
 {
