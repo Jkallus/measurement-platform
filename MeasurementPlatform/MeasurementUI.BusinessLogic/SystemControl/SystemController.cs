@@ -1,5 +1,6 @@
 ﻿using MeasurementUI.BusinessLogic.Configuration;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
+using StageControl.Enums;
 using StageControl.Events;
 using StageControl.Interfaces;
 using StageControl.Model;
@@ -32,9 +33,20 @@ namespace MeasurementUI.BusinessLogic.SystemControl
         {
             MotionControllerStatus = FNCMachineControl.ConvertControllerStateToStatus(e.State);
         }
+
+        private void MotionController_PositionChanged(object? sender, PositionChangedEventArgs e)
+        {
+            
+        }
         #endregion
 
         #region Public Methods
+        public async Task Home(HomingAxes axes)
+        {
+            await MotionController.Home(axes);
+        }
+
+
         public async Task Initialize()
         {
             await MotionController.Initialize();

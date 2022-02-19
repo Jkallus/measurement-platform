@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MeasurementUI.Controls.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,9 +19,9 @@ namespace MeasurementUI.Controls.Views
     /// <summary>
     /// Interaction logic for StageControl.xaml
     /// </summary>
-    public partial class StageControl : UserControl
+    public partial class StagePositioningControl : UserControl
     {
-        public StageControl()
+        public StagePositioningControl()
         {
             InitializeComponent();
         }

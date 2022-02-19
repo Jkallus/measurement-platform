@@ -4,6 +4,7 @@ using MeasurementUI.BusinessLogic.Configuration;
 using MeasurementUI.BusinessLogic.SystemControl;
 using MeasurementUI.Core.Interfaces;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,20 +19,29 @@ namespace MeasurementUI.Controls.ViewModels
         private readonly IConfiguration _configuration;
         private readonly MachineConfiguration _machineConfiguration;
         private readonly ISystemController _systemController;
+        private readonly IServiceProvider _serviceProvider;
 
         public RelayCommand ConnectCommand { get; }
 
+        public StagePositioningControlViewModel StagePositioningControlViewModel { get; private set; }
 
-        public MainWindowViewModel(IDialogService dialogService, IConfiguration configuration, MachineConfiguration machineConf, SystemController systemController)
+
+        public MainWindowViewModel(IDialogService dialogService,
+                                   IConfiguration configuration,
+                                   MachineConfiguration machineConf,
+                                   SystemController systemController,
+                                   IServiceProvider serivceProvider)
         {
             _dialogService = dialogService;
             _configuration = configuration;
             _machineConfiguration = machineConf;
             _systemController = systemController;
+            _serviceProvider = serivceProvider;
             
             ConnectCommand = new RelayCommand(Connect);
 
-            test();
+            StagePositioningControlViewModel = _serviceProvider.GetRequiredService<StagePositioningControlViewModel>();
+            
         }
 
 
@@ -41,11 +51,6 @@ namespace MeasurementUI.Controls.ViewModels
             {
                 var test = result;
             });
-        }
-
-        private void test()
-        {
-            System.Diagnostics.Debug.WriteLine(_machineConfiguration.SerialConfig.COM);
         }
     }
 }

@@ -38,7 +38,7 @@
 
         <StackPanel Grid.Row="1" Grid.Column="0">
             <local:StageViewControlStub/>
-            <local:StageControl  Margin="0 5 0 0"/>
+            <local:StagePositioningControl  Margin="0 5 0 0"/>
         </StackPanel>
 
     </Grid>
