@@ -19,16 +19,18 @@ namespace MeasurementUI.BusinessLogic.SystemControl
         #endregion
 
         
-        public IMachineControl MotionController;
+        public readonly IMachineControl MotionController;
 
         #region Constructor
         public SystemController(MachineConfiguration machineConfiguration)
         {
             _machineConfiguration = machineConfiguration;
+            _motionControllerStatus = "";
             MotionController = new FNCMachineControl(_machineConfiguration.SerialConfig, _machineConfiguration.StageConfig);
             MotionController.StateChanged += MotionController_StateChanged;
+            
         }
-
+            
         private void MotionController_StateChanged(object? sender, FNCStateChangedEventArgs e)
         {
             MotionControllerStatus = FNCMachineControl.ConvertControllerStateToStatus(e.State);
@@ -51,6 +53,11 @@ namespace MeasurementUI.BusinessLogic.SystemControl
         {
             await MotionController.Initialize();
         }
+
+        public void Deinitialize()
+        {
+            MotionController.Deinitialize();
+        }
         #endregion
 
         #region Public Properties
@@ -60,6 +67,11 @@ namespace MeasurementUI.BusinessLogic.SystemControl
         {
             get { return _motionControllerStatus; }
             private set { SetProperty(ref _motionControllerStatus, value); }
+        }
+
+        public bool IsMotionControllerConnected
+        {
+            get { return MotionController.IsConnected; }
         }
 
         #endregion

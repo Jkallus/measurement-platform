@@ -18,11 +18,11 @@ namespace StageControl.Model
         private readonly SerialController serial;
         private readonly List<SerialDataItem> incomingMessages;
         private readonly List<SerialDataItem> outgoingMessages;
-        private readonly MachineState machineState;
         private readonly Timer statusTimer;
 
         private bool initPending;
         private bool requestPending;
+        private bool isConnected;
 
         public event EventHandler<FNCStateChangedEventArgs>? FNCStateChanged;
         public event EventHandler<RequestCompleteEventArgs>? RequestComplete;
@@ -39,21 +39,20 @@ namespace StageControl.Model
             private set { controllerState = value; }  
         }
 
+        public bool RequestPending { get => requestPending; }
+        public bool IsConnected 
+        {
+            get => isConnected;
+            private set => isConnected = value; 
+        }
+
         #endregion
 
         #region Constructors
 
-        public FluidNCController()
+        public FluidNCController() : this(new SerialConfig("COM3"))
         {
-            serial = new SerialController();
-            incomingMessages = new List<SerialDataItem>();
-            outgoingMessages = new List<SerialDataItem>();
-            machineState = new MachineState();
-            initPending = false;
-            requestPending = false;
-            statusTimer = new Timer();
-            initTimer();
-            controllerState = LifetimeFNCState.Unknown;
+
         }
 
         public FluidNCController(SerialConfig serialConf)
@@ -61,9 +60,9 @@ namespace StageControl.Model
             serial = new SerialController(serialConf);
             incomingMessages = new List<SerialDataItem>();
             outgoingMessages = new List<SerialDataItem>();
-            machineState = new MachineState();
             initPending = false;
             requestPending = false;
+            isConnected = false;
             statusTimer = new Timer();
             initTimer();
             controllerState = LifetimeFNCState.Unknown;
@@ -74,7 +73,10 @@ namespace StageControl.Model
 
         public void Disconnect()
         {
+            statusTimer.Stop();
             serial.Disconnect();
+            controllerState = LifetimeFNCState.Unknown;
+            IsConnected = false;
         }
 
         public void Request(Request req)
@@ -112,6 +114,7 @@ namespace StageControl.Model
             serial.SerialDataItemReceived += DataReceived;
             initPending = true;
             serial.Connect();
+            IsConnected = true;
         }
 
         #endregion

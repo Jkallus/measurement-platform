@@ -20,11 +20,19 @@ namespace StageControl.Model
         #region Public Properties
         public event EventHandler<FNCStateChangedEventArgs>? StateChanged
         {
-            add { this.controller.FNCStateChanged += value; }
-            remove { this.controller.FNCStateChanged -= value;}
+            add => this.controller.FNCStateChanged += value;
+            remove => this.controller.FNCStateChanged -= value;
         }
 
         public event EventHandler<PositionChangedEventArgs>? PositionChanged;
+
+        public event EventHandler<RequestCompleteEventArgs>? RequestComplete
+        {
+            add => this.controller.RequestComplete += value;
+            remove => this.controller.RequestComplete -= value;
+        }
+
+        public event EventHandler<EventArgs>? RequestInProcess;
 
         public double XPosition
         {
@@ -34,6 +42,16 @@ namespace StageControl.Model
         public double YPosition
         {
             get { return this.state.YAxis.Position.GetValueOrDefault(); }
+        }
+
+        public bool RequestPending
+        {
+            get { return controller.RequestPending; }
+        }
+
+        public bool IsConnected
+        {
+            get => controller.IsConnected;
         }
         #endregion
 
@@ -63,11 +81,13 @@ namespace StageControl.Model
         public async Task<bool> Initialize()
         {
             TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
-            controller.InitializationComplete += (sender, e) =>
+            EventHandler<EventArgs>? InitCompleteEventHandler = null;
+            InitCompleteEventHandler = (sender, e) =>
             {
                 tcs.SetResult(true);
+                controller.InitializationComplete -= InitCompleteEventHandler;
             };
-
+            controller.InitializationComplete += InitCompleteEventHandler;
             controller.Connect();
             return await tcs.Task;
         }
@@ -113,7 +133,14 @@ namespace StageControl.Model
         }
 
 
-
+        protected virtual void OnRequestInProcess(EventArgs e)
+        {
+            if(RequestInProcess != null)
+            {
+                EventHandler<EventArgs> handler = RequestInProcess;
+                handler?.Invoke(this, e);
+            }
+        }
 
         protected virtual void OnPositionChanged(PositionChangedEventArgs e)
         {
@@ -170,6 +197,7 @@ namespace StageControl.Model
                 tcs.TrySetResult(true);
             };
 
+            OnRequestInProcess(EventArgs.Empty);
             controller.Request(req);
             return await tcs.Task;
         }

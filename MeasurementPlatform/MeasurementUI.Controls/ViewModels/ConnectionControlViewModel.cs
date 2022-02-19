@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace MeasurementUI.Controls.ViewModels
 {
-    public class ConnectionControlViewModel: ObservableObject
+    public class ConnectionControlViewModel : ObservableObject
     {
         #region Private Members
         private readonly SystemController _systemController;
@@ -30,6 +30,19 @@ namespace MeasurementUI.Controls.ViewModels
         public IAsyncRelayCommand ConnectCommand { get; set; }
         public RelayCommand DisconnectCommand { get; set; }
 
+        private bool isBusy;
+        public bool IsBusy
+        {
+            get { return isBusy; }
+            set
+            {
+                if(SetProperty(ref isBusy, value))
+                {
+                    ConnectCommand.NotifyCanExecuteChanged();
+                    DisconnectCommand.NotifyCanExecuteChanged();
+                }
+            }
+        }
 
         public string MotionControllerStatus
         {
@@ -46,22 +59,43 @@ namespace MeasurementUI.Controls.ViewModels
 
         private async Task OnConnect()
         {
-            await _systemController.Initialize();
+            try
+            {
+                IsBusy = true;
+                await _systemController.Initialize();
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+            
         }
 
         private bool CanConnect()
         {
-            return true;
+            if (_systemController.IsMotionControllerConnected)
+                return false;
+            else if (IsBusy)
+                return false;
+            else 
+                return true;
         }
 
         private void OnDisconnect()
         {
-
+            _systemController.Deinitialize();
+            ConnectCommand.NotifyCanExecuteChanged();
+            DisconnectCommand.NotifyCanExecuteChanged();
         }
 
         private bool CanDisconnect()
         {
-            return true;
+            if (!_systemController.IsMotionControllerConnected)
+                return false;
+            else if (IsBusy)
+                return false;
+            else
+                return true;
         }
         #endregion
     }

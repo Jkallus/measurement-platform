@@ -16,6 +16,18 @@ namespace MeasurementUI.Controls.ViewModels
 
         public IAsyncRelayCommand<HomingAxes> HomeCommand { get; private set; }
 
+        private bool isBusy;
+        public bool IsBusy
+        {
+            get => isBusy;
+            set
+            {
+                if(SetProperty(ref isBusy, value))
+                {
+                    HomeCommand.NotifyCanExecuteChanged();
+                }
+            }
+        }
         public StagePositioningControlViewModel(SystemController systemController)
         {
             _systemController = systemController;
@@ -24,12 +36,21 @@ namespace MeasurementUI.Controls.ViewModels
 
         private async Task OnHomeRequested(HomingAxes axes)
         {
-            await _systemController.Home(axes);
+            try
+            {
+                IsBusy = true;
+                await _systemController.Home(axes);
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+            
         }
 
         private bool CanHome(HomingAxes axes)
         {
-            return true;
+            return !IsBusy;
         }
         
     }

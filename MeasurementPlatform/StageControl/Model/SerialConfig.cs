@@ -15,6 +15,15 @@ namespace StageControl.Model
         public System.IO.Ports.StopBits StopBits { get; set; }
         
 
+        public SerialConfig(string com)
+        {
+            COM = com;
+            BaudRate = 115200;
+            Parity = System.IO.Ports.Parity.None;
+            DataBits = 8;
+            StopBits = System.IO.Ports.StopBits.None;
+        }
+
         public SerialConfig()
         {
             this.COM = String.Empty;

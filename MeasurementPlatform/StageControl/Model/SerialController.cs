@@ -42,15 +42,9 @@ namespace StageControl.Model
 
         private void triggerReboot()
         {
+            port.RtsEnable = true;
+            Thread.Sleep(10);
             port.RtsEnable = false;
-            port.DtrEnable = true;
-            Thread.Sleep(10);
-            port.RtsEnable = true;
-            port.DtrEnable = false;
-            Thread.Sleep(10);
-            port.RtsEnable = true;
-            port.DtrEnable = true;
-            Thread.Sleep(10);
         }
 
         public void Disconnect()
@@ -61,7 +55,7 @@ namespace StageControl.Model
         public void Connect()
         {
             port.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
-            port.DtrEnable = false;
+            port.RtsEnable = false;
             port.Open();
             triggerReboot();
         }
