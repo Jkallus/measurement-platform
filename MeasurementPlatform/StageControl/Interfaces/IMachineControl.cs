@@ -14,6 +14,7 @@ namespace StageControl.Interfaces
         event EventHandler<PositionChangedEventArgs>? PositionChanged;
         event EventHandler<RequestCompleteEventArgs>? RequestComplete;
         event EventHandler<EventArgs>? RequestInProcess;
+        event EventHandler<EventArgs>? UnexpectedRestart;
 
         public Task<bool> Initialize();
         public void Deinitialize();

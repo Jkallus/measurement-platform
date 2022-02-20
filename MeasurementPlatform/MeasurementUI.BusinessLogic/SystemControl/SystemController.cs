@@ -28,9 +28,15 @@ namespace MeasurementUI.BusinessLogic.SystemControl
             _motionControllerStatus = "";
             MotionController = new FNCMachineControl(_machineConfiguration.SerialConfig, _machineConfiguration.StageConfig);
             MotionController.StateChanged += MotionController_StateChanged;
+            MotionController.UnexpectedRestart += MotionController_UnexpectedRestart;
             
         }
+
+        private void MotionController_UnexpectedRestart(object? sender, EventArgs e)
+        {
             
+        }
+
         private void MotionController_StateChanged(object? sender, FNCStateChangedEventArgs e)
         {
             MotionControllerStatus = FNCMachineControl.ConvertControllerStateToStatus(e.State);

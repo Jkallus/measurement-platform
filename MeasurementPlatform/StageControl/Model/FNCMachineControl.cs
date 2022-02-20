@@ -34,6 +34,12 @@ namespace StageControl.Model
 
         public event EventHandler<EventArgs>? RequestInProcess;
 
+        public event EventHandler<EventArgs>? UnexpectedRestart
+        {
+            add => this.controller.UnexpectedRestart += value;
+            remove => this.controller.UnexpectedRestart -= value;
+        }
+
         public double XPosition
         {
             get { return this.state.XAxis.Position.GetValueOrDefault(); }

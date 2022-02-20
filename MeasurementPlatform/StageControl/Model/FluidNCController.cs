@@ -27,7 +27,8 @@ namespace StageControl.Model
         public event EventHandler<FNCStateChangedEventArgs>? FNCStateChanged;
         public event EventHandler<RequestCompleteEventArgs>? RequestComplete;
         public event EventHandler<StatusUpdateEventArgs>? ReceivedStatusUpdate;
-        public event EventHandler<EventArgs>? InitializationComplete;        
+        public event EventHandler<EventArgs>? InitializationComplete;
+        public event EventHandler<EventArgs>? UnexpectedRestart;
 
         #endregion
 
@@ -175,6 +176,15 @@ namespace StageControl.Model
             }
         }
 
+        protected virtual void OnUnexpectedRestart(EventArgs e)
+        {
+            if(UnexpectedRestart != null)
+            {
+                 EventHandler<EventArgs> handler = UnexpectedRestart;
+                handler(this, e);
+            }
+        }
+
         #endregion
 
         #region Private Methods
@@ -192,7 +202,7 @@ namespace StageControl.Model
             {
                 OnReceivedStatusUpdate(new StatusUpdateEventArgs(item));
             }
-            if(controllerState == LifetimeFNCState.Unknown && item.Type == SerialDataType.ESPFirstBootMessage) // expected transition when starting up
+            else if(controllerState == LifetimeFNCState.Unknown && item.Type == SerialDataType.ESPFirstBootMessage) // expected transition when starting up
             {
                 controllerState = LifetimeFNCState.FirstBoot;
                 OnFNCStateChanged(new FNCStateChangedEventArgs(controllerState));
@@ -201,6 +211,7 @@ namespace StageControl.Model
             {
                 controllerState = LifetimeFNCState.FirstBoot;
                 OnFNCStateChanged(new FNCStateChangedEventArgs(controllerState));
+                OnUnexpectedRestart(EventArgs.Empty);
             }
             else if(controllerState == LifetimeFNCState.FirstBoot && item.Type == SerialDataType.ESPBootloader) // next state in startup routine
             {
