@@ -22,6 +22,7 @@ namespace StageControl.Model
 
         private bool initPending;
         private bool requestPending;
+        private Request? activeRequest;
         private bool isConnected;
 
         public event EventHandler<FNCStateChangedEventArgs>? FNCStateChanged;
@@ -83,6 +84,7 @@ namespace StageControl.Model
         public void Request(Request req)
         {
             requestPending = true;
+            activeRequest = req;
             if(req != null && req is HomingRequest)
             {   
                 HomingRequest homingRequest = (HomingRequest)req;
@@ -105,10 +107,7 @@ namespace StageControl.Model
             }
         }
 
-        public void RequestStatus()
-        {
-            serial.SendStatusRequest();
-        }
+        
 
         public void Connect()
         {
@@ -189,6 +188,11 @@ namespace StageControl.Model
 
         #region Private Methods
 
+        private void RequestStatus()
+        {
+            serial.SendStatusRequest();
+        }
+
         private void initTimer()
         {
             statusTimer.Interval = 100;
@@ -242,10 +246,12 @@ namespace StageControl.Model
             }
             else if(controllerState == LifetimeFNCState.FNCReady && item.Type == SerialDataType.RequestComplete)
             {
-                if (requestPending)
+                if (requestPending && activeRequest != null)
                 {
-                    OnRequestComplete(new RequestCompleteEventArgs());
+                    OnRequestComplete(new RequestCompleteEventArgs(activeRequest));
                     requestPending = false;
+                    activeRequest = null;
+
                 }
             }
             incomingMessages.Add(item);

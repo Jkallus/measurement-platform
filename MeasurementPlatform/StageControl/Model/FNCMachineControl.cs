@@ -40,25 +40,16 @@ namespace StageControl.Model
             remove => this.controller.UnexpectedRestart -= value;
         }
 
-        public double XPosition
-        {
-            get { return this.state.XAxis.Position.GetValueOrDefault(); }
-        }
+        public event EventHandler<EventArgs>? HomingComplete;
 
-        public double YPosition
-        {
-            get { return this.state.YAxis.Position.GetValueOrDefault(); }
-        }
+        public double XPosition => state.XAxis.Position.GetValueOrDefault();
+        public double YPosition => state.YAxis.Position.GetValueOrDefault();
+        public bool RequestPending => controller.RequestPending;
+        public bool IsConnected => controller.IsConnected;
+        public bool IsXAxisHomed => state.XAxis.IsHomed;
+        public bool IsYAxisHomed => state.YAxis.IsHomed;
+        public bool IsHomed => state.XAxis.IsHomed && state.YAxis.IsHomed;
 
-        public bool RequestPending
-        {
-            get { return controller.RequestPending; }
-        }
-
-        public bool IsConnected
-        {
-            get => controller.IsConnected;
-        }
         #endregion
 
 
@@ -68,7 +59,7 @@ namespace StageControl.Model
             controller = new FluidNCController();
             state = new MachineState();
 
-            controller.FNCStateChanged += ReceivedStateChanged;
+            controller.FNCStateChanged += Controller_StateChanged;
             controller.ReceivedStatusUpdate += StatusUpdateReceived;
         }
 
@@ -77,9 +68,12 @@ namespace StageControl.Model
             controller = new FluidNCController(serialConf);
             state = new MachineState(stageConf);
 
-            controller.FNCStateChanged += ReceivedStateChanged;
+            controller.FNCStateChanged += Controller_StateChanged;
             controller.ReceivedStatusUpdate += StatusUpdateReceived;
+            controller.RequestComplete += Controller_RequestComplete;
         }
+
+       
 
         #endregion
 
@@ -110,8 +104,41 @@ namespace StageControl.Model
         #endregion
 
         #region Private Methods
-       
-        private void ReceivedStateChanged(object? sender, FNCStateChangedEventArgs e) // event receiving code for inside the module
+
+        private void Controller_RequestComplete(object? sender, RequestCompleteEventArgs e)
+        {
+            if(e.Req != null)
+            {
+                if(e.Req is HomingRequest)
+                {
+                    HomingRequest? homingRequest = e.Req as HomingRequest;
+                    if(homingRequest != null)
+                    {
+                        if (homingRequest.Axes == HomingAxes.XY)
+                        {
+                            state.XAxis.IsHomed = true;
+                            state.YAxis.IsHomed = true;
+                        }
+                        else if (homingRequest.Axes == HomingAxes.X)
+                        {
+                            state.XAxis.IsHomed = true;
+                        }
+                        else if (homingRequest.Axes == HomingAxes.Y)
+                        {
+                            state.YAxis.IsHomed = true;
+                        }
+                        OnHomingComplete(new EventArgs());
+                    }
+                    
+                }
+            }
+            else
+            {
+                throw new NullReferenceException();
+            }
+        }
+
+        private void Controller_StateChanged(object? sender, FNCStateChangedEventArgs e) // event receiving code for inside the module
         {
             //Console.WriteLine(e.State.ToString());
         }
@@ -153,6 +180,15 @@ namespace StageControl.Model
             if(PositionChanged != null)
             {
                 EventHandler<PositionChangedEventArgs> handler = PositionChanged;
+                handler?.Invoke(this, e);
+            }
+        }
+
+        protected virtual void OnHomingComplete(EventArgs e)
+        {
+            if(HomingComplete != null)
+            {
+                EventHandler<EventArgs> handler = HomingComplete;
                 handler?.Invoke(this, e);
             }
         }

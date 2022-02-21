@@ -15,6 +15,7 @@ namespace StageControl.Interfaces
         event EventHandler<RequestCompleteEventArgs>? RequestComplete;
         event EventHandler<EventArgs>? RequestInProcess;
         event EventHandler<EventArgs>? UnexpectedRestart;
+        event EventHandler<EventArgs>? HomingComplete;
 
         public Task<bool> Initialize();
         public void Deinitialize();
@@ -25,5 +26,8 @@ namespace StageControl.Interfaces
 
         public bool RequestPending { get; }
         public bool IsConnected { get; }
+        public bool IsXAxisHomed { get; }
+        public bool IsYAxisHomed { get; }
+        public bool IsHomed { get; }
     }
 }
