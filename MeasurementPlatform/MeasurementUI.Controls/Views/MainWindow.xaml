@@ -36,10 +36,14 @@
 
         <local:SerialTerminalControl Grid.Row="1"  Grid.Column="3"/>
 
+        <local:PositionReadoutControl Grid.Row="1" Grid.Column="1" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0 50 0 0"/>
+
         <StackPanel Grid.Row="1" Grid.Column="0">
             <local:StageViewControlStub/>
             <local:StagePositioningControl  Margin="0 5 0 0"/>
         </StackPanel>
+        
+        
 
     </Grid>
 </Window>

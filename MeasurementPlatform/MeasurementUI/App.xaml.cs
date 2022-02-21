@@ -65,6 +65,7 @@ namespace MeasurementUI
 
             services.AddTransient<ConnectionControlViewModel>();
             services.AddTransient<StagePositioningControlViewModel>();
+            services.AddTransient<PositionReadoutControlViewModel>();
             
             // Add Services
             services.AddSingleton<IDialogService,DialogService>();

@@ -24,7 +24,7 @@ namespace MeasurementUI.Controls.ViewModels
         public RelayCommand ConnectCommand { get; }
 
         public StagePositioningControlViewModel StagePositioningControlViewModel { get; private set; }
-
+        public PositionReadoutControlViewModel PositionReadoutControlViewModel { get; private set; }
 
         public MainWindowViewModel(IDialogService dialogService,
                                    IConfiguration configuration,
@@ -41,6 +41,7 @@ namespace MeasurementUI.Controls.ViewModels
             ConnectCommand = new RelayCommand(Connect);
 
             StagePositioningControlViewModel = _serviceProvider.GetRequiredService<StagePositioningControlViewModel>();
+            PositionReadoutControlViewModel = _serviceProvider.GetRequiredService<PositionReadoutControlViewModel>();
             
         }
 
