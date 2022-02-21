@@ -105,6 +105,30 @@ namespace StageControl.Model
                     outgoingMessages.Add(new SerialDataItem(reqText, DateTime.Now, SerialDataType.OutgoingMessage));
                 }
             }
+            else if(req != null && req is JogRequest)
+            {
+                JogRequest jogRequest = (JogRequest)req;
+                if(jogRequest != null)
+                {
+                    string reqText = "$J=";
+                    if (jogRequest.JogType == JogType.Absolute)
+                        reqText += "G90 ";
+                    else if (jogRequest.JogType == JogType.Incremental)
+                        reqText += "G91 ";
+                    else { }
+
+                    float x_mm = (float)jogRequest.X / 1000;
+                    float y_mm = (float)jogRequest.Y / 1000;
+
+                    reqText += "G21 ";
+                    reqText += "F700 ";
+                    reqText += $"X{x_mm.ToString("0.000")} ";
+                    reqText += $"Y{y_mm.ToString("0.000")}";
+
+                    serial.SendSerialData(reqText);
+                    outgoingMessages.Add(new SerialDataItem(reqText, DateTime.Now, SerialDataType.OutgoingMessage));
+                }
+            }
         }
 
         

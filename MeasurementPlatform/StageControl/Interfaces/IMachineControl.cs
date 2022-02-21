@@ -20,6 +20,7 @@ namespace StageControl.Interfaces
         public Task<bool> Initialize();
         public void Deinitialize();
         public Task<bool> Home(HomingAxes axes);
+        public Task<bool> Jog(int X, int Y, JogType type);
 
         public double XPosition { get; }
         public double YPosition { get; }

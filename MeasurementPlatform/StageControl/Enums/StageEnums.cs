@@ -11,6 +11,11 @@ namespace StageControl.Enums
         X,
         Y,
         XY
+    }
 
+    public enum JogType
+    {
+        Absolute,
+        Incremental
     }
 }

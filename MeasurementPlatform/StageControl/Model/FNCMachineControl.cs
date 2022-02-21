@@ -97,6 +97,11 @@ namespace StageControl.Model
             controller.Disconnect();
         }
 
+        public async Task<bool> Jog(int X, int Y, JogType type)
+        {
+            return await Request(new JogRequest(X, Y, type));
+        }
+
         public async Task<bool> Home(HomingAxes axes)
         {
             return await Request(new HomingRequest(axes));

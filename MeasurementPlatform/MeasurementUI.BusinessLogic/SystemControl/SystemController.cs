@@ -54,6 +54,11 @@ namespace MeasurementUI.BusinessLogic.SystemControl
             await MotionController.Home(axes);
         }
 
+        public async Task Jog(int x, int y, JogType type)
+        {
+            await MotionController.Jog(x, y, type);
+        }
+
 
         public async Task Initialize()
         {

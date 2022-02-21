@@ -24,13 +24,15 @@ namespace StageControl.Model
 
     public class JogRequest: Request
     {
-        public double Xcoordinate { get; set; }
-        public double Ycoordinate { get; set; }
+        public JogType JogType { get; set; }
+        public double X { get; set; }
+        public double Y { get; set; }
 
-        public JogRequest(int xcoordinate, int ycoordinate)
+        public JogRequest(int x, int y, JogType type)
         {
-            Xcoordinate = xcoordinate; 
-            Ycoordinate = ycoordinate;
+            JogType = type;
+            X = x;
+            Y = y;
         }
     }
 }
