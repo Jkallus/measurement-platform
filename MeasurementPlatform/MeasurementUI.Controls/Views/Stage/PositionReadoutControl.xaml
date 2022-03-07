@@ -14,7 +14,7 @@
                     <GridViewColumn DisplayMemberBinding="{Binding Path=Field}" Width="150">
                         <GridViewColumnHeader Content="Field"/>
                     </GridViewColumn>
-                    <GridViewColumn DisplayMemberBinding="{Binding Path=Value}" Width="150">
+                    <GridViewColumn DisplayMemberBinding="{Binding Path=Value, IsAsync=True}" Width="150">
                         <GridViewColumnHeader Content="Value"/>
                     </GridViewColumn>
                 </GridView>

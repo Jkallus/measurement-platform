@@ -5,6 +5,7 @@ using StageControl.Enums;
 using StageControl.Model;
 using MeasurementUI.BusinessLogic.Configuration;
 using StageControl.Events;
+//using STILAdapter;
 
 namespace StageControlTester
 {
@@ -54,35 +55,38 @@ namespace StageControlTester
     //    }
     //}
 
-    internal class Program
+    public class Program
     {
         static void Main(string[] args)
         {
-            SerialPort serialPort = new SerialPort();
-            serialPort.PortName = "COM3";
-            serialPort.BaudRate = 115200;
-            serialPort.DataBits = 8;
-            serialPort.StopBits = StopBits.One;
-            serialPort.Parity = Parity.None;
-
-            serialPort.RtsEnable = false;
-            serialPort.Open();
-
-            serialPort.RtsEnable = true;
-            Thread.Sleep(10);
-            serialPort.RtsEnable = false;
+            //SerialPort serialPort = new SerialPort();
+            //serialPort.PortName = "COM3";
+            //serialPort.BaudRate = 115200;
+            //serialPort.DataBits = 8;
+            //serialPort.StopBits = StopBits.One;
+            //serialPort.Parity = Parity.None;
 
             //serialPort.RtsEnable = false;
-            //serialPort.DtrEnable = true;
-            //Thread.Sleep(10);
-            //serialPort.RtsEnable = true;
-            //serialPort.DtrEnable = false;
-            //Thread.Sleep(10);
-            //serialPort.RtsEnable = true;
-            //serialPort.DtrEnable = true;
-            //Thread.Sleep(10);
+            //serialPort.Open();
 
-            serialPort.Close();
+            //serialPort.RtsEnable = true;
+            //Thread.Sleep(10);
+            //serialPort.RtsEnable = false;
+
+            ////serialPort.RtsEnable = false;
+            ////serialPort.DtrEnable = true;
+            ////Thread.Sleep(10);
+            ////serialPort.RtsEnable = true;
+            ////serialPort.DtrEnable = false;
+            ////Thread.Sleep(10);
+            ////serialPort.RtsEnable = true;
+            ////serialPort.DtrEnable = true;
+            ////Thread.Sleep(10);
+
+            //serialPort.Close();
+
+            //Runner.DoWork();
+            
         }
     }
 }
