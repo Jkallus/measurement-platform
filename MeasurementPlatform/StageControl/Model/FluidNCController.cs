@@ -219,7 +219,7 @@ namespace StageControl.Model
 
         private void initTimer()
         {
-            statusTimer.Interval = 100;
+            statusTimer.Interval = 200;
             statusTimer.AutoReset = true;
             statusTimer.Elapsed += statusTimerTick;
         }
