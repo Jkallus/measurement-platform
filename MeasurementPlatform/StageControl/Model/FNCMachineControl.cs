@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using StageControl.Interfaces;
 using StageControl.Events;
+using MeasurementUI.Core.Models;
 
 namespace StageControl.Model
 {
