@@ -1,6 +1,7 @@
 ﻿using System.IO.Ports;
 using StageControl.Enums;
 using StageControl.Consts;
+using MeasurementUI.Core.Models;
 
 namespace StageControl.Model
 {

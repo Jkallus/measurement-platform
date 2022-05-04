@@ -7,6 +7,8 @@ using System.IO.Ports;
 using System.Text.Json;
 using StageControl;
 using StageControl.Model;
+using MeasurementUI.Core.Models;
+
 namespace MeasurementUI.BusinessLogic.Configuration
 {
     public class MachineConfiguration
