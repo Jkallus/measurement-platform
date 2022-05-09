@@ -21,7 +21,7 @@ namespace MeasurementUI.Core.Models
             BaudRate = 115200;
             Parity = System.IO.Ports.Parity.None;
             DataBits = 8;
-            StopBits = System.IO.Ports.StopBits.None;
+            StopBits = System.IO.Ports.StopBits.One;
         }
 
         public SerialConfig()
