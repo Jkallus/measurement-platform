@@ -6,32 +6,20 @@ using System.Threading.Tasks;
 using Microsoft.Toolkit.Mvvm.Input;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using System.Collections.ObjectModel;
-using DAQ;
+using DAQ.Model;
+using DAQ.Interfaces;
 
 namespace DAQTester
 {
     public class MainWindowViewModel: ObservableObject
     {
-        //private NIDAQ daq;
-        private ESPDAQ daq;
+        private IDAQ daq;
 
-        public RelayCommand InitializeCommand { get; set; }
+        public IAsyncRelayCommand InitializeCommand { get; set; }
         public RelayCommand DeinitializeCommand { get; set; }
-        public RelayCommand GetVoltageCommand { get; set; }
-        public RelayCommand GetCountCommand { get; set; }
-        public RelayCommand ResetCounterCommand { get; set; }
-        public RelayCommand GetScaledValueCommand { get; set; }
-
-
-        private double _scaledCounterValue;
-        public double ScaledCounterValue
-        {
-            get { return _scaledCounterValue; }
-            set
-            {
-                SetProperty(ref _scaledCounterValue, value);
-            }
-        }
+        public IAsyncRelayCommand GetVoltageCommand { get; set; }
+        public IAsyncRelayCommand GetCountCommand { get; set; }
+        public RelayCommand ResetEncoderCommand { get; set; }
 
         private bool _initialized;
         public bool Initialized
@@ -62,36 +50,25 @@ namespace DAQTester
         public MainWindowViewModel()
         {
             daq = new ESPDAQ();
-            InitializeCommand = new RelayCommand(Initialize, CanInitialize);
+            InitializeCommand = new AsyncRelayCommand(Initialize, CanInitialize);
             DeinitializeCommand = new RelayCommand(Deinitialize, CanDeinitialize);
-            GetVoltageCommand = new RelayCommand(GetVoltage, CanGetVoltage);
-            GetCountCommand = new RelayCommand(GetCount, CanGetCount);
-            ResetCounterCommand = new RelayCommand(ResetCounter, CanResetCounter);
-            GetScaledValueCommand = new RelayCommand(GetScaledValue, CanGetScaledValue);
+            GetVoltageCommand = new AsyncRelayCommand(GetVoltage, CanGetVoltage);
+            GetCountCommand = new AsyncRelayCommand(GetCount, CanGetCount);
+            ResetEncoderCommand = new RelayCommand(ResetEncoder, CanResetEncoder);
 
             Initialized = daq.Initialized;
             Voltage = 0.0;
         }
 
-        private bool CanGetScaledValue()
+        private bool CanResetEncoder()
         {
             return daq.Initialized;
         }
 
-        private void GetScaledValue()
+        private void ResetEncoder()
         {
-            ScaledCounterValue = daq.GetScaledValue();
-        }
-
-        private bool CanResetCounter()
-        {
-            return daq.Initialized;
-        }
-
-        private void ResetCounter()
-        {
-            daq.ResetCounter();
-            GetCount();
+            daq.ResetEncoder();
+            //GetCount();
         }
 
         private void NotifyInitialized()
@@ -100,18 +77,24 @@ namespace DAQTester
             DeinitializeCommand.NotifyCanExecuteChanged();
             GetVoltageCommand.NotifyCanExecuteChanged();
             GetCountCommand.NotifyCanExecuteChanged();
-            ResetCounterCommand.NotifyCanExecuteChanged();
-            GetScaledValueCommand.NotifyCanExecuteChanged();
+            ResetEncoderCommand.NotifyCanExecuteChanged();
         }
 
         private bool CanGetCount()
         {
-            return daq.Initialized;
+            return true; // daq.Initialized;
         }
 
-        private void GetCount()
+        private async Task GetCount()
         {
-            Count = daq.GetCounterValue();
+            try
+            {
+                Count = await daq.GetEncoderCounts();
+            }
+            catch (DAQException ex)
+            {
+
+            }
         }
 
         private bool CanDeinitialize()
@@ -125,20 +108,38 @@ namespace DAQTester
             Initialized = false;
         }
 
-        private void GetVoltage()
+        private async Task GetVoltage()
         {
-            Voltage = daq.GetVolts();
+            try
+            {
+                Voltage = await daq.GetVolts();
+            }
+            catch (DAQException ex)
+            {
+
+            }
+            
         }
 
         private bool CanGetVoltage()
         {
-            return daq.Initialized;
+            //return daq.Initialized;
+            return true;
         }
 
-        private void Initialize()
+        private async Task Initialize()
         {
-            daq.Initialize();
-            Initialized = true;
+            try
+            {
+                await daq.Initialize();
+                Initialized = true;
+            }
+            catch (DAQException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            
+            
         }
 
         private bool CanInitialize()
