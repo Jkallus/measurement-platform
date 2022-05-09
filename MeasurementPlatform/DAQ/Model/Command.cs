@@ -9,9 +9,9 @@ namespace DAQ.Model
 {
     public class Command
     {
-        public OutgoingMessageType MessageType { get; set; }
+        public MessageType MessageType { get; set; }
 
-        public Command(OutgoingMessageType messageType)
+        public Command(MessageType messageType)
         {
             MessageType = messageType;
         }

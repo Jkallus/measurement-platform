@@ -5,11 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO.Ports;
 using DAQ.Enums;
+using DAQ.Interfaces;
 using MeasurementUI.Core.Models;
 
 namespace DAQ.Model
 {
-    public class ESPDAQ: DAQ
+    public class ESPDAQ: IDAQ
     {
         // Private members
         private readonly ESPDAQController _controller;
@@ -19,8 +20,7 @@ namespace DAQ.Model
         private bool _initialized;
         public bool Initialized
         {
-            get { return _initialized; } 
-            set { _initialized = value; }
+            get { return _controller.IsInitialized; } 
         }
 
         // Public methods
@@ -34,49 +34,76 @@ namespace DAQ.Model
             _controller = new ESPDAQController(serialConfig);
         }
 
-        public async Task<bool> Initialize()
+        public async Task Initialize()
         {
-            TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
-            EventHandler<EventArgs>? InitCompleteEventHandler = null;
-            InitCompleteEventHandler = (sender, e) =>
-            {
-                tcs.SetResult(true);
-                _controller.InitializationComplete -= InitCompleteEventHandler;
-            };
-            _controller.InitializationComplete += InitCompleteEventHandler;
-            _controller.SendCommand(new Command(OutgoingMessageType.Initialize));
-            return await tcs.Task;
+            await SendCommand(new Command(MessageType.Initialize));
         }
 
-        private async Task<bool> SendCommand(Command cmd)
+        public async Task Deinitialize()
         {
-            TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
-            _controller.RequestComplete += (sender, e) =>
+            await SendCommand(new Command(MessageType.Deinitialize));
+        }
+
+        public async Task<float> GetVolts()
+        {
+            return await SendDataCommand<float>(new Command(MessageType.GetVoltage));
+        }
+
+        public async Task<int> GetEncoderCounts()
+        {
+            return await SendDataCommand<int>(new Command(MessageType.GetEncoderCounts));
+        }
+
+        public async Task ResetEncoder()
+        {
+            await SendCommand(new Command(MessageType.ResetEncoder));
+        }
+
+        
+
+
+        // private methods
+        private async Task SendCommand(Command cmd)
+        {
+            TaskCompletionSource tcs = new TaskCompletionSource();
+            EventHandler<ResponseReceivedEventArgs>? CommandCompleteEventHandler = null;
+            CommandCompleteEventHandler = (sender, e) =>
             {
-                tcs.TrySetResult(true);
+                _controller.CommandComplete -= CommandCompleteEventHandler;
+                if (e.Response.ErrorCode == ErrorCode.Success)
+                {
+                    tcs.SetResult();
+                }
+                else
+                {
+                    tcs.SetException(new DAQException(e.Response.ErrorCode));
+                }
             };
+            _controller.CommandComplete += CommandCompleteEventHandler;
+            _controller.SendCommand(cmd);
+            await tcs.Task;
+        }
+
+        private async Task<T> SendDataCommand<T>(Command cmd)
+        {
+            TaskCompletionSource<T> tcs = new TaskCompletionSource<T>();
+            EventHandler<ResponseReceivedEventArgs>? CommandCompleteEventHandler = null;
+            CommandCompleteEventHandler = (sender, e) =>
+            {
+                _controller.CommandComplete -= CommandCompleteEventHandler;
+                if (e.Response.ErrorCode == ErrorCode.Success)
+                {
+                    DataResponse<T>? result = e.Response as DataResponse<T>;
+                    tcs.SetResult(result!.Data);
+                }
+                else
+                {
+                    tcs.SetException(new DAQException(e.Response.ErrorCode));
+                }
+            };
+            _controller.CommandComplete += CommandCompleteEventHandler;
             _controller.SendCommand(cmd);
             return await tcs.Task;
         }
-
-        public float GetVolts()
-        {
-            return 0.0f;
-        }
-
-        public int GetEncoderCounts()
-        {
-            return 0;
-        }
-
-        public void ResetEncoder()
-        {
-            throw new NotImplementedException();
-        }
-
-        // private methods
-
-
-
     }
 }

@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace DAQ.Model
 {
-    public class RequestCompleteEventArgs: EventArgs
+    public class ResponseReceivedEventArgs: EventArgs
     {
         public Response Response { get; set; }
 
-        public RequestCompleteEventArgs(Response response)
+        public ResponseReceivedEventArgs(Response response)
         {
             Response = response;
         }

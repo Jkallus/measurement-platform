@@ -9,13 +9,24 @@ namespace DAQ.Model
 {
     public class Response
     {
-        public IncomingMessageType MessageType { get; set; }
+        public MessageType MessageType { get; set; }
         public ErrorCode ErrorCode { get; set; }
 
-        public Response(IncomingMessageType messageType, ErrorCode errorCode)
+        public Response(MessageType messageType, ErrorCode errorCode)
         {
             this.MessageType = messageType;
             this.ErrorCode = errorCode;
+        }
+    }
+
+    
+    public class DataResponse<T>: Response
+    {
+        public T Data { get; set; }
+
+        public DataResponse(MessageType messageType, ErrorCode errorCode, T data): base(messageType, errorCode)
+        {
+            Data = data;
         }
     }
 
@@ -23,7 +34,7 @@ namespace DAQ.Model
     {
         public float Voltage { get; set; }
 
-        public MeasureVoltageResponse(IncomingMessageType messageType, ErrorCode errorCode, float voltage): base(messageType, errorCode)
+        public MeasureVoltageResponse(MessageType messageType, ErrorCode errorCode, float voltage): base(messageType, errorCode)
         {
             Voltage = voltage;
         }
@@ -33,7 +44,7 @@ namespace DAQ.Model
     {
         public int Counts { get; set; }
 
-        public MeasureEncoderCountsResponse(IncomingMessageType messageType, ErrorCode errorCode, int counts): base(messageType, errorCode)
+        public MeasureEncoderCountsResponse(MessageType messageType, ErrorCode errorCode, int counts): base(messageType, errorCode)
         {
             Counts = counts;
         }
