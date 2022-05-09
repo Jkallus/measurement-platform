@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DAQ\DAQ.csproj" />
+    <ProjectReference Include="..\MeasurementUI.Core\MeasurementUI.Core.csproj" />
   </ItemGroup>
 
 </Project>

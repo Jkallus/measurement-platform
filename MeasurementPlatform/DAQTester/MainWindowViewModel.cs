@@ -8,18 +8,20 @@ using Microsoft.Toolkit.Mvvm.ComponentModel;
 using System.Collections.ObjectModel;
 using DAQ.Model;
 using DAQ.Interfaces;
+using MeasurementUI.Core.Interfaces;
+using MeasurementUI.Core.Services;
 
 namespace DAQTester
 {
     public class MainWindowViewModel: ObservableObject
     {
-        private IDAQ daq;
-
+        private IDAQ _daq;
+        private IMessageBoxService _messageBox;
         public IAsyncRelayCommand InitializeCommand { get; set; }
-        public RelayCommand DeinitializeCommand { get; set; }
+        public IAsyncRelayCommand DeinitializeCommand { get; set; }
         public IAsyncRelayCommand GetVoltageCommand { get; set; }
         public IAsyncRelayCommand GetCountCommand { get; set; }
-        public RelayCommand ResetEncoderCommand { get; set; }
+        public IAsyncRelayCommand ResetEncoderCommand { get; set; }
 
         private bool _initialized;
         public bool Initialized
@@ -49,26 +51,33 @@ namespace DAQTester
 
         public MainWindowViewModel()
         {
-            daq = new ESPDAQ();
+            _daq = new ESPDAQ();
+            _messageBox = new MessageBoxService();
             InitializeCommand = new AsyncRelayCommand(Initialize, CanInitialize);
-            DeinitializeCommand = new RelayCommand(Deinitialize, CanDeinitialize);
+            DeinitializeCommand = new AsyncRelayCommand(Deinitialize, CanDeinitialize);
             GetVoltageCommand = new AsyncRelayCommand(GetVoltage, CanGetVoltage);
             GetCountCommand = new AsyncRelayCommand(GetCount, CanGetCount);
-            ResetEncoderCommand = new RelayCommand(ResetEncoder, CanResetEncoder);
+            ResetEncoderCommand = new AsyncRelayCommand(ResetEncoder, CanResetEncoder);
 
-            Initialized = daq.Initialized;
+            Initialized = _daq.Initialized;
             Voltage = 0.0;
         }
 
         private bool CanResetEncoder()
         {
-            return daq.Initialized;
+            return _daq.Initialized;
         }
 
-        private void ResetEncoder()
+        private async Task ResetEncoder()
         {
-            daq.ResetEncoder();
-            //GetCount();
+            try
+            {
+                await _daq.ResetEncoder();
+            }
+            catch (DAQException ex)
+            {
+                _messageBox.ShowMessageBox(ex.Message);
+            }
         }
 
         private void NotifyInitialized()
@@ -82,29 +91,29 @@ namespace DAQTester
 
         private bool CanGetCount()
         {
-            return true; // daq.Initialized;
+            return _daq.Initialized;
         }
 
         private async Task GetCount()
         {
             try
             {
-                Count = await daq.GetEncoderCounts();
+                Count = await _daq.GetEncoderCounts();
             }
             catch (DAQException ex)
             {
-
+                _messageBox.ShowMessageBox(ex.Message);
             }
         }
 
         private bool CanDeinitialize()
         {
-            return daq.Initialized;
+            return _daq.Initialized;
         }
 
-        private void Deinitialize()
+        private async Task Deinitialize()
         {
-            daq.Deinitialize();
+            await _daq.Deinitialize();
             Initialized = false;
         }
 
@@ -112,39 +121,43 @@ namespace DAQTester
         {
             try
             {
-                Voltage = await daq.GetVolts();
+                Voltage = await _daq.GetVolts();
             }
             catch (DAQException ex)
             {
-
+                _messageBox.ShowMessageBox(ex.Message);
             }
             
         }
 
         private bool CanGetVoltage()
         {
-            //return daq.Initialized;
-            return true;
+            return _daq.Initialized;
         }
 
         private async Task Initialize()
         {
             try
             {
-                await daq.Initialize();
+                await _daq.Initialize();
                 Initialized = true;
             }
             catch (DAQException ex)
             {
-                Console.WriteLine(ex.Message);
-            }
-            
-            
+                if(ex.DAQError == DAQ.Enums.ErrorCode.AlreadyInitialized)
+                {
+                    Initialized = true;
+                }
+                else
+                {
+                    _messageBox.ShowMessageBox(ex.Message);
+                }
+            }                        
         }
 
         private bool CanInitialize()
         {
-            return !daq.Initialized;
+            return !_daq.Initialized;
         }
     }
 }

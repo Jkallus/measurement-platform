@@ -25,7 +25,8 @@ namespace DAQ.Model
     {
         // Private members
         private readonly SerialController _serial;
-        private Command? _currentCommand;
+        private Command? _currentCommand; // pending command
+        private bool _initCommandPending; // are we waiting for a response to an init or deinit command
 
         // Public properties
         //public event EventHandler<EventArgs>? InitializationComplete;
@@ -37,22 +38,25 @@ namespace DAQ.Model
         {
             _serial = new SerialController();
             _serial.ResponseReceived += _serial_ResponseReceived;
+            _initCommandPending = false; 
+            IsInitialized = false;
         }
 
         private void _serial_ResponseReceived(object? sender, ResponseReceivedEventArgs e)
         {
             if (e.Response != null)
             {
-                if(_currentCommand != null)
+                if(_currentCommand != null && _currentCommand.MessageType == e.Response.MessageType)
                 {
-                    if(_currentCommand.MessageType == e.Response.MessageType)
-                    {
-                        OnCommandComplete(e);
-                    }
-                    else
-                    {
-                        // Raise unexpected message
-                    }
+                    if (_initCommandPending)
+                        CheckInitialized(e);
+                        _initCommandPending = false;
+
+                    OnCommandComplete(e);
+                }
+                else // either theres no current command or the response type doesnt match the command type, either way this is unexpected feedback
+                {
+                    // handle unexpected feedback
                 }
             }
         }
@@ -65,6 +69,8 @@ namespace DAQ.Model
         // Public methods
         public void SendCommand(Command cmd)
         {
+            if (cmd.MessageType == MessageType.Initialize || cmd.MessageType == MessageType.Deinitialize) // mark init command pending if the request was either init or deinit
+                _initCommandPending = true;
             _serial.SendSerialData(cmd.ToString());
             _currentCommand = cmd;
         }
@@ -79,14 +85,24 @@ namespace DAQ.Model
             }
         }
 
-        //protected virtual void OnInitializationComplete(ResponseReceivedEventArgs e)
-        //{
-        //    if(InitializationComplete != null)
-        //    {
-        //        EventHandler<EventArgs> handler = InitializationComplete;
-        //        handler(this, e);
-        //    }
-        //}
+        private void CheckInitialized(ResponseReceivedEventArgs e)
+        {
+            if(e.Response.MessageType == MessageType.Initialize) // responding to an init command
+            {
+                if(e.Response.ErrorCode == ErrorCode.Success || e.Response.ErrorCode == ErrorCode.AlreadyInitialized)
+                    IsInitialized = true; // in these cases we are initialized
+                else
+                    IsInitialized = false; // any other error codes for init mean DAQ is not initialized
+            }
+            if(e.Response.MessageType == MessageType.Deinitialize)
+            {
+                IsInitialized = false; // regardless of success it means DAQ is deinitialized
+            }
+
+        }
+
+
+
 
     }
 }

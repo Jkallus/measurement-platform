@@ -9,7 +9,7 @@ namespace DAQ.Model
 {
     public class DAQException: Exception
     {
-        ErrorCode DAQError;
+        public ErrorCode DAQError { get; set; }
 
         public DAQException(ErrorCode error): base(error.ToFriendlyString())
         {

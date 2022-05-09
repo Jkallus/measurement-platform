@@ -37,25 +37,6 @@ namespace DAQ.Enums
         UnexpectedMessage = 101
     }
 
-
-    //public enum OutgoingMessageType
-    //{
-    //    Initialize = 1,
-    //    Deinitialize = 2,
-    //    GetVoltage = 3,
-    //    GetEncoderCounts = 4,
-    //    ResetEncoder = 5,
-    //}
-
-    //public enum IncomingMessageType
-    //{
-    //    Initialize = OutgoingMessageType.Initialize,
-    //    Deinitialize = OutgoingMessageType.Deinitialize,
-    //    GetVoltage = OutgoingMessageType.GetVoltage,
-    //    GetEncoderCounts = OutgoingMessageType.GetEncoderCounts,
-    //    ResetEncoder = OutgoingMessageType.ResetEncoder
-    //}
-
     public enum ErrorCode
     {
         Success = 0,
