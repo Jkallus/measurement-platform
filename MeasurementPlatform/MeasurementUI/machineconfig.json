@@ -1,6 +1,13 @@
 {
-  "SerialConfig": {
+  "StageSerialConfig": {
     "COM": "COM3",
+    "BaudRate": 115200,
+    "Parity": 0,
+    "DataBits": 8,
+    "StopBits": 1
+  },
+  "DAQSerialConfig": {
+    "COM": "COM6",
     "BaudRate": 115200,
     "Parity": 0,
     "DataBits": 8,

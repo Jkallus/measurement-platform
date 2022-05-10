@@ -13,12 +13,14 @@ namespace MeasurementUI.BusinessLogic.Configuration
 {
     public class MachineConfiguration
     {
-        public SerialConfig SerialConfig { get; set; }
+        public SerialConfig StageSerialConfig { get; set; }
+        public SerialConfig DAQSerialConfig { get; set; }
         public StageConfig StageConfig { get; set; }
 
         public MachineConfiguration()
         {
-            this.SerialConfig = new SerialConfig();
+            this.StageSerialConfig = new SerialConfig();
+            this.DAQSerialConfig = new SerialConfig();
             this.StageConfig = new StageConfig();
         }
 

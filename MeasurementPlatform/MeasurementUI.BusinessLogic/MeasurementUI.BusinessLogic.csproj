@@ -17,10 +17,4 @@
     <ProjectReference Include="..\StageControl\StageControl.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="Configuration\machineconfig.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
 </Project>
