@@ -22,6 +22,18 @@ namespace DAQTester
         public IAsyncRelayCommand GetVoltageCommand { get; set; }
         public IAsyncRelayCommand GetCountCommand { get; set; }
         public IAsyncRelayCommand ResetEncoderCommand { get; set; }
+        public IAsyncRelayCommand GetScaledValueCommand { get; set; }
+
+        private float _scaledValue;
+        public float ScaledValue
+        {
+            get => _scaledValue;
+            set
+            {
+                SetProperty(ref _scaledValue, value);
+            }
+        }
+
 
         private bool _initialized;
         public bool Initialized
@@ -58,9 +70,33 @@ namespace DAQTester
             GetVoltageCommand = new AsyncRelayCommand(GetVoltage, CanGetVoltage);
             GetCountCommand = new AsyncRelayCommand(GetCount, CanGetCount);
             ResetEncoderCommand = new AsyncRelayCommand(ResetEncoder, CanResetEncoder);
+            GetScaledValueCommand = new AsyncRelayCommand(GetScaledValue, CanGetScaledValue);
 
             Initialized = _daq.Initialized;
             Voltage = 0.0;
+        }
+
+        private bool CanGetScaledValue()
+        {
+            return _daq.Initialized;
+        }
+
+        public async Task GetScaledValue()
+        {
+            try
+            {
+                float x = await _daq.GetVolts();
+                ScaledValue = ApplyScale(x);
+            }
+            catch (DAQException ex)
+            {
+                _messageBox.ShowMessageBox(ex.Message);
+            }
+        }
+
+        private float ApplyScale(float volts)
+        {
+            return (1.0f / (0.023f * volts + 0.0046f)) - 8;
         }
 
         private bool CanResetEncoder()
@@ -73,6 +109,7 @@ namespace DAQTester
             try
             {
                 await _daq.ResetEncoder();
+                await GetCount();
             }
             catch (DAQException ex)
             {
@@ -87,6 +124,7 @@ namespace DAQTester
             GetVoltageCommand.NotifyCanExecuteChanged();
             GetCountCommand.NotifyCanExecuteChanged();
             ResetEncoderCommand.NotifyCanExecuteChanged();
+            GetScaledValueCommand.NotifyCanExecuteChanged();
         }
 
         private bool CanGetCount()

@@ -42,9 +42,9 @@
                 <TextBox Text="{Binding Count}" IsReadOnly="True" Grid.Row="2" Grid.Column="2" VerticalAlignment="Top" Height="20"/>
 
                 <Button Content="Get Scaled Value" Command="{Binding GetScaledValueCommand}" Grid.Column="0" Grid.Row="3" VerticalAlignment="Top" Height="20"/>
-                <TextBox Text="{Binding ScaledCounterValue}" IsReadOnly="True" Grid.Row="3" Grid.Column="2" VerticalAlignment="Top" Height="20"/>
+                <TextBox Text="{Binding ScaledValue}" IsReadOnly="True" Grid.Row="3" Grid.Column="2" VerticalAlignment="Top" Height="20"/>
 
-                <Button Content="Reset Counter Value" Command="{Binding ResetCounterCommand}" Grid.Column="0" Grid.Row="4" VerticalAlignment="Top" Height="20"/>
+                <Button Content="Reset Counter Value" Command="{Binding ResetEncoderCommand}" Grid.Column="0" Grid.Row="4" VerticalAlignment="Top" Height="20"/>
 
             </Grid>
 
