@@ -1,4 +1,5 @@
-﻿using MeasurementUI.BusinessLogic.Configuration;
+﻿using DAQ.Interfaces;
+using MeasurementUI.BusinessLogic.Configuration;
 using MeasurementUI.BusinessLogic.SystemControl;
 using MeasurementUI.Controls.ViewModels;
 using MeasurementUI.Controls.Views;
@@ -72,6 +73,7 @@ namespace MeasurementUI
             services.AddSingleton<IConfiguration>(Configuration);
             services.AddSingleton<MachineConfiguration>(MachineConfiguration.LoadConfiguration(Configuration.GetSection("MachineConfigurationLocation").Value));
             services.AddSingleton<SystemController>();
+            services.AddSingleton<IMessageBoxService, MessageBoxService>();
 
             // RegisterDialogs with DialogService
             DialogService.RegisterDialog<ConnectionControlStub, ConnectionControlStubViewModel>();

@@ -31,14 +31,32 @@ namespace DAQ.Model
         // Public properties
         //public event EventHandler<EventArgs>? InitializationComplete;
         public event EventHandler<ResponseReceivedEventArgs>? CommandComplete;
-        public bool IsInitialized { get; set; }
+        public event EventHandler<DAQStateEventArgs>? StateChanged;
+
+        private bool _isInitialized;
+        public bool IsInitialized
+        {
+            get { return _isInitialized; }
+            set
+            {
+                _isInitialized = value;
+                OnStateChanged(new DAQStateEventArgs(_isInitialized ? "DAQ Initialized" : "DAQ Uninitialized"));
+            }
+        }
+
+        
+
 
         // Constructors
-        public ESPDAQController()
+        public ESPDAQController(): this(new SerialConfig("COM6"))
         {
-            _serial = new SerialController();
+        }
+
+        public ESPDAQController(SerialConfig serialConfig)
+        {
+            _serial = new SerialController(serialConfig);
             _serial.ResponseReceived += _serial_ResponseReceived;
-            _initCommandPending = false; 
+            _initCommandPending = false;
             IsInitialized = false;
         }
 
@@ -61,10 +79,7 @@ namespace DAQ.Model
             }
         }
 
-        public ESPDAQController(SerialConfig serialConfig)
-        {
-            _serial = new SerialController(serialConfig);
-        }
+        
 
         // Public methods
         public void SendCommand(Command cmd)
@@ -82,6 +97,15 @@ namespace DAQ.Model
             {
                 EventHandler<ResponseReceivedEventArgs> handler = CommandComplete;
                 handler(this, e);
+            }
+        }
+
+        protected virtual void OnStateChanged(DAQStateEventArgs e)
+        {
+            if(StateChanged != null)
+            {
+                EventHandler<DAQStateEventArgs> handler = StateChanged;
+                handler(handler, e);
             }
         }
 

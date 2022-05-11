@@ -16,8 +16,7 @@
 
         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0 20 0 0">
             <local:ComponentState ComponentName="Motion Controller" ComponentStatus="{Binding MotionControllerStatus}"/>
+            <local:ComponentState ComponentName="DAQ" ComponentStatus="{Binding DAQStatus}"/>
         </StackPanel>
-        
-
     </Grid>
 </UserControl>

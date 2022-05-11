@@ -18,6 +18,13 @@ namespace DAQ.Model
 
         // Public properties
         private bool _initialized;
+
+        public event EventHandler<DAQStateEventArgs>? StateChanged
+        {
+            add => this._controller.StateChanged += value;
+            remove => this._controller.StateChanged -= value;
+        }
+
         public bool Initialized
         {
             get { return _controller.IsInitialized; } 

@@ -1,4 +1,5 @@
-﻿using MeasurementUI.BusinessLogic.Configuration;
+﻿using DAQ.Interfaces;
+using MeasurementUI.BusinessLogic.Configuration;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using StageControl.Enums;
 using StageControl.Events;
@@ -9,6 +10,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DAQ.Model;
+using DAQ.Enums;
+
 
 namespace MeasurementUI.BusinessLogic.SystemControl
 {
@@ -16,10 +20,12 @@ namespace MeasurementUI.BusinessLogic.SystemControl
     {
         #region Private Members
         private readonly MachineConfiguration _machineConfiguration;
+        
         #endregion
 
         
         public readonly IMachineControl MotionController;
+        public readonly IDAQ DAQ;
 
         #region Constructor
         public SystemController(MachineConfiguration machineConfiguration)
@@ -29,6 +35,9 @@ namespace MeasurementUI.BusinessLogic.SystemControl
             MotionController = new FNCMachineControl(_machineConfiguration.StageSerialConfig, _machineConfiguration.StageConfig);
             MotionController.StateChanged += MotionController_StateChanged;
             MotionController.UnexpectedRestart += MotionController_UnexpectedRestart;
+
+            DAQ = new ESPDAQ(_machineConfiguration.DAQSerialConfig);
+            DAQ.StateChanged += DAQ_StateChanged;
             
         }
 
@@ -40,6 +49,11 @@ namespace MeasurementUI.BusinessLogic.SystemControl
         private void MotionController_StateChanged(object? sender, FNCStateChangedEventArgs e)
         {
             MotionControllerStatus = FNCMachineControl.ConvertControllerStateToStatus(e.State);
+        }
+
+        private void DAQ_StateChanged(object? sender, DAQStateEventArgs e)
+        {
+            DAQStatus = e.State;
         }
 
         private void MotionController_PositionChanged(object? sender, PositionChangedEventArgs e)
@@ -62,12 +76,26 @@ namespace MeasurementUI.BusinessLogic.SystemControl
 
         public async Task Initialize()
         {
-            await MotionController.Initialize();
+            try
+            {
+                var task1 = MotionController.Initialize();
+                var task2 = DAQ.Initialize();
+                await Task.WhenAll(task1, task2);
+            }
+            catch (DAQException ex)
+            {
+                if (ex.DAQError != ErrorCode.AlreadyInitialized)
+                {
+                    throw ex;
+                }
+            }
+            
         }
 
-        public void Deinitialize()
+        public async Task Deinitialize()
         {
             MotionController.Deinitialize();
+            await DAQ.Deinitialize();
         }
         #endregion
 
@@ -78,6 +106,13 @@ namespace MeasurementUI.BusinessLogic.SystemControl
         {
             get { return _motionControllerStatus; }
             private set { SetProperty(ref _motionControllerStatus, value); }
+        }
+
+        private string _daqStatus;
+        public string DAQStatus
+        {
+            get { return _daqStatus; }
+            private set { SetProperty(ref _daqStatus, value); }
         }
 
         public bool IsMotionControllerConnected
