@@ -18,6 +18,14 @@ namespace DAQ.Enums
                     return "DAQ is already initialized";
                 case ErrorCode.NotCurrentlyInitialized:
                     return "DAQ is not initialized yet";
+                case ErrorCode.ADCInitFail:
+                    return "DAQ ADC module failed to initialize";
+                case ErrorCode.EncoderInitFail:
+                    return "DAQ Encoder module failed to initialize";
+                case ErrorCode.DAQInitFail:
+                    return "DAQ ADC and Encoder failed to initialize";
+                case ErrorCode.DAQDeinitFail:
+                    return "DAQ unable to deinitialize";
                 default:
                     return "Unknown DAQ error";
 
@@ -41,7 +49,11 @@ namespace DAQ.Enums
     {
         Success = 0,
         AlreadyInitialized = 1,
-        NotCurrentlyInitialized = 2
+        NotCurrentlyInitialized = 2,
+        ADCInitFail = 3,
+        EncoderInitFail = 4,
+        DAQInitFail = 5,
+        DAQDeinitFail = 6,
     }
 
 }

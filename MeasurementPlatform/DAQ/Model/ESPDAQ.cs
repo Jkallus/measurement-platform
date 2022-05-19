@@ -56,9 +56,9 @@ namespace DAQ.Model
             return await SendDataCommand<float>(new Command(MessageType.GetVoltage));
         }
 
-        public async Task<int> GetEncoderCounts()
+        public async Task<Tuple<int,int>> GetEncoderCounts()
         {
-            return await SendDataCommand<int>(new Command(MessageType.GetEncoderCounts));
+            return await SendDataCommand<Tuple<int,int>>(new Command(MessageType.GetEncoderCounts));
         }
 
         public async Task ResetEncoder()

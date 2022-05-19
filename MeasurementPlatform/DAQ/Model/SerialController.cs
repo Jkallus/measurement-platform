@@ -87,8 +87,9 @@ namespace DAQ.Model
                             RaiseResponseReceivedEvent(new ResponseReceivedEventArgs(new DataResponse<float>(type, errorCode, voltage)));
                             break;
                         case MessageType.GetEncoderCounts:
-                            int counts = int.Parse(parts[2]);
-                            RaiseResponseReceivedEvent(new ResponseReceivedEventArgs(new DataResponse<int>(type, errorCode, counts)));
+                            string[] counts = parts[2].Split(',', StringSplitOptions.TrimEntries);
+                            var data = Tuple.Create<int, int>(int.Parse(counts[0]), int.Parse(counts[1]));
+                            RaiseResponseReceivedEvent(new ResponseReceivedEventArgs(new DataResponse<Tuple<int, int>>(type, errorCode, data)));
                             break;
                     }
                 }

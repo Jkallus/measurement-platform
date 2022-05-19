@@ -9,13 +9,13 @@ namespace DAQ.Interfaces
     public interface IDAQ
     {
         bool Initialized { get; } // returns whether DAQ is currently initialized or not
-
+        
         event EventHandler<DAQStateEventArgs>? StateChanged;
 
         Task Initialize(); // async method to initialize DAQ
         Task Deinitialize();
         Task<float> GetVolts();
-        Task<int> GetEncoderCounts();
+        Task<Tuple<int, int>> GetEncoderCounts();
         Task ResetEncoder();
     }
 }
