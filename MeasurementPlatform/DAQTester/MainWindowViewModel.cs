@@ -46,11 +46,18 @@ namespace DAQTester
             }
         }
 
-        private long _count;
-        public long Count
+        private long _xcount;
+        public long XCount
         {
-            get { return _count; }
-            set { SetProperty(ref _count, value); }
+            get { return _xcount; }
+            set { SetProperty(ref _xcount, value); }
+        }
+
+        private long _ycount;
+        public long YCount
+        {
+            get { return _ycount; }
+            set { SetProperty(ref _ycount, value); }
         }
 
 
@@ -136,7 +143,10 @@ namespace DAQTester
         {
             try
             {
-                Count = await _daq.GetEncoderCounts();
+
+                var counts = await _daq.GetEncoderCounts();
+                XCount = counts.Item1;
+                YCount = counts.Item2;
             }
             catch (DAQException ex)
             {
