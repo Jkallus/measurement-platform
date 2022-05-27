@@ -24,15 +24,6 @@ namespace MeasurementUI.BusinessLogic.Configuration
             this.StageConfig = new StageConfig();
         }
 
-
-        public static MachineConfiguration LoadConfiguration(string jsonPath)
-        {
-            string json = File.ReadAllText(jsonPath);
-            MachineConfiguration conf = JsonSerializer.Deserialize<MachineConfiguration>(json);
-            return conf;
-        }
-
-
         public void SaveToJSON(string path)
         {
             JsonSerializerOptions options = new JsonSerializerOptions();

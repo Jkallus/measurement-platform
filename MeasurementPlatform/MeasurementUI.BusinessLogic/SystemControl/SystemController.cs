@@ -19,6 +19,7 @@ namespace MeasurementUI.BusinessLogic.SystemControl
     public class SystemController: ObservableObject, ISystemController
     {
         #region Private Members
+        private readonly IServiceProvider _serviceProvider;
         private readonly MachineConfiguration _machineConfiguration;
         
         #endregion
@@ -28,9 +29,10 @@ namespace MeasurementUI.BusinessLogic.SystemControl
         public readonly IDAQ DAQ;
 
         #region Constructor
-        public SystemController(MachineConfiguration machineConfiguration)
+        public SystemController(IServiceProvider serviceProvider)
         {
-            _machineConfiguration = machineConfiguration;
+            _serviceProvider = serviceProvider;
+            _machineConfiguration = _serviceProvider.GetService(typeof(MachineConfiguration)) as MachineConfiguration;
             _motionControllerStatus = "";
             MotionController = new FNCMachineControl(_machineConfiguration.StageSerialConfig, _machineConfiguration.StageConfig);
             MotionController.StateChanged += MotionController_StateChanged;
