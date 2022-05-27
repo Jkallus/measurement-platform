@@ -1,0 +1,21 @@
+﻿<UserControl
+    x:Class="MeasurementApp.Controls.Connection.ComponentState"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:MeasurementApp.Controls.Connection"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    x:Name="root">
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="130"/>
+            <ColumnDefinition Width="130"/>
+        </Grid.ColumnDefinitions>
+        <Ellipse Grid.Column="0" Height="15" Width="15" Fill="Green"/>
+        <TextBlock Grid.Column="1" x:Name="ComponentNameText" Text="{x:Bind ComponentName, Mode=OneWay}" Margin="5 0 0 0"/>
+        <TextBlock  Grid.Column="2" x:Name="ComponentStatusText" Text="{x:Bind ComponentStatus, Mode=OneWay}" />
+    </Grid>
+</UserControl>
