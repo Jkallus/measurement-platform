@@ -14,6 +14,7 @@
   <ItemGroup>
     <None Remove="Controls\Connection\ComponentState.xaml" />
     <None Remove="Controls\Connection\ConnectionControl.xaml" />
+    <None Remove="Controls\DAQ\DAQDiagnosticsControl.xaml" />
     <None Remove="Controls\Stage\StagePositioningControl.xaml" />
   </ItemGroup>
 
@@ -36,6 +37,9 @@
     <None Update="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <Page Update="Controls\DAQ\DAQDiagnosticsControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="Controls\Stage\StagePositioningControl.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
