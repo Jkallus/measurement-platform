@@ -16,7 +16,7 @@ using Windows.Foundation.Collections;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
-namespace MeasurementApp.Controls.Connection
+namespace MeasurementApp.Controls
 {
     public sealed partial class ComponentState : UserControl
     {
