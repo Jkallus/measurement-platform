@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:MeasurementApp.Controls"
     mc:Ignorable="d"
     Style="{StaticResource PageStyle}">
 
@@ -14,6 +15,16 @@
                 The SystemControlPageBackgroundChromeLowBrush background represents where you should place your content.
                 Place your content here.
             -->
+            <StackPanel>
+                <controls:StagePositioningControl HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0 10 0 0"/>
+
+                <!--<Canvas>
+                    <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Center" VerticalAlignment="Top">
+                        <TextBlock Text="Hello World!" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+                    </Border>
+                </Canvas>-->
+            </StackPanel>
+            
         </Grid>
     </Grid>
 </Page>

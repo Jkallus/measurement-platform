@@ -70,6 +70,7 @@ namespace MeasurementApp
                 services.AddTransient<ShellViewModel>();
 
                 services.AddSingleton<ConnectionControlViewModel>();
+                services.AddSingleton<StagePositioningControlViewModel>();
 
                 // Configuration
                 services.Configure<LocalSettingsOptions>(context.Configuration.GetSection(nameof(LocalSettingsOptions)));
