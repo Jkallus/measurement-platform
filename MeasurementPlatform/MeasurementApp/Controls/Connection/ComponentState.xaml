@@ -14,7 +14,7 @@
             <ColumnDefinition Width="130"/>
             <ColumnDefinition Width="130"/>
         </Grid.ColumnDefinitions>
-        <Ellipse Grid.Column="0" Height="15" Width="15" Fill="Green"/>
+        <Ellipse Grid.Column="0" Height="15" Width="15" Fill="{x:Bind StatusColor, Mode=OneWay}"/>
         <TextBlock Grid.Column="1" x:Name="ComponentNameText" Text="{x:Bind ComponentName, Mode=OneWay}" Margin="5 0 0 0"/>
         <TextBlock  Grid.Column="2" x:Name="ComponentStatusText" Text="{x:Bind ComponentStatus, Mode=OneWay}" />
     </Grid>

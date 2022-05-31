@@ -79,6 +79,7 @@ namespace StageControl.Model
             statusTimer.Stop();
             serial.Disconnect();
             controllerState = LifetimeFNCState.Unknown;
+            OnFNCStateChanged(new FNCStateChangedEventArgs(ControllerState));
             IsConnected = false;
         }
 

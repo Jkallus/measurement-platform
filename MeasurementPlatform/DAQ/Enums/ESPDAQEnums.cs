@@ -45,6 +45,13 @@ namespace DAQ.Enums
         UnexpectedMessage = 101
     }
 
+    public enum DAQState
+    {
+        Uninitialized,
+        Initializing,
+        Initialized
+    }
+
     public enum ErrorCode
     {
         Success = 0,

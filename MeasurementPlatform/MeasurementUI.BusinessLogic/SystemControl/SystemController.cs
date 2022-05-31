@@ -12,7 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using DAQ.Model;
 using DAQ.Enums;
-
+using MeasurementUI.BusinessLogic.SystemControl.Enums;
 
 namespace MeasurementUI.BusinessLogic.SystemControl
 {
@@ -51,11 +51,35 @@ namespace MeasurementUI.BusinessLogic.SystemControl
         private void MotionController_StateChanged(object? sender, FNCStateChangedEventArgs e)
         {
             MotionControllerStatus = FNCMachineControl.ConvertControllerStateToStatus(e.State);
+            if(e.State == LifetimeFNCState.Unknown)
+            {
+                MotionControllerInitializationState = ModuleInitializationState.Uninitialized;
+            }
+            else if(e.State == LifetimeFNCState.FNCReady)
+            {
+                MotionControllerInitializationState = ModuleInitializationState.Initialized;
+            }
+            else
+            {
+                MotionControllerInitializationState = ModuleInitializationState.Initializing;
+            }
         }
 
         private void DAQ_StateChanged(object? sender, DAQStateEventArgs e)
         {
-            DAQStatus = e.State;
+            DAQStatus = e.ToFriendlyString();
+            switch(e.State)
+            {
+                case DAQState.Uninitialized:
+                    DAQInitializationState = ModuleInitializationState.Uninitialized;
+                    break;
+                case DAQState.Initializing:
+                    DAQInitializationState = ModuleInitializationState.Initializing;
+                    break;
+                case DAQState.Initialized:
+                    DAQInitializationState = ModuleInitializationState.Initialized;
+                    break;
+            }
         }
 
         private void MotionController_PositionChanged(object? sender, PositionChangedEventArgs e)
@@ -108,6 +132,20 @@ namespace MeasurementUI.BusinessLogic.SystemControl
         {
             get { return _motionControllerStatus; }
             private set { SetProperty(ref _motionControllerStatus, value); }
+        }
+
+        private ModuleInitializationState _daqInitializationState;
+        public ModuleInitializationState DAQInitializationState
+        {
+            get { return _daqInitializationState; }
+            set { SetProperty(ref _daqInitializationState, value); }
+        }
+
+        private ModuleInitializationState _motionControllerInitializationState;
+        public ModuleInitializationState MotionControllerInitializationState
+        {
+            get { return _motionControllerInitializationState; }
+            set { SetProperty(ref _motionControllerInitializationState, value); }
         }
 
         private string _daqStatus;

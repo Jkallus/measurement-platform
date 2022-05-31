@@ -40,7 +40,7 @@ namespace DAQ.Model
             set
             {
                 _isInitialized = value;
-                OnStateChanged(new DAQStateEventArgs(_isInitialized ? "DAQ Initialized" : "DAQ Uninitialized"));
+                OnStateChanged(new DAQStateEventArgs(_isInitialized ? DAQState.Initialized : DAQState.Uninitialized));
             }
         }
 
@@ -86,6 +86,8 @@ namespace DAQ.Model
         {
             if (cmd.MessageType == MessageType.Initialize || cmd.MessageType == MessageType.Deinitialize) // mark init command pending if the request was either init or deinit
                 _initCommandPending = true;
+            if(cmd.MessageType == MessageType.Initialize)
+                OnStateChanged(new DAQStateEventArgs(DAQState.Initializing));
             _serial.SendSerialData(cmd.ToString());
             _currentCommand = cmd;
         }

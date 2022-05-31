@@ -25,6 +25,18 @@ namespace MeasurementApp.Controls
             this.InitializeComponent();
         }
 
+
+
+
+
+        public Brush StatusColor
+        {
+            get { return (Brush)GetValue(StatusColorProperty); }
+            set { SetValue(StatusColorProperty, value); }
+        }
+
+        public static readonly DependencyProperty StatusColorProperty = DependencyProperty.Register("StatusColor", typeof(Brush), typeof(ComponentState), new PropertyMetadata(null));
+
         public string ComponentStatus
         {
             get { return (string)GetValue(ComponentStatusProperty); }

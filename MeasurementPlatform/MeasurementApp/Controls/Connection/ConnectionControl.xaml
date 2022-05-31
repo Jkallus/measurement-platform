@@ -5,13 +5,23 @@
     xmlns:local="using:MeasurementApp.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:converters="using:MeasurementApp.Controls.Converters"
     mc:Ignorable="d">
+    <UserControl.Resources>
+        <converters:ModuleInitializationStateBrushConverter x:Key="ModuleInitConverter"/>
 
+    </UserControl.Resources>
     <Grid>
         <StackPanel>
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0 20 0 0">
-                <local:ComponentState ComponentName="Motion Controller:" ComponentStatus="{x:Bind ViewModel.MotionControllerStatus, Mode=OneWay}"/>
-                <local:ComponentState ComponentName="DAQ:" ComponentStatus="{x:Bind ViewModel.DAQStatus, Mode=OneWay}"/>
+                <local:ComponentState 
+                    ComponentName="Motion Controller:"
+                    ComponentStatus="{x:Bind ViewModel.MotionControllerStatus, Mode=OneWay}"
+                    StatusColor="{x:Bind ViewModel.MotionControllerInitializationState, Mode=OneWay, Converter={StaticResource ModuleInitConverter}}"/>
+                <local:ComponentState
+                    ComponentName="DAQ:"
+                    ComponentStatus="{x:Bind ViewModel.DAQStatus, Mode=OneWay}"
+                    StatusColor="{x:Bind ViewModel.DAQInitializationState, Mode=OneWay, Converter={StaticResource ModuleInitConverter}}"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top">
                 <Button Content="Connect to System" Width="150" Height="40" HorizontalAlignment="Center" Margin="10"

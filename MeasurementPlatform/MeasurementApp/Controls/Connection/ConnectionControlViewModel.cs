@@ -1,8 +1,10 @@
 ﻿using DAQ.Model;
 using MeasurementApp.Services;
 using MeasurementUI.BusinessLogic.SystemControl;
+using MeasurementUI.BusinessLogic.SystemControl.Enums;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
+using Microsoft.UI.Xaml.Media;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -45,6 +47,9 @@ namespace MeasurementApp.Controls
                 }
             }
         }
+
+        public ModuleInitializationState DAQInitializationState { get => _systemController.DAQInitializationState; }
+        public ModuleInitializationState MotionControllerInitializationState { get => _systemController.MotionControllerInitializationState; }
 
         public string MotionControllerStatus
         {
