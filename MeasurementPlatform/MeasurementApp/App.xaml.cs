@@ -72,6 +72,7 @@ namespace MeasurementApp
                 services.AddSingleton<ConnectionControlViewModel>();
                 services.AddSingleton<StagePositioningControlViewModel>();
                 services.AddSingleton<DAQDiagnosticsControlViewModel>();
+                services.AddSingleton<PositionReadoutControlViewModel>();
 
                 // Configuration
                 services.Configure<LocalSettingsOptions>(context.Configuration.GetSection(nameof(LocalSettingsOptions)));

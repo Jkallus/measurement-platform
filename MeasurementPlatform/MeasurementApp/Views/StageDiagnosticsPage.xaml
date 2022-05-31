@@ -17,12 +17,7 @@
             -->
             <StackPanel>
                 <controls:StagePositioningControl HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0 10 0 0"/>
-
-                <!--<Canvas>
-                    <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Center" VerticalAlignment="Top">
-                        <TextBlock Text="Hello World!" HorizontalAlignment="Center" VerticalAlignment="Top"/>
-                    </Border>
-                </Canvas>-->
+                <controls:PositionReadoutControl HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0 10 0 0"/>
             </StackPanel>
             
         </Grid>
