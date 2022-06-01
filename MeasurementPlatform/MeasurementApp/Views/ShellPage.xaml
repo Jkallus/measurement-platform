@@ -26,9 +26,21 @@
             Or to use an IconElement instead of a Symbol see https://github.com/microsoft/TemplateStudio/blob/main/docs/UWP/projectTypes/navigationpane.md
             Edit String/en-US/Resources.resw: Add a menu item title for each page
             -->
-            <NavigationViewItem x:Uid="Shell_Home" Icon="Document" helpers:NavigationHelper.NavigateTo="MeasurementApp.ViewModels.HomeViewModel" />
-            <NavigationViewItem x:Uid="Shell_StageDiagnostics" Icon="Document" helpers:NavigationHelper.NavigateTo="MeasurementApp.ViewModels.StageDiagnosticsViewModel" />
-            <NavigationViewItem x:Uid="Shell_DAQDiagnostics" Icon="Document" helpers:NavigationHelper.NavigateTo="MeasurementApp.ViewModels.DAQDiagnosticsViewModel" />
+            <NavigationViewItem x:Uid="Shell_Home" helpers:NavigationHelper.NavigateTo="MeasurementApp.ViewModels.HomeViewModel" Content="Home">
+                <NavigationViewItem.Icon>
+                    <FontIcon Glyph="&#xF0B9;"/>
+                </NavigationViewItem.Icon>
+            </NavigationViewItem>
+            <NavigationViewItem x:Uid="Shell_StageDiagnostics" helpers:NavigationHelper.NavigateTo="MeasurementApp.ViewModels.StageDiagnosticsViewModel" Content="Stage Diagnostics">
+                <NavigationViewItem.Icon>
+                    <FontIcon Glyph="&#xE7C2;"/>
+                </NavigationViewItem.Icon>
+            </NavigationViewItem>
+            <NavigationViewItem x:Uid="Shell_DAQDiagnostics" helpers:NavigationHelper.NavigateTo="MeasurementApp.ViewModels.DAQDiagnosticsViewModel" Content="DAQ Diagnostics">
+                <NavigationViewItem.Icon>
+                    <FontIcon Glyph="&#xED5E;"/>
+                </NavigationViewItem.Icon>
+            </NavigationViewItem>
         </NavigationView.MenuItems>
         <NavigationView.HeaderTemplate>
             <DataTemplate>
