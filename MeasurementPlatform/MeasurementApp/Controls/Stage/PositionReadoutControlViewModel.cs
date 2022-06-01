@@ -53,10 +53,19 @@ namespace MeasurementApp.Controls
             double? initialYPosition = _systemController.IsMotionControllerConnected ? _systemController.MotionController.YPosition : null;
             Items.Add(new ReadoutItem("X Position", initialXPosition.ToString()));
             Items.Add(new ReadoutItem("Y Position", initialYPosition.ToString()));
-
+            Items.Add(new ReadoutItem("Stage Homed", _systemController.MotionController.IsHomed.ToString()));
+            
             _systemController.MotionController.PositionChanged += MotionController_PositionChanged;
+            _systemController.MotionController.HomingComplete += MotionController_HomingComplete;
+        }
 
-
+        private void MotionController_HomingComplete(object? sender, EventArgs e)
+        {
+            App.MainRoot.DispatcherQueue.TryEnqueue(() =>
+            {
+                Items[2].Value = _systemController.MotionController.IsHomed.ToString();
+            });
+            
         }
 
         private void MotionController_PositionChanged(object? sender, StageControl.Events.PositionChangedEventArgs e)
