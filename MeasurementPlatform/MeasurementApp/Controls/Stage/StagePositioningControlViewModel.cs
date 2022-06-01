@@ -1,8 +1,10 @@
 ﻿using MeasurementApp.Controls.Enums;
+using MeasurementApp.Services;
 using MeasurementUI.BusinessLogic.SystemControl;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
 using StageControl.Enums;
+using StageControl.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -110,6 +112,15 @@ namespace MeasurementApp.Controls
             _realStepSize = 10000;
             HomeCommand = new AsyncRelayCommand<HomingAxes>(OnHomeRequested, CanHome);
             MotionCommand = new AsyncRelayCommand<MotionDirection>(OnMotionRequested, CanPerformMotion);
+            _systemController.MotionController.RuntimeError += MotionController_RuntimeError;
+        }
+
+        private void MotionController_RuntimeError(object sender, RuntimeErrorEventArgs e)
+        {
+            App.MainRoot.DispatcherQueue.TryEnqueue(async () =>
+            {
+                await App.MainRoot.MessageDialogAsync("Motion Error", e.Message);
+            });
         }
 
         // Private Methods

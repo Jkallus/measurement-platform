@@ -31,6 +31,7 @@ namespace StageControl.Model
         public event EventHandler<StatusUpdateEventArgs>? ReceivedStatusUpdate;
         public event EventHandler<EventArgs>? InitializationComplete;
         public event EventHandler<EventArgs>? UnexpectedRestart;
+        public event EventHandler<RuntimeErrorEventArgs>? RuntimeError;
 
         #endregion
 
@@ -210,6 +211,15 @@ namespace StageControl.Model
             }
         }
 
+        protected virtual void OnRuntimeErrorReceived(RuntimeErrorEventArgs e)
+        {
+            if(RuntimeError != null)
+            {
+                EventHandler<RuntimeErrorEventArgs> handler = RuntimeError;
+                handler(this, e);
+            }
+        }
+
         #endregion
 
         #region Private Methods
@@ -221,7 +231,7 @@ namespace StageControl.Model
 
         private void initTimer()
         {
-            statusTimer.Interval = 200;
+            statusTimer.Interval = 500;
             statusTimer.AutoReset = true;
             statusTimer.Elapsed += statusTimerTick;
         }
@@ -267,8 +277,7 @@ namespace StageControl.Model
                     OnInitializationComplete(new EventArgs());
                     initPending = false;
                 }
-                statusTimer.Enabled = true;
-                    
+                statusTimer.Enabled = true;       
             }
             else if(controllerState == LifetimeFNCState.FNCReady && item.Type == SerialDataType.RequestComplete)
             {
@@ -278,6 +287,19 @@ namespace StageControl.Model
                     requestPending = false;
                     activeRequest = null;
 
+                }
+            }
+            else if(controllerState == LifetimeFNCState.FNCReady && item.Type == SerialDataType.RuntimeError)
+            {
+                string message = incomingMessages.Last().Data!;
+                string[] parts = item.Data!.Split(':');
+                int id = int.Parse(parts[1]);
+                OnRuntimeErrorReceived(new RuntimeErrorEventArgs(message, id));
+                if(requestPending && activeRequest != null)
+                {
+                    OnRequestComplete(new RequestCompleteEventArgs(activeRequest));
+                    requestPending = false;
+                    activeRequest = null;
                 }
             }
             incomingMessages.Add(item);

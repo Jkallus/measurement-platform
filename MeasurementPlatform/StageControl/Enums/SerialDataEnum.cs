@@ -16,6 +16,7 @@ namespace StageControl.Enums
         UnlockPrompt,
         Status,
         RequestComplete,
-        OutgoingMessage
+        OutgoingMessage,
+        RuntimeError
     }
 }

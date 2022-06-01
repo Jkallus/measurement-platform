@@ -33,6 +33,12 @@ namespace StageControl.Model
             remove => this.controller.RequestComplete -= value;
         }
 
+        public event EventHandler<RuntimeErrorEventArgs>? RuntimeError
+        {
+            add => this.controller.RuntimeError += value;
+            remove => this.controller.RuntimeError -= value;
+        }
+
         public event EventHandler<EventArgs>? RequestInProcess;
 
         public event EventHandler<EventArgs>? UnexpectedRestart

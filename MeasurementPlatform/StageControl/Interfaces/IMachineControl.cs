@@ -16,6 +16,7 @@ namespace StageControl.Interfaces
         event EventHandler<EventArgs>? RequestInProcess;
         event EventHandler<EventArgs>? UnexpectedRestart;
         event EventHandler<EventArgs>? HomingComplete;
+        event EventHandler<RuntimeErrorEventArgs>? RuntimeError;
 
         public Task<bool> Initialize();
         public void Deinitialize();

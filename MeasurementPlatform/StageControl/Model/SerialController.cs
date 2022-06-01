@@ -155,6 +155,13 @@ namespace StageControl.Model
                     RaiseSerialDataItemReceivedEvent(item);
                     currentMessage = currentMessage.Remove(0, endIndex + 2);
                 }
+                else if(currentMessage.StartsWith(SerialDataConsts.RuntimeErrorMessageMarker) && currentMessage.Contains(SerialDataConsts.Newline))
+                {
+                    int endIndex = currentMessage.IndexOf(SerialDataConsts.Newline);
+                    SerialDataItem item = new SerialDataItem(currentMessage.Substring(0, endIndex), DateTime.Now, SerialDataType.RuntimeError);
+                    RaiseSerialDataItemReceivedEvent(item);
+                    currentMessage = currentMessage.Remove(0, endIndex + 1);
+                }
                 else if (currentMessage.StartsWith(SerialDataConsts.LineBreak))
                 {
                     currentMessage = currentMessage.Remove(0, 2);

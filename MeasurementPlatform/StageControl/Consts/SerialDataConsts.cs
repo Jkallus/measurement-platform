@@ -19,5 +19,7 @@ namespace StageControl.Consts
         public const string StatusStartMessageMarker = "<";
         public const string StatusEndMessageMarker = ">";
         public const string RequestCompleteMessageMarker = "ok";
+        public const string RuntimeErrorMessageMarker = "error:";
+        public const string Newline = "\n";
     }
 }
