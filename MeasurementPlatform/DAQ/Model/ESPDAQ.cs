@@ -31,12 +31,12 @@ namespace DAQ.Model
         }
 
         // Public methods
-        public ESPDAQ()
-        {
-            _controller = new ESPDAQController();
-        }
+        //public ESPDAQ()
+        //{
+        //    _controller = new ESPDAQController();
+        //}
 
-        public ESPDAQ(SerialConfig serialConfig)
+        public ESPDAQ(DAQSerialConfig serialConfig)
         {
             _controller = new ESPDAQController(serialConfig);
         }
