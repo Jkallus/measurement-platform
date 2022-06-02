@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MeasurementUI.Core.Models;
 using Timer = System.Timers.Timer;
+using Microsoft.Extensions.Logging;
 
 namespace StageControl.Model
 {
@@ -20,6 +21,7 @@ namespace StageControl.Model
         private readonly List<SerialDataItem> incomingMessages;
         private readonly List<SerialDataItem> outgoingMessages;
         private readonly Timer statusTimer;
+        private readonly ILogger<FluidNCController> _logger;
 
         private bool initPending;
         private bool requestPending;
@@ -53,15 +55,10 @@ namespace StageControl.Model
         #endregion
 
         #region Constructors
-
-        public FluidNCController() : this(new SerialConfig("COM3"))
+        public FluidNCController(SerialConfig serialConf, ILogger<FluidNCController> middleLogger, ILogger<SerialController> bottomLogger)
         {
-
-        }
-
-        public FluidNCController(SerialConfig serialConf)
-        {
-            serial = new SerialController(serialConf);
+            _logger = middleLogger;
+            serial = new SerialController(serialConf, bottomLogger);
             incomingMessages = new List<SerialDataItem>();
             outgoingMessages = new List<SerialDataItem>();
             initPending = false;
@@ -70,6 +67,7 @@ namespace StageControl.Model
             statusTimer = new Timer();
             initTimer();
             controllerState = LifetimeFNCState.Unknown;
+            _logger.LogInformation("FluidNCController constructed");
         }
         #endregion
 
@@ -86,6 +84,7 @@ namespace StageControl.Model
 
         public void Request(Request req)
         {
+            _logger.LogInformation("Processing request");
             requestPending = true;
             activeRequest = req;
             if(req != null && req is HomingRequest)
@@ -138,6 +137,7 @@ namespace StageControl.Model
 
         public void Connect()
         {
+            _logger.LogInformation("Connecting to FluidNC");
             serial.SerialDataItemReceived += DataReceived;
             initPending = true;
             serial.Connect();
@@ -197,6 +197,7 @@ namespace StageControl.Model
         {
             if(RequestComplete != null)
             {
+                _logger.LogInformation("Request complete");
                 EventHandler<RequestCompleteEventArgs> handler = RequestComplete;
                 handler(this, e);
             }
@@ -206,7 +207,8 @@ namespace StageControl.Model
         {
             if(UnexpectedRestart != null)
             {
-                 EventHandler<EventArgs> handler = UnexpectedRestart;
+                _logger.LogError("FluidNC Unexpected restart occured");
+                EventHandler<EventArgs> handler = UnexpectedRestart;
                 handler(this, e);
             }
         }
@@ -215,6 +217,7 @@ namespace StageControl.Model
         {
             if(RuntimeError != null)
             {
+                _logger.LogWarning("Stage runtime error: [{Id}] {Error}", e.Error, e.Message);
                 EventHandler<RuntimeErrorEventArgs> handler = RuntimeError;
                 handler(this, e);
             }
@@ -238,6 +241,7 @@ namespace StageControl.Model
 
         private void ProcessIncomingSerialDataItem(SerialDataItem item)
         {
+            _logger.LogDebug("Received SerialDataItem {SDI}", item);
             if(controllerState == LifetimeFNCState.FNCReady && item.Type == SerialDataType.Status) // regular status update case, put first because most messages will be this
             {
                 OnReceivedStatusUpdate(new StatusUpdateEventArgs(item));
@@ -303,9 +307,7 @@ namespace StageControl.Model
                 }
             }
             incomingMessages.Add(item);
-            
         }
-
         #endregion
     }
 }

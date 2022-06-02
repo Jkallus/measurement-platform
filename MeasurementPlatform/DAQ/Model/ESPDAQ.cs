@@ -7,6 +7,7 @@ using System.IO.Ports;
 using DAQ.Enums;
 using DAQ.Interfaces;
 using MeasurementUI.Core.Models;
+using Microsoft.Extensions.Logging;
 
 namespace DAQ.Model
 {
@@ -14,11 +15,10 @@ namespace DAQ.Model
     {
         // Private members
         private readonly ESPDAQController _controller;
+        private readonly ILogger _logger;
 
 
         // Public properties
-        private bool _initialized;
-
         public event EventHandler<DAQStateEventArgs>? StateChanged
         {
             add => this._controller.StateChanged += value;
@@ -30,44 +30,43 @@ namespace DAQ.Model
             get { return _controller.IsInitialized; } 
         }
 
-        // Public methods
-        //public ESPDAQ()
-        //{
-        //    _controller = new ESPDAQController();
-        //}
-
-        public ESPDAQ(DAQSerialConfig serialConfig)
+        // Constructor
+        public ESPDAQ(DAQSerialConfig serialConfig, ILogger<ESPDAQ> logger)
         {
+            _logger = logger;
             _controller = new ESPDAQController(serialConfig);
         }
 
+        // Public methods
         public async Task Initialize()
         {
+            _logger.LogInformation("Initializing DAQ");
             await SendCommand(new Command(MessageType.Initialize));
         }
 
         public async Task Deinitialize()
         {
+            _logger.LogInformation("Deinitializing DAQ");
             await SendCommand(new Command(MessageType.Deinitialize));
         }
 
         public async Task<float> GetVolts()
         {
+            _logger.LogInformation("Getting voltage");
             return await SendDataCommand<float>(new Command(MessageType.GetVoltage));
         }
 
         public async Task<Tuple<int,int>> GetEncoderCounts()
         {
+            _logger.LogInformation("Getting encoder counts");
             return await SendDataCommand<Tuple<int,int>>(new Command(MessageType.GetEncoderCounts));
         }
 
         public async Task ResetEncoder()
         {
+            _logger.LogInformation("Resetting encoder counts");
             await SendCommand(new Command(MessageType.ResetEncoder));
         }
-
-        
-
 
         // private methods
         private async Task SendCommand(Command cmd)

@@ -2,6 +2,7 @@
 using StageControl.Enums;
 using StageControl.Consts;
 using MeasurementUI.Core.Models;
+using Microsoft.Extensions.Logging;
 
 namespace StageControl.Model
 {
@@ -23,22 +24,19 @@ namespace StageControl.Model
 
     public class SerialController
     {
+        // Private members
         private readonly SerialPort port;
-        string currentMessage;
+        private string currentMessage;
+        private readonly ILogger<SerialController> _logger;
 
         public event EventHandler<SerialDataItemReceivedEventArgs>? SerialDataItemReceived;
 
-        public SerialController()
+        public SerialController(SerialConfig serialConf, ILogger<SerialController> bottomLogger)
         {
-            currentMessage = "";
-            port = new SerialPort("COM3", 115200, Parity.None, 8, StopBits.One);
-        }
-
-
-        public SerialController(SerialConfig serialConf)
-        {
+            _logger = bottomLogger;
             currentMessage = "";
             port = new SerialPort(serialConf.COM, serialConf.BaudRate, serialConf.Parity, serialConf.DataBits, serialConf.StopBits);
+            _logger.LogInformation("Stage SerialController constructed");
         }
 
         private void triggerReboot()

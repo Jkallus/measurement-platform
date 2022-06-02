@@ -63,40 +63,29 @@ namespace StageControl.Model
 
 
         #region Constructors
-        //public FNCMachineControl()
-        //{
-        //    controller = new FluidNCController();
-        //    state = new MachineState();
-
-        //    controller.FNCStateChanged += Controller_StateChanged;
-        //    controller.ReceivedStatusUpdate += StatusUpdateReceived;
-        //}
-
-        public FNCMachineControl(StageSerialConfig serialConf, StageConfig stageConf, ILogger<FNCMachineControl> logger)
+        public FNCMachineControl(StageSerialConfig serialConf, StageConfig stageConf, ILogger<FNCMachineControl> topLogger, ILogger<FluidNCController> middleLogger, ILogger<SerialController> bottomLogger)
         {
-            _logger = logger;
-            _logger.LogInformation("FNCMachineControl constructed");
-            controller = new FluidNCController(serialConf);
+            _logger = topLogger;
+            controller = new FluidNCController(serialConf, middleLogger, bottomLogger);
             state = new MachineState(stageConf);
-
             controller.FNCStateChanged += Controller_StateChanged;
             controller.ReceivedStatusUpdate += StatusUpdateReceived;
             controller.RequestComplete += Controller_RequestComplete;
+            _logger.LogInformation("FNCMachineControl constructed");
         }
-
-       
-
         #endregion
 
         #region Public Methods
         public async Task<bool> Initialize()
         {
+            _logger.LogInformation("Initializing Stage");
             TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
             EventHandler<EventArgs>? InitCompleteEventHandler = null;
             InitCompleteEventHandler = (sender, e) =>
             {
                 tcs.SetResult(true);
                 controller.InitializationComplete -= InitCompleteEventHandler;
+                _logger.LogInformation("Stage Initialization complete");
             };
             controller.InitializationComplete += InitCompleteEventHandler;
             controller.Connect();
@@ -106,6 +95,7 @@ namespace StageControl.Model
         public void Deinitialize()
         {
             controller.Disconnect();
+            _logger.LogInformation("Deinitialized stage");
         }
 
         public async Task<bool> Jog(int X, int Y, JogType type)
@@ -144,6 +134,7 @@ namespace StageControl.Model
                             state.YAxis.IsHomed = true;
                         }
                         OnHomingComplete(new EventArgs());
+                        _logger.LogInformation("Homing complete");
                     }
                     
                 }
