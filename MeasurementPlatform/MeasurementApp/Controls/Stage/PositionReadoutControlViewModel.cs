@@ -49,14 +49,23 @@ namespace MeasurementApp.Controls
             _serviceProvider = serviceProvider;
             _systemController = _serviceProvider.GetService(typeof(SystemController)) as SystemController;
             _items = new ObservableCollection<ReadoutItem>();
-            double? initialXPosition = _systemController.IsMotionControllerConnected ? _systemController.MotionController.XPosition : null;
-            double? initialYPosition = _systemController.IsMotionControllerConnected ? _systemController.MotionController.YPosition : null;
-            Items.Add(new ReadoutItem("X Position", initialXPosition.ToString()));
-            Items.Add(new ReadoutItem("Y Position", initialYPosition.ToString()));
+            Items.Add(new ReadoutItem("X Position", "Unknown"));
+            Items.Add(new ReadoutItem("Y Position", "Unknown"));
             Items.Add(new ReadoutItem("Stage Homed", _systemController.MotionController.IsHomed.ToString()));
             
             _systemController.MotionController.PositionChanged += MotionController_PositionChanged;
             _systemController.MotionController.HomingComplete += MotionController_HomingComplete;
+            _systemController.MotionController.StateChanged += MotionController_StateChanged;
+        }
+
+        private void MotionController_StateChanged(object sender, StageControl.Events.FNCStateChangedEventArgs e)
+        {
+            App.MainRoot.DispatcherQueue.TryEnqueue(() =>
+            {
+                Items[0].Value = "Unknown";
+                Items[1].Value = "Unknown";
+                Items[2].Value = _systemController.MotionController.IsHomed.ToString();
+            });
         }
 
         private void MotionController_HomingComplete(object? sender, EventArgs e)

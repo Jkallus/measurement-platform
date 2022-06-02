@@ -95,6 +95,8 @@ namespace StageControl.Model
         public void Deinitialize()
         {
             controller.Disconnect();
+            state.XAxis.IsHomed = false;
+            state.YAxis.IsHomed = false;
             _logger.LogInformation("Deinitialized stage");
         }
 
