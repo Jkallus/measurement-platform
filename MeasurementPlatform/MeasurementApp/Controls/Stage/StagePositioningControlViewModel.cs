@@ -113,6 +113,13 @@ namespace MeasurementApp.Controls
             HomeCommand = new AsyncRelayCommand<HomingAxes>(OnHomeRequested, CanHome);
             MotionCommand = new AsyncRelayCommand<MotionDirection>(OnMotionRequested, CanPerformMotion);
             _systemController.MotionController.RuntimeError += MotionController_RuntimeError;
+            _systemController.MotionController.StateChanged += MotionController_StateChanged;
+        }
+
+        private void MotionController_StateChanged(object sender, FNCStateChangedEventArgs e)
+        {
+            MotionCommand.NotifyCanExecuteChanged();
+            HomeCommand.NotifyCanExecuteChanged();
         }
 
         private void MotionController_RuntimeError(object sender, RuntimeErrorEventArgs e)
@@ -126,7 +133,9 @@ namespace MeasurementApp.Controls
         // Private Methods
         private bool CanPerformMotion(MotionDirection obj)
         {
-            if (IsBusy)
+            if (!_systemController.IsMotionControllerConnected)
+                return false;
+            else if (IsBusy)
                 return false;
             else if (_systemController.MotionController.IsHomed == false)
                 return false;
@@ -176,7 +185,7 @@ namespace MeasurementApp.Controls
 
         private bool CanHome(HomingAxes axes)
         {
-            return !IsBusy;
+            return !IsBusy && _systemController.IsMotionControllerConnected;
         }
 
     }

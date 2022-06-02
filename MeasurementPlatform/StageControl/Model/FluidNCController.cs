@@ -188,6 +188,7 @@ namespace StageControl.Model
         {
             if(FNCStateChanged != null)
             {
+                _logger.LogInformation("FNC state changed: {state}", e.State);
                 EventHandler<FNCStateChangedEventArgs> handler = FNCStateChanged;
                 handler(this, e);
             }            
