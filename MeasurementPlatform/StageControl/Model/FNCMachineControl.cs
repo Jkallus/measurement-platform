@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using StageControl.Interfaces;
 using StageControl.Events;
 using MeasurementUI.Core.Models;
+using Microsoft.Extensions.Logging;
 
 namespace StageControl.Model
 {
@@ -15,6 +16,7 @@ namespace StageControl.Model
         #region Private Members
         private FluidNCController controller;
         private MachineState state;
+        private readonly ILogger<FNCMachineControl> _logger;
 
         #endregion
 
@@ -61,17 +63,19 @@ namespace StageControl.Model
 
 
         #region Constructors
-        public FNCMachineControl()
-        {
-            controller = new FluidNCController();
-            state = new MachineState();
+        //public FNCMachineControl()
+        //{
+        //    controller = new FluidNCController();
+        //    state = new MachineState();
 
-            controller.FNCStateChanged += Controller_StateChanged;
-            controller.ReceivedStatusUpdate += StatusUpdateReceived;
-        }
+        //    controller.FNCStateChanged += Controller_StateChanged;
+        //    controller.ReceivedStatusUpdate += StatusUpdateReceived;
+        //}
 
-        public FNCMachineControl(SerialConfig serialConf, StageConfig stageConf)
+        public FNCMachineControl(StageSerialConfig serialConf, StageConfig stageConf, ILogger<FNCMachineControl> logger)
         {
+            _logger = logger;
+            _logger.LogInformation("FNCMachineControl constructed");
             controller = new FluidNCController(serialConf);
             state = new MachineState(stageConf);
 

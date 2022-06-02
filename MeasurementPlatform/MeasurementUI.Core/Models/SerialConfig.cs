@@ -6,6 +6,37 @@ using System.Threading.Tasks;
 
 namespace MeasurementUI.Core.Models
 {
+
+    public class StageSerialConfig : SerialConfig
+    {
+        public StageSerialConfig(string com): base(com)
+        {
+
+        }
+
+        public StageSerialConfig(): base()
+        {
+            
+        }
+    }
+
+    public class DAQSerialConfig : SerialConfig
+    {
+        public DAQSerialConfig(string com): base(com)
+        {
+
+        }
+
+        public DAQSerialConfig(): base()
+        {
+
+        }
+    }
+
+
+
+
+
     public class SerialConfig
     {
         public string COM { get; set; }

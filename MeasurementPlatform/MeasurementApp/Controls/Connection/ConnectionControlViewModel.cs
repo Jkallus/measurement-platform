@@ -2,6 +2,7 @@
 using MeasurementApp.Services;
 using MeasurementUI.BusinessLogic.SystemControl;
 using MeasurementUI.BusinessLogic.SystemControl.Enums;
+using Microsoft.Extensions.Logging;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
 using Microsoft.UI.Xaml.Media;
@@ -19,15 +20,17 @@ namespace MeasurementApp.Controls
         // Private Members
         private readonly SystemController _systemController;
         private readonly IServiceProvider _serviceProvider;
+        private readonly ILogger<ConnectionControlViewModel> _logger;
 
         // Constructor
-        public ConnectionControlViewModel(IServiceProvider serviceProvider)
+        public ConnectionControlViewModel(IServiceProvider serviceProvider, ILogger<ConnectionControlViewModel> logger)
         {
             _serviceProvider = serviceProvider;
             _systemController = _serviceProvider.GetService(typeof(SystemController)) as SystemController;
             _systemController.PropertyChanged += SystemController_PropertyChanged;
             ConnectCommand = new AsyncRelayCommand(OnConnect, CanConnect);
             DisconnectCommand = new AsyncRelayCommand(OnDisconnect, CanDisconnect);
+            _logger = logger;
         }
 
         // Public Properties
@@ -76,10 +79,12 @@ namespace MeasurementApp.Controls
             try
             {
                 IsBusy = true;
+                _logger.LogInformation("Connecting to system");
                 await _systemController.Initialize();
             }
             catch(DAQException ex)
             {
+                _logger.LogError(ex, "Error on connect");
                 await App.MainRoot.MessageDialogAsync("DAQError", ex.Message);
             }
             finally

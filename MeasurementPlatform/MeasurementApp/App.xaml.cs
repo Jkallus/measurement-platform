@@ -15,6 +15,16 @@ using System.IO;
 using MeasurementUI.BusinessLogic.Configuration;
 using MeasurementUI.BusinessLogic.SystemControl;
 using MeasurementApp.Controls;
+using Serilog;
+using Serilog.AspNetCore;
+using Microsoft.Extensions.Logging.Configuration;
+using System;
+using UnhandledExceptionEventArgs = Microsoft.UI.Xaml.UnhandledExceptionEventArgs;
+using MeasurementUI.Core.Models;
+using DAQ.Interfaces;
+using DAQ.Model;
+using StageControl.Interfaces;
+using StageControl.Model;
 
 // To learn more about WinUI3, see: https://docs.microsoft.com/windows/apps/winui/winui3/.
 namespace MeasurementApp
@@ -34,6 +44,7 @@ namespace MeasurementApp
                 .AddJsonFile("machineconfig.json", optional: false, reloadOnChange: false)
                 .Build();
             })
+            .UseSerilog()
             .ConfigureServices((context, services) =>
             {
 
@@ -45,7 +56,13 @@ namespace MeasurementApp
 
                 // Application Custom Services
                 services.AddSingleton<MachineConfiguration>(context.Configuration.GetSection("MachineConfig").Get<MachineConfiguration>());
+
+                services.AddSingleton<StageSerialConfig>(context.Configuration.GetSection("MachineConfig:StageSerialConfig").Get<StageSerialConfig>());
+                services.AddSingleton<DAQSerialConfig>(context.Configuration.GetSection("MachineConfig:DAQSerialConfig").Get<DAQSerialConfig>());
+                services.AddSingleton<StageConfig>(context.Configuration.GetSection("MachineConfig:StageConfig").Get<StageConfig>());
                 services.AddSingleton<SystemController>();
+                services.AddSingleton<IDAQ, ESPDAQ>();
+                services.AddSingleton<IMachineControl, FNCMachineControl>();
 
                 // Services
                 services.AddSingleton<IThemeSelectorService, ThemeSelectorService>();
@@ -89,8 +106,33 @@ namespace MeasurementApp
 
         public App()
         {
-            InitializeComponent();
-            UnhandledException += App_UnhandledException;
+            var configuration = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json")
+                .Build();
+
+            Log.Logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(configuration)
+                .CreateLogger();
+
+            try
+            {
+                Log.Information("Application Starting Up");
+                InitializeComponent();
+                UnhandledException += App_UnhandledException;
+            }
+            catch(Exception ex)
+            {
+                Log.Fatal(ex, "The application failed to start correctly");
+                Log.CloseAndFlush();
+            }
+            finally
+            {
+                
+                
+            }
+
+            
+            
         }
 
         private void App_UnhandledException(object sender, UnhandledExceptionEventArgs e)
