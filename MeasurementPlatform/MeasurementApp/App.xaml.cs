@@ -86,10 +86,12 @@ namespace MeasurementApp
                 services.AddTransient<ShellPage>();
                 services.AddTransient<ShellViewModel>();
 
-                services.AddSingleton<ConnectionControlViewModel>();
-                services.AddSingleton<StagePositioningControlViewModel>();
-                services.AddSingleton<DAQDiagnosticsControlViewModel>();
-                services.AddSingleton<PositionReadoutControlViewModel>();
+                services.AddTransient<ConnectionControlViewModel>();
+                services.AddTransient<StagePositioningControlViewModel>();
+                services.AddTransient<DAQDiagnosticsControlViewModel>();
+                services.AddTransient<PositionReadoutControlViewModel>();
+                services.AddTransient<StageGraphicalControlViewModel>();
+                services.AddTransient<ExampleControlViewModel>();
 
                 // Configuration
                 services.Configure<LocalSettingsOptions>(context.Configuration.GetSection(nameof(LocalSettingsOptions)));
