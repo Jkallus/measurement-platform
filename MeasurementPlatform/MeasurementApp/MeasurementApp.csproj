@@ -13,11 +13,22 @@
     <ApplicationIcon>Assets\target.ico</ApplicationIcon>
     <StartupObject>MeasurementApp.Program</StartupObject>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
+    <Optimize>False</Optimize>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Optimize>False</Optimize>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|arm64'">
+    <Optimize>False</Optimize>
+  </PropertyGroup>
   <ItemGroup>
     <None Remove="Controls\Connection\ComponentState.xaml" />
     <None Remove="Controls\Connection\ConnectionControl.xaml" />
     <None Remove="Controls\DAQ\DAQDiagnosticsControl.xaml" />
+    <None Remove="Controls\Example\ExampleControl.xaml" />
     <None Remove="Controls\Stage\PositionReadoutControl.xaml" />
+    <None Remove="Controls\Stage\StageGraphicalControl.xaml" />
     <None Remove="Controls\Stage\StagePositioningControl.xaml" />
   </ItemGroup>
 
@@ -27,6 +38,7 @@
 
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.WinUI.UI.Controls" Version="7.1.2" />
+    <PackageReference Include="H.OxyPlot.WinUI" Version="0.9.21" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
     <PackageReference Include="Microsoft.Toolkit.Mvvm" Version="7.1.2" />
     <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls" Version="7.1.2" />
@@ -50,6 +62,12 @@
     <None Update="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <Page Update="Controls\Stage\StageGraphicalControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Controls\Example\ExampleControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="Controls\Stage\PositionReadoutControl.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>

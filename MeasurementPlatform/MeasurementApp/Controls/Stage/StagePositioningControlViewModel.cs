@@ -3,6 +3,7 @@ using MeasurementApp.Services;
 using MeasurementUI.BusinessLogic.SystemControl;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
+using Microsoft.Toolkit.Mvvm.Messaging;
 using StageControl.Enums;
 using StageControl.Events;
 using System;
@@ -13,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace MeasurementApp.Controls
 {
-    public class StagePositioningControlViewModel: ObservableObject
+    public class StagePositioningControlViewModel: ObservableRecipient
     {
         // Private member variables
         private readonly IServiceProvider _serviceProvider;
@@ -21,6 +22,7 @@ namespace MeasurementApp.Controls
         private int _realStepSize;
 
         // Public properties
+        public IAsyncRelayCommand GoToTargetCommand { get; private set; }
         public IAsyncRelayCommand<HomingAxes> HomeCommand { get; private set; }
         public IAsyncRelayCommand<MotionDirection> MotionCommand { get; private set; }
 
@@ -71,8 +73,16 @@ namespace MeasurementApp.Controls
                 if (SetProperty(ref isBusy, value))
                 {
                     HomeCommand.NotifyCanExecuteChanged();
+                    MotionCommand.NotifyCanExecuteChanged();
+                    GoToTargetCommand.NotifyCanExecuteChanged();
                 }
             }
+        }
+
+        private (float XCoordinate, float YCoordinate) _targetPosition;
+        public string TargetPosition
+        {
+            get => $"{_targetPosition.XCoordinate.ToString("0.000")}, {_targetPosition.YCoordinate.ToString("0.000")}";
         }
 
         private int _stepSizeButtonIndex;
@@ -112,14 +122,48 @@ namespace MeasurementApp.Controls
             _realStepSize = 10000;
             HomeCommand = new AsyncRelayCommand<HomingAxes>(OnHomeRequested, CanHome);
             MotionCommand = new AsyncRelayCommand<MotionDirection>(OnMotionRequested, CanPerformMotion);
+            GoToTargetCommand = new AsyncRelayCommand(OnGoToTargetRequested, CanGoToTarget);
             _systemController.MotionController.RuntimeError += MotionController_RuntimeError;
             _systemController.MotionController.StateChanged += MotionController_StateChanged;
+            WeakReferenceMessenger.Default.Register<StageTargetPositionChangedMessage>(this, (r, m) =>
+            {
+                App.MainRoot.DispatcherQueue.TryEnqueue(() =>
+                {
+                    _targetPosition = m.TargetLocation;
+                    OnPropertyChanged("TargetPosition");
+                });
+            });
+        }
+
+        private async Task OnGoToTargetRequested()
+        {
+            try
+            {
+                IsBusy = true;
+                await _systemController.Jog( (int)_targetPosition.XCoordinate, (int)_targetPosition.YCoordinate, JogType.Absolute);
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+        private bool CanGoToTarget()
+        {
+            if (!_systemController.IsMotionControllerConnected)
+                return false;
+            else if (IsBusy)
+                return false;
+            else if (_systemController.MotionController.IsHomed == false)
+                return false;
+            else return true;
         }
 
         private void MotionController_StateChanged(object sender, FNCStateChangedEventArgs e)
         {
             MotionCommand.NotifyCanExecuteChanged();
             HomeCommand.NotifyCanExecuteChanged();
+            GoToTargetCommand.NotifyCanExecuteChanged();
         }
 
         private void MotionController_RuntimeError(object sender, RuntimeErrorEventArgs e)
@@ -163,8 +207,8 @@ namespace MeasurementApp.Controls
             finally
             {
                 IsBusy = false;
-                MotionCommand.NotifyCanExecuteChanged();
-                HomeCommand.NotifyCanExecuteChanged();
+                //MotionCommand.NotifyCanExecuteChanged();
+                //HomeCommand.NotifyCanExecuteChanged();
             }
         }
 
@@ -178,7 +222,7 @@ namespace MeasurementApp.Controls
             finally
             {
                 IsBusy = false;
-                MotionCommand.NotifyCanExecuteChanged();
+                //MotionCommand.NotifyCanExecuteChanged();
             }
 
         }

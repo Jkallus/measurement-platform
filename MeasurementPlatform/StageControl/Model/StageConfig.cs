@@ -10,5 +10,10 @@ namespace StageControl.Model
     {
         public double XAxisLength { get; set; }
         public double YAxisLength { get; set; }
+
+        public override string ToString()
+        {
+            return $"{XAxisLength} by {YAxisLength}";
+        }
     }
 }
