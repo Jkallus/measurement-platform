@@ -9,6 +9,7 @@ using Microsoft.UI.Xaml.Media;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -87,6 +88,11 @@ namespace MeasurementApp.Controls
                 _logger.LogError(ex, "Error on connect");
                 await App.MainRoot.MessageDialogAsync("DAQError", ex.Message);
             }
+            catch(FileNotFoundException ex)
+            {
+                _logger.LogDebug(ex.Message);
+                await App.MainRoot.MessageDialogAsync("Serial Port Error", ex.Message);
+             }
             finally
             {
                 IsBusy = false;
