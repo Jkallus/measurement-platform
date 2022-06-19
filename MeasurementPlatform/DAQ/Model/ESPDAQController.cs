@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DAQ.Enums;
+using Microsoft.Extensions.Logging;
 
 namespace DAQ.Model
 {
@@ -27,6 +28,7 @@ namespace DAQ.Model
         private readonly SerialController _serial;
         private Command? _currentCommand; // pending command
         private bool _initCommandPending; // are we waiting for a response to an init or deinit command
+        private readonly ILogger<ESPDAQController> _logger;
 
         // Public properties
         //public event EventHandler<EventArgs>? InitializationComplete;
@@ -48,13 +50,14 @@ namespace DAQ.Model
 
 
         // Constructors
-        public ESPDAQController(): this(new SerialConfig("COM6"))
-        {
-        }
+        //public ESPDAQController(): this(new SerialConfig("COM6"))
+        //{
+        //}
 
-        public ESPDAQController(SerialConfig serialConfig)
+        public ESPDAQController(SerialConfig serialConfig, ILogger<ESPDAQController> middleLogger, ILogger<SerialController> bottomLogger)
         {
-            _serial = new SerialController(serialConfig);
+            _logger = middleLogger;
+            _serial = new SerialController(serialConfig, bottomLogger);
             _serial.ResponseReceived += _serial_ResponseReceived;
             _initCommandPending = false;
             IsInitialized = false;
@@ -74,7 +77,7 @@ namespace DAQ.Model
                 }
                 else // either theres no current command or the response type doesnt match the command type, either way this is unexpected feedback
                 {
-                    // handle unexpected feedback
+                    // TODO handle unexpected feedback
                 }
             }
         }
@@ -84,6 +87,10 @@ namespace DAQ.Model
         // Public methods
         public void SendCommand(Command cmd)
         {
+            if(!_serial.IsSerialportInitialized)
+            {
+                _serial.Initialize();
+            }
             if (cmd.MessageType == MessageType.Initialize || cmd.MessageType == MessageType.Deinitialize) // mark init command pending if the request was either init or deinit
                 _initCommandPending = true;
             if(cmd.MessageType == MessageType.Initialize)
@@ -107,7 +114,7 @@ namespace DAQ.Model
             if(StateChanged != null)
             {
                 EventHandler<DAQStateEventArgs> handler = StateChanged;
-                handler(handler, e);
+                handler(this, e);
             }
         }
 

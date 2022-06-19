@@ -31,10 +31,10 @@ namespace DAQ.Model
         }
 
         // Constructor
-        public ESPDAQ(DAQSerialConfig serialConfig, ILogger<ESPDAQ> logger)
+        public ESPDAQ(DAQSerialConfig serialConfig, ILogger<ESPDAQ> topLogger, ILogger<ESPDAQController> middleLogger, ILogger<SerialController> bottomLogger)
         {
-            _logger = logger;
-            _controller = new ESPDAQController(serialConfig);
+            _logger = topLogger;
+            _controller = new ESPDAQController(serialConfig, middleLogger, bottomLogger);
         }
 
         // Public methods

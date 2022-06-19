@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using DAQ.Enums;
 using MeasurementUI.Core.Models;
+using Microsoft.Extensions.Logging;
 
 namespace DAQ.Model
 {
@@ -18,15 +19,30 @@ namespace DAQ.Model
         // Private member variables
         private readonly SerialPort _port;
         private string _currentMessage;
-
+        private readonly ILogger<SerialController> _logger;
         // Public properties
         public event EventHandler<ResponseReceivedEventArgs>? ResponseReceived;
+
+
+        public bool IsSerialportInitialized
+        {
+            get { return _port.IsOpen; }
+        }
 
         // Public methods
         public void Initialize()
         {
-            _port.Open();
-            _port.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
+            try
+            {
+                _port.Open();
+                _port.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
+            }
+            catch(System.IO.FileNotFoundException ex)
+            {
+                _logger.LogError(ex.Message);
+                throw ex;
+            }
+            
         }
 
         public void SendSerialData(string msg)
@@ -36,17 +52,20 @@ namespace DAQ.Model
 
 
         // Constructors
-        public SerialController(): this(new SerialConfig("COM6"))
-        {
+        //public SerialController(): this(new SerialConfig("COM6"))
+        //{
 
-        }
+        //}
 
-        public SerialController(SerialConfig serialConf)
+        public SerialController(SerialConfig serialConf, ILogger<SerialController> bottomLogger)
         {
+            _logger = bottomLogger;
             _currentMessage = "";
             _port = new SerialPort(serialConf.COM, serialConf.BaudRate, serialConf.Parity, serialConf.DataBits, serialConf.StopBits);
-            this.Initialize();
+            //this.Initialize();
         }
+
+        
 
         // Private methods
         private void DataReceivedHandler(object sender, SerialDataReceivedEventArgs e)
