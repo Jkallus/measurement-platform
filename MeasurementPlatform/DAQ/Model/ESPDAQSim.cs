@@ -66,7 +66,10 @@ namespace DAQ.Model
             Task.Run(async () =>
             {
                 await Task.Delay(_delayMs);
-                RaiseResponseReceivedEvent(new ResponseReceivedEventArgs(new DataResponse<int>(MessageType.GetEncoderCounts, ErrorCode.Success, 1234)));
+                var rand = new Random();
+                int countVariabilityX = rand.Next(-5, 5);
+                int countVariabilityY = rand.Next(-5, 5);
+                RaiseResponseReceivedEvent(new ResponseReceivedEventArgs(new DataResponse<Tuple<int,int>>(MessageType.GetEncoderCounts, ErrorCode.Success, Tuple.Create<int, int>(1234 + countVariabilityX, 5678 + countVariabilityY))));
             });
         }
 
@@ -75,7 +78,9 @@ namespace DAQ.Model
             Task.Run(async () =>
             {
                 await Task.Delay(_delayMs);
-                RaiseResponseReceivedEvent(new ResponseReceivedEventArgs(new DataResponse<float>(MessageType.GetVoltage, ErrorCode.Success, 3.141592f)));
+                var rand = new Random();
+                double voltageFluctuation = rand.NextDouble();
+                RaiseResponseReceivedEvent(new ResponseReceivedEventArgs(new DataResponse<float>(MessageType.GetVoltage, ErrorCode.Success, (float)(3.141592 + 1.0 * voltageFluctuation))));
             });            
         }
 
