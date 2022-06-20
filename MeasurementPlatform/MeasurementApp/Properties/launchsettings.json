@@ -1,10 +1,18 @@
-﻿{
-    "profiles": {
-      "MeasurementApp (Package)": {
-        "commandName": "MsixPackage"
-      },
-      "MeasurementApp (Unpackaged)": {
-        "commandName": "Project"
-      }
+{
+  "profiles": {
+    "MeasurementApp (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "MeasurementApp (Unpackaged)": {
+      "commandName": "Project"
+    },
+    "MeasurementApp (Simulation)": {
+      "commandName": "MsixPackage",
+      "commandLineArgs": "Simulation"
+    },
+    "MeasurementApp (Hardware)": {
+      "commandName": "MsixPackage",
+      "commandLineArgs": "Hardware"
     }
+  }
 }

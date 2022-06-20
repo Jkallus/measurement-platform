@@ -47,7 +47,8 @@ namespace MeasurementApp
             .UseSerilog()
             .ConfigureServices((context, services) =>
             {
-
+                string[] cmdargs = Environment.GetCommandLineArgs();
+                bool simulationMode = cmdargs.Length > 1 ? (cmdargs[1] == "Simulation") : false;
 
                 // Default Activation Handler
                 services.AddTransient<ActivationHandler<LaunchActivatedEventArgs>, DefaultActivationHandler>();
@@ -61,8 +62,9 @@ namespace MeasurementApp
                 services.AddSingleton<DAQSerialConfig>(context.Configuration.GetSection("MachineConfig:DAQSerialConfig").Get<DAQSerialConfig>());
                 services.AddSingleton<StageConfig>(context.Configuration.GetSection("MachineConfig:StageConfig").Get<StageConfig>());
                 services.AddSingleton<SystemController>();
-                services.AddSingleton<IDAQ, ESPDAQ>();
-                services.AddSingleton<IMachineControl, FNCMachineControl>();
+
+                services.AddSingleton(typeof(IDAQ), simulationMode ? typeof(ESPDAQSim) : typeof(ESPDAQ));
+                services.AddSingleton(typeof(IMachineControl), simulationMode ? typeof(FNCMachineControlSim) : typeof(FNCMachineControl));
 
                 // Services
                 services.AddSingleton<IThemeSelectorService, ThemeSelectorService>();
