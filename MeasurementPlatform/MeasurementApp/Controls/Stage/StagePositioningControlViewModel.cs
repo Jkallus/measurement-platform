@@ -140,7 +140,7 @@ namespace MeasurementApp.Controls
             try
             {
                 IsBusy = true;
-                await _systemController.Jog( (int)_targetPosition.XCoordinate, (int)_targetPosition.YCoordinate, JogType.Absolute);
+                await _systemController.Jog( (int)(_targetPosition.XCoordinate * 1000), (int)(_targetPosition.YCoordinate * 1000), JogType.Absolute);
             }
             finally
             {
