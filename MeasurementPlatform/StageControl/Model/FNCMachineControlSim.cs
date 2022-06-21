@@ -15,10 +15,17 @@ namespace StageControl.Model
 {
     public class FluidNCSim
     {
+        // internal machine state
+        private double _xLoc;
+        private double _yLoc;
+        private double _xHomePosition;
+        private double _yHomePosition;
+
         private ILogger<FluidNCSim> _logger;
         private int _commandDelayMs;
         private int _statusDelayMs;
         private int _bootStepDelayMs;
+        private int _moveDelayMs;
 
         public event EventHandler<SerialDataItemReceivedEventArgs>? ResponseReceived;
         
@@ -29,6 +36,12 @@ namespace StageControl.Model
             _commandDelayMs = 50;
             _statusDelayMs = 10;
             _bootStepDelayMs = 100;
+            _moveDelayMs = 1000;
+
+            _xHomePosition = 298.000;
+            _yHomePosition = 2.000;
+            _xLoc = 150.000;
+            _yLoc = 125.000;
         }
 
         public void ReceiveRequest(Request req)
@@ -51,7 +64,18 @@ namespace StageControl.Model
             Task.Run(async () =>
             {
                 await Task.Delay(_commandDelayMs);
-                OnResponseReceived(new SerialDataItemReceivedEventArgs(new SerialDataItem(SerialDataConsts.RequestCompleteMessageMarker, DateTime.Now, SerialDataType.RequestComplete)));
+                OnResponseReceived(new SerialDataItemReceivedEventArgs(new SerialDataItem(SerialDataConsts.RequestCompleteMessageMarker, DateTime.Now, SerialDataType.RequestComplete))); // send ack after processing but before moving
+                await Task.Delay(_moveDelayMs);
+                if(jogReq.JogType == JogType.Absolute)
+                {
+                    _xLoc = jogReq.X / 1000.0;
+                    _yLoc = jogReq.Y / 1000.0;
+                }
+                else // incremental
+                {
+                    _xLoc += jogReq.X / 1000.0;
+                    _yLoc += jogReq.Y / 1000.0;
+                }
             });
         }
 
@@ -59,8 +83,18 @@ namespace StageControl.Model
         {
             Task.Run(async () =>
             {
-                await Task.Delay(_commandDelayMs);
-                OnResponseReceived(new SerialDataItemReceivedEventArgs(new SerialDataItem(SerialDataConsts.RequestCompleteMessageMarker, DateTime.Now, SerialDataType.RequestComplete)));
+                await Task.Delay(_commandDelayMs); // delay to simulate FNC processing time
+                await Task.Delay(_moveDelayMs);
+                if (homeReq.Axes == HomingAxes.X)
+                    _xLoc = _xHomePosition;
+                else if (homeReq.Axes == HomingAxes.Y)
+                    _yLoc = _yHomePosition;
+                else
+                {
+                    _xLoc = _xHomePosition;
+                    _yLoc = _yHomePosition;
+                }
+                OnResponseReceived(new SerialDataItemReceivedEventArgs(new SerialDataItem(SerialDataConsts.RequestCompleteMessageMarker, DateTime.Now, SerialDataType.RequestComplete))); // send ack only after finishing
             });
         }
 
@@ -69,9 +103,7 @@ namespace StageControl.Model
             Task.Run(async () =>
             {
                 await Task.Delay(_statusDelayMs);
-                float x = 0.000f;
-                float y = 0.000f;
-                string statusMsg = $"<Alarm|MPos:{x.ToString("0.000")},{y.ToString("0.000")},0.000|FS:0,0>\n";
+                string statusMsg = $"<Alarm|MPos:{_xLoc.ToString("0.000")},{_yLoc.ToString("0.000")},0.000|FS:0,0>\n";
                 OnResponseReceived(new SerialDataItemReceivedEventArgs(new SerialDataItem(statusMsg, DateTime.Now, SerialDataType.Status)));
             });
         }
@@ -229,7 +261,8 @@ namespace StageControl.Model
 
         private void StatusTimerTick(object? sender, EventArgs e)
         {
-            RequestStatus();
+            _logger.LogDebug("Sending Status Request");
+            _fluidNCSim.SendStatusRequest();
         }
 
         private void ResponseReceived(object? sender, SerialDataItemReceivedEventArgs e)
@@ -299,10 +332,7 @@ namespace StageControl.Model
         }
 
 
-        private void RequestStatus()
-        {
-            _fluidNCSim.SendStatusRequest();
-        }
+       
 
         private void InitTimer()
         {
