@@ -24,7 +24,7 @@
                 </StackPanel>
                 <StackPanel Orientation="Vertical" Canvas.Left="275" Canvas.Top="30">
                     <TextBlock Text="Step Size"/>
-                    <RadioButtons x:Name="StepSizeRadioButtons" SelectedIndex="{x:Bind ViewModel.StepSizeButtonIndex, Mode=TwoWay}">
+                    <RadioButtons x:Name="StepSizeRadioButtons" SelectedItem="" SelectedIndex="{x:Bind ViewModel.StepSizeButtonIndex, Mode=TwoWay}">
                         <x:String>50,000um</x:String>
                         <x:String>10,000um</x:String>
                         <x:String>1,000um</x:String>
