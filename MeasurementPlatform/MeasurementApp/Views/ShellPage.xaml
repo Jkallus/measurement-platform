@@ -33,12 +33,17 @@
             </NavigationViewItem>
             <NavigationViewItem x:Uid="Shell_StageDiagnostics" helpers:NavigationHelper.NavigateTo="MeasurementApp.ViewModels.StageDiagnosticsViewModel">
                 <NavigationViewItem.Icon>
-                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE8F0;"/>
+                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xECE9;"/>
                 </NavigationViewItem.Icon>
             </NavigationViewItem>
             <NavigationViewItem x:Uid="Shell_DAQDiagnostics" helpers:NavigationHelper.NavigateTo="MeasurementApp.ViewModels.DAQDiagnosticsViewModel">
                 <NavigationViewItem.Icon>
                     <FontIcon Glyph="&#xED5E;"/>
+                </NavigationViewItem.Icon>
+            </NavigationViewItem>
+            <NavigationViewItem x:Uid="Shell_JobSetup" helpers:NavigationHelper.NavigateTo="MeasurementApp.ViewModels.JobSetupViewModel">
+                <NavigationViewItem.Icon>
+                    <FontIcon Glyph="&#xEE6F;"/>
                 </NavigationViewItem.Icon>
             </NavigationViewItem>
         </NavigationView.MenuItems>

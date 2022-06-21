@@ -30,6 +30,7 @@
     <None Remove="Controls\Stage\PositionReadoutControl.xaml" />
     <None Remove="Controls\Stage\StageGraphicalControl.xaml" />
     <None Remove="Controls\Stage\StagePositioningControl.xaml" />
+    <None Remove="Views\JobSetupPage.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -62,6 +63,9 @@
     <None Update="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <Page Update="Views\JobSetupPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="Controls\Stage\StageGraphicalControl.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>

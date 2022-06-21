@@ -132,4 +132,7 @@
   <data name="Shell_DAQDiagnostics.Content" xml:space="preserve">
     <value>DAQ Diagnostics</value>
   </data>
+  <data name="Shell_JobSetup.Content" xml:space="preserve">
+    <value>Job Setup</value>
+  </data>
 </root>

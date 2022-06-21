@@ -79,6 +79,8 @@ namespace MeasurementApp
                 services.AddSingleton<IFileService, FileService>();
 
                 // Views and ViewModels
+                services.AddTransient<JobSetupViewModel>();
+                services.AddTransient<JobSetupPage>();
                 services.AddTransient<DAQDiagnosticsViewModel>();
                 services.AddTransient<DAQDiagnosticsPage>();
                 services.AddTransient<StageDiagnosticsViewModel>();
