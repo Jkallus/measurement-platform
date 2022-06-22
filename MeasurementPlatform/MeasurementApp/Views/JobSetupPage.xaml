@@ -5,12 +5,19 @@
     xmlns:local="using:MeasurementApp.Views"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:MeasurementApp.Controls.JobSetup"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid x:Name="ContentArea" Margin="{StaticResource MediumLeftRightMargin}">
         <Grid Background="{ThemeResource SystemControlPageBackgroundChromeLowBrush}">
-            <TextBlock Text="Job Setup Page Stub" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="32"/>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="600"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            
+            <controls:ScanDisplayControl Width="600" Height="500" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+            
         </Grid>
     </Grid>
 </Page>

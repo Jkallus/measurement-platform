@@ -25,6 +25,7 @@ using DAQ.Interfaces;
 using DAQ.Model;
 using StageControl.Interfaces;
 using StageControl.Model;
+using MeasurementApp.Controls.JobSetup;
 
 // To learn more about WinUI3, see: https://docs.microsoft.com/windows/apps/winui/winui3/.
 namespace MeasurementApp
@@ -36,7 +37,7 @@ namespace MeasurementApp
         // https://docs.microsoft.com/dotnet/core/extensions/dependency-injection
         // https://docs.microsoft.com/dotnet/core/extensions/configuration
         // https://docs.microsoft.com/dotnet/core/extensions/logging
-        private static IHost _host = Host
+        private static readonly IHost _host = Host
             .CreateDefaultBuilder()
             .ConfigureAppConfiguration((builder) =>
             {
@@ -96,6 +97,7 @@ namespace MeasurementApp
                 services.AddTransient<PositionReadoutControlViewModel>();
                 services.AddTransient<StageGraphicalControlViewModel>();
                 services.AddTransient<ExampleControlViewModel>();
+                services.AddTransient<ScanDisplayControlViewModel>();
 
                 // Configuration
                 services.Configure<LocalSettingsOptions>(context.Configuration.GetSection(nameof(LocalSettingsOptions)));
