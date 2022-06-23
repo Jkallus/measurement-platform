@@ -1,5 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using MeasurementApp.Core.Models;
+using Microsoft.Extensions.Logging;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
+using Microsoft.Toolkit.Mvvm.Messaging;
 using OxyPlot;
 using OxyPlot.Annotations;
 using OxyPlot.Axes;
@@ -24,6 +26,10 @@ namespace MeasurementApp.Controls.JobSetup
         // Public properties
         public PlotModel Model { get; set; }
 
+        PositionCoordinate BottomLeft { get; set; }
+        PositionCoordinate TopLeft { get; set; }
+        PositionCoordinate TopRight { get; set; }
+        PositionCoordinate BottomRight { get; set; }
 
         // Constructor
         public ScanDisplayControlViewModel(IServiceProvider service, ILogger<ScanDisplayControlViewModel> logger)
@@ -90,15 +96,6 @@ namespace MeasurementApp.Controls.JobSetup
             };
             model.Annotations.Add(edge);
 
-            //var scanPoints = new ScatterSeries
-            //{
-            //    Title = "Scan Points",
-            //    MarkerType = MarkerType.Circle,
-            //    MarkerFill = OxyColors.Red,
-            //    MarkerSize = 3,
-            //};
-            //model.Series.Add(scanPoints);
-
             double centerX = _stageConfig.XAxisLength / 2;
             double centerY = _stageConfig.YAxisLength / 2;
             int defaultBoxSize = 50;
@@ -111,7 +108,8 @@ namespace MeasurementApp.Controls.JobSetup
                 MaximumY = centerY + defaultBoxSize,
                 Fill = OxyColors.Transparent,
                 Stroke = OxyColors.Blue,
-                StrokeThickness = 2
+                StrokeThickness = 2,
+                Layer = AnnotationLayer.BelowSeries
             };
             model.Annotations.Add(samplingBox);
 
@@ -119,7 +117,7 @@ namespace MeasurementApp.Controls.JobSetup
             {
                 MarkerType = MarkerType.Circle,
                 MarkerFill = OxyColors.Green,
-                MarkerSize = 6
+                MarkerSize = 6,
             };
             ScatterPoint bottomLeft = new(samplingBox.MinimumX, samplingBox.MinimumY);
             ScatterPoint topLeft = new(samplingBox.MinimumX, samplingBox.MaximumY);
@@ -196,7 +194,12 @@ namespace MeasurementApp.Controls.JobSetup
                         default:
                             throw new IndexOutOfRangeException("Invalid point index");
                     }
+                    BottomLeft = new PositionCoordinate(dragPoints.Points[bottomLeftIdx].X, dragPoints.Points[bottomLeftIdx].Y);
+                    TopLeft = new PositionCoordinate(dragPoints.Points[topLeftIdx].X, dragPoints.Points[topLeftIdx].Y);
+                    TopRight = new PositionCoordinate(dragPoints.Points[topRightIdx].X, dragPoints.Points[topRightIdx].Y);
+                    BottomRight = new PositionCoordinate(dragPoints.Points[bottomRightIdx].X, dragPoints.Points[bottomRightIdx].Y);
 
+                    WeakReferenceMessenger.Default.Send<ScanAreaSelectionMessage>(new ScanAreaSelectionMessage((BottomLeft, TopLeft, TopRight, BottomRight)));
                     Model.InvalidatePlot(false);
                     e.Handled = true;
                 }
@@ -206,6 +209,12 @@ namespace MeasurementApp.Controls.JobSetup
             {
                 indexOfPointToMove = -1;
                 var point = dragPoints.InverseTransform(e.Position);
+                BottomLeft = new PositionCoordinate(dragPoints.Points[bottomLeftIdx].X, dragPoints.Points[bottomLeftIdx].Y);
+                TopLeft = new PositionCoordinate(dragPoints.Points[topLeftIdx].X, dragPoints.Points[topLeftIdx].Y);
+                TopRight = new PositionCoordinate(dragPoints.Points[topRightIdx].X, dragPoints.Points[topRightIdx].Y);
+                BottomRight = new PositionCoordinate(dragPoints.Points[bottomRightIdx].X, dragPoints.Points[bottomRightIdx].Y);
+
+                WeakReferenceMessenger.Default.Send<ScanAreaSelectionMessage>(new ScanAreaSelectionMessage((BottomLeft, TopLeft, TopRight, BottomRight)));
                 model.InvalidatePlot(false);
                 e.Handled = true;
             };

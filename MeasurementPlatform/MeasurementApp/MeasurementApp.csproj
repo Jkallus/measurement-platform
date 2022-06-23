@@ -28,6 +28,7 @@
     <None Remove="Controls\DAQ\DAQDiagnosticsControl.xaml" />
     <None Remove="Controls\Example\ExampleControl.xaml" />
     <None Remove="Controls\JobSetup\ScanDisplayControl.xaml" />
+    <None Remove="Controls\JobSetup\ScanSettingsControl.xaml" />
     <None Remove="Controls\Stage\PositionReadoutControl.xaml" />
     <None Remove="Controls\Stage\StageGraphicalControl.xaml" />
     <None Remove="Controls\Stage\StagePositioningControl.xaml" />
@@ -64,6 +65,9 @@
     <None Update="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <Page Update="Controls\JobSetup\ScanSettingsControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="Controls\JobSetup\ScanDisplayControl.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -98,6 +98,7 @@ namespace MeasurementApp
                 services.AddTransient<StageGraphicalControlViewModel>();
                 services.AddTransient<ExampleControlViewModel>();
                 services.AddTransient<ScanDisplayControlViewModel>();
+                services.AddTransient<ScanSettingsControlViewModel>();
 
                 // Configuration
                 services.Configure<LocalSettingsOptions>(context.Configuration.GetSection(nameof(LocalSettingsOptions)));
