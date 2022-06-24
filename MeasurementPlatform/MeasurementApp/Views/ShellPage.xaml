@@ -46,6 +46,11 @@
                     <FontIcon Glyph="&#xEE6F;"/>
                 </NavigationViewItem.Icon>
             </NavigationViewItem>
+            <NavigationViewItem x:Uid="Shell_JobRun" helpers:NavigationHelper.NavigateTo="MeasurementApp.ViewModels.JobRunViewModel">
+                <NavigationViewItem.Icon>
+                    <FontIcon Glyph="&#xE9F3;"/>
+                </NavigationViewItem.Icon>
+            </NavigationViewItem>
         </NavigationView.MenuItems>
         <NavigationView.HeaderTemplate>
             <DataTemplate>

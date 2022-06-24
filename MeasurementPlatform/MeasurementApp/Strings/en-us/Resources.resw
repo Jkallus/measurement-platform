@@ -135,4 +135,7 @@
   <data name="Shell_JobSetup.Content" xml:space="preserve">
     <value>Job Setup</value>
   </data>
+  <data name="Shell_JobRun.Content" xml:space="preserve">
+    <value>Job Run</value>
+  </data>
 </root>
