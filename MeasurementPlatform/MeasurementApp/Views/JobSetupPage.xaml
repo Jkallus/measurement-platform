@@ -17,7 +17,7 @@
             </Grid.ColumnDefinitions>
             
             <controls:ScanDisplayControl Width="600" Height="500" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Top"/>
-            <controls:ScanSettingsControl Width="Auto" Height="Auto" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+            <controls:ScanSettingsControl Width="Auto" Height="Auto" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20 0 0 0"/>
         </Grid>
     </Grid>
 </Page>

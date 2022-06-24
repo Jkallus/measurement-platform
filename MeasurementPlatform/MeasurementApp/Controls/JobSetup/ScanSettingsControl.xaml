@@ -8,29 +8,90 @@
     mc:Ignorable="d">
 
     <Grid>
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
 
-            <TextBlock Text="Bottom Left" Grid.Row="0" Grid.Column="0"/>
-            <TextBox Text="{x:Bind ViewModel.BottomLeft, Mode=OneWay}" IsReadOnly="True" Grid.Row="0" Grid.Column="1"/>
+        <StackPanel Orientation="Vertical">
+            <StackPanel Orientation="Horizontal" Margin="0 10 0 0">
+                <Grid Margin="0 0 40 0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
 
-            <TextBlock Text="Top Left" Grid.Row="1" Grid.Column="0"/>
-            <TextBox Text="{x:Bind ViewModel.TopLeft, Mode=OneWay}" IsReadOnly="True" Grid.Row="1" Grid.Column="1"/>
+                    <TextBlock Text="Bottom Left:" Grid.Row="0" Grid.Column="0" Margin="0 0 10 0" VerticalAlignment="Center"/>
+                    <TextBlock Text="{x:Bind ViewModel.BottomLeft, Mode=OneWay}" Grid.Row="0" Grid.Column="1"/>
 
-            <TextBlock Text="Top Right" Grid.Row="2" Grid.Column="0"/>
-            <TextBox Text="{x:Bind ViewModel.TopRight, Mode=OneWay}" IsReadOnly="True" Grid.Row="2" Grid.Column="1"/>
+                    <TextBlock Text="Top Left:" Grid.Row="1" Grid.Column="0" Margin="0 0 10 0" VerticalAlignment="Center"/>
+                    <TextBlock Text="{x:Bind ViewModel.TopLeft, Mode=OneWay}" Grid.Row="1" Grid.Column="1"/>
 
-            <TextBlock Text="Bottom Right" Grid.Row="3" Grid.Column="0"/>
-            <TextBox Text="{x:Bind ViewModel.BottomRight, Mode=OneWay}" IsReadOnly="True" Grid.Row="3" Grid.Column="1"/>
-        </Grid>
+                    <TextBlock Text="Top Right:" Grid.Row="2" Grid.Column="0" Margin="0 0 10 0" VerticalAlignment="Center"/>
+                    <TextBlock Text="{x:Bind ViewModel.TopRight, Mode=OneWay}" Grid.Row="2" Grid.Column="1"/>
+
+                    <TextBlock Text="Bottom Right:" Grid.Row="3" Grid.Column="0" Margin="0 0 10 0" VerticalAlignment="Center"/>
+                    <TextBlock Text="{x:Bind ViewModel.BottomRight, Mode=OneWay}" Grid.Row="3" Grid.Column="1"/>
+                </Grid>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="X Scan Dimension:" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Margin="0 0 10 0"/>
+                    <TextBlock Text="{x:Bind ViewModel.XDimension, Mode=OneWay}" Grid.Row="0" Grid.Column="1" VerticalAlignment="Center"/>
+
+                    <TextBlock Text="Y Scan Dimension:" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="0 0 10 0"/>
+                    <TextBlock Text="{x:Bind ViewModel.YDimension, Mode=OneWay}" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center"/>
+
+                    <TextBlock Text="Scan Area:" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Margin="0 0 10 0"/>
+                    <TextBlock Text="{x:Bind ViewModel.ScanArea, Mode=OneWay}" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center"/>
+
+                </Grid>
+            </StackPanel>
+
+
+            <Canvas Margin="0 20 0 0">
+                <StackPanel>
+                    <TextBlock Text="Sampling Settings" FontSize="18"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Scan Pitch:" VerticalAlignment="Center" Margin="0 0 10 0" />
+                        <Slider Minimum="0" Maximum="1" Width="100" Value="{x:Bind ViewModel.SliderValue, Mode=TwoWay}" VerticalAlignment="Center" StepFrequency="0.001" IsThumbToolTipEnabled="False" Margin="0 0 10 0"/>
+                        <TextBlock Text="{x:Bind ViewModel.ScanPitch, Mode=OneWay}" VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Text="X Sample Count:" Grid.Row="0" Grid.Column="0"/>
+                        <TextBlock Text="{x:Bind ViewModel.XSampleCount, Mode=OneWay}" Margin="5 0 0 0" Grid.Row="0" Grid.Column="1"/>
+                        <TextBlock Text="Y Sample Count:" Grid.Row="1" Grid.Column="0"/>
+                        <TextBlock Text="{x:Bind ViewModel.YSampleCount, Mode=OneWay}" Margin="5 0 0 0" Grid.Row="1" Grid.Column="1"/>
+                        <TextBlock Text="Total Sample Count:" Grid.Row="2" Grid.Column="0"/>
+                        <TextBlock Text="{x:Bind ViewModel.TotalSampleCount, Mode=OneWay}" Margin="5 0 0 0" Grid.Row="2" Grid.Column="1"/>
+                    </Grid>
+
+                    
+
+                </StackPanel>
+            </Canvas>
+        </StackPanel>
     </Grid>
 </UserControl>

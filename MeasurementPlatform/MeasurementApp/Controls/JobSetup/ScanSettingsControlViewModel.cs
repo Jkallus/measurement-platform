@@ -46,13 +46,91 @@ namespace MeasurementApp.Controls.JobSetup
             set => SetProperty(ref _bottomRight, value);
         }
 
+        public ScanDimension XDimension
+        {
+            get => new ScanDimension(BottomRight.X - BottomLeft.X, Units.Millimeters);
+        }
 
+        public ScanDimension YDimension
+        {
+            get => new ScanDimension(TopLeft.Y - BottomLeft.Y, Units.Millimeters);
+        }
+
+        public ScanDimension ScanArea
+        {
+            get => new ScanDimension(XDimension.Value * YDimension.Value, Units.SquareMillimeters);
+        }
+
+
+        private double _sliderValue;
+        public double SliderValue
+        {
+            get => _sliderValue;
+            set
+            {
+                if(SetProperty(ref _sliderValue, value))
+                {
+                    double adjustedValue = 100 + (0.01 - 100) / (1 + Math.Pow((value / 1.883328), 3.472488));
+                    adjustedValue *= 1000; // convert to um
+                    ScanPitch = new ScanDimension(adjustedValue, Units.Micrometers);
+                    UpdateCalculations();
+                }
+            }
+        }
+
+        /*
+         * Scan Pitch Notes:
+         * Scan pitch can range from 0.01mm to 10mm
+         * Linear slider maps to exponential scale
+         * 0 -> 0.01
+         * 0.25 -> 0.1
+         * 0.5 -> 1
+         * 1.0 -> 10
+         * 
+         * Y = 100 + (0.01 - 100)/(1 + (X/1.883328)^3.472488) from https://mycurvefit.com/
+         */
+
+
+        private ScanDimension _scanPitch;
+        public ScanDimension ScanPitch
+        {
+            get => _scanPitch;
+            set => SetProperty(ref _scanPitch, value);
+        }
+
+        private int _xSampleCount;
+        public int XSampleCount
+        {
+            get => _xSampleCount;
+            set => SetProperty(ref _xSampleCount, value);
+        }
+
+        private int _ySampleCount;
+        public int YSampleCount
+        {
+            get => _ySampleCount;
+            set => SetProperty(ref _ySampleCount, value);
+        }
+
+        private int _totalSampleCount;
+        public int TotalSampleCount
+        {
+            get => XSampleCount * YSampleCount;
+        }
 
         // Constructor
         public ScanSettingsControlViewModel(IServiceProvider service, ILogger<ScanSettingsControlViewModel> logger)
         {
             _service = service;
             _logger = logger;
+
+            _bottomLeft = new PositionCoordinate(0, 0);
+            _topLeft = new PositionCoordinate(0, 0);
+            _topRight = new PositionCoordinate(0, 0);
+            _bottomRight = new PositionCoordinate(0, 0);
+            _scanPitch = new ScanDimension(1000, Units.Micrometers);
+            _sliderValue = 0.5;
+
             WeakReferenceMessenger.Default.Register<ScanAreaSelectionMessage>(this, (r, m) =>
             {
                 App.MainRoot.DispatcherQueue.TryEnqueue(() =>
@@ -61,9 +139,24 @@ namespace MeasurementApp.Controls.JobSetup
                     TopLeft = m.Value.topLeft;
                     TopRight = m.Value.topRight;
                     BottomRight = m.Value.bottomRight;
+                    UpdateCalculations();
                 });
                 
             });
+        }
+
+        // Public methods
+        
+
+        // Private methods
+        private void UpdateCalculations()
+        {
+            OnPropertyChanged("XDimension");
+            OnPropertyChanged("YDimension");
+            OnPropertyChanged("ScanArea");
+            XSampleCount = (int)(XDimension.Value / ScanPitch.Value * 1000);
+            YSampleCount = (int)(YDimension.Value / ScanPitch.Value * 1000);
+            OnPropertyChanged("TotalSampleCount");
         }
     }
 }
