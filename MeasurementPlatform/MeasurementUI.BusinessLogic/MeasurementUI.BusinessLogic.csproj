@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DAQ\DAQ.csproj" />
+    <ProjectReference Include="..\MeasurementApp.Core\MeasurementApp.Core.csproj" />
     <ProjectReference Include="..\StageControl\StageControl.csproj" />
   </ItemGroup>
 
