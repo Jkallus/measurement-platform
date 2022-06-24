@@ -23,6 +23,13 @@ namespace MeasurementApp.Controls.JobSetup
         private readonly IServiceProvider _service;
         private readonly StageConfig _stageConfig;
 
+        private const int bottomLeftIdx = 0;
+        private const int topLeftIdx = 1;
+        private const int topRightIdx = 2;
+        private const int bottomRightIdx = 3;
+
+        ScatterSeries dragPoints;
+
         // Public properties
         public PlotModel Model { get; set; }
 
@@ -39,11 +46,20 @@ namespace MeasurementApp.Controls.JobSetup
             _stageConfig = _service.GetService(typeof(StageConfig)) as StageConfig;
 
             Model = CustomPlot();
-
+            SendUpdate();
             _logger.LogInformation("Constructed ScanDisplayControlViewModel");
         }
 
         // Private methods
+        void SendUpdate()
+        {
+            BottomLeft = new PositionCoordinate(dragPoints.Points[bottomLeftIdx].X, dragPoints.Points[bottomLeftIdx].Y);
+            TopLeft = new PositionCoordinate(dragPoints.Points[topLeftIdx].X, dragPoints.Points[topLeftIdx].Y);
+            TopRight = new PositionCoordinate(dragPoints.Points[topRightIdx].X, dragPoints.Points[topRightIdx].Y);
+            BottomRight = new PositionCoordinate(dragPoints.Points[bottomRightIdx].X, dragPoints.Points[bottomRightIdx].Y);
+            WeakReferenceMessenger.Default.Send<ScanAreaSelectionMessage>(new ScanAreaSelectionMessage((BottomLeft, TopLeft, TopRight, BottomRight)));
+        }
+
         private PlotModel CustomPlot()
         {
             var model = new PlotModel();
@@ -113,7 +129,7 @@ namespace MeasurementApp.Controls.JobSetup
             };
             model.Annotations.Add(samplingBox);
 
-            var dragPoints = new ScatterSeries
+            dragPoints = new ScatterSeries
             {
                 MarkerType = MarkerType.Circle,
                 MarkerFill = OxyColors.Green,
@@ -127,10 +143,7 @@ namespace MeasurementApp.Controls.JobSetup
             dragPoints.Points.Add(topLeft);
             dragPoints.Points.Add(topRight);
             dragPoints.Points.Add(bottomRight);
-            const int bottomLeftIdx = 0;
-            const int topLeftIdx = 1;
-            const int topRightIdx = 2;
-            const int bottomRightIdx = 3;
+            
 
             int indexOfPointToMove = -1;
 
@@ -194,12 +207,7 @@ namespace MeasurementApp.Controls.JobSetup
                         default:
                             throw new IndexOutOfRangeException("Invalid point index");
                     }
-                    BottomLeft = new PositionCoordinate(dragPoints.Points[bottomLeftIdx].X, dragPoints.Points[bottomLeftIdx].Y);
-                    TopLeft = new PositionCoordinate(dragPoints.Points[topLeftIdx].X, dragPoints.Points[topLeftIdx].Y);
-                    TopRight = new PositionCoordinate(dragPoints.Points[topRightIdx].X, dragPoints.Points[topRightIdx].Y);
-                    BottomRight = new PositionCoordinate(dragPoints.Points[bottomRightIdx].X, dragPoints.Points[bottomRightIdx].Y);
-
-                    WeakReferenceMessenger.Default.Send<ScanAreaSelectionMessage>(new ScanAreaSelectionMessage((BottomLeft, TopLeft, TopRight, BottomRight)));
+                    SendUpdate();
                     Model.InvalidatePlot(false);
                     e.Handled = true;
                 }
@@ -209,12 +217,7 @@ namespace MeasurementApp.Controls.JobSetup
             {
                 indexOfPointToMove = -1;
                 var point = dragPoints.InverseTransform(e.Position);
-                BottomLeft = new PositionCoordinate(dragPoints.Points[bottomLeftIdx].X, dragPoints.Points[bottomLeftIdx].Y);
-                TopLeft = new PositionCoordinate(dragPoints.Points[topLeftIdx].X, dragPoints.Points[topLeftIdx].Y);
-                TopRight = new PositionCoordinate(dragPoints.Points[topRightIdx].X, dragPoints.Points[topRightIdx].Y);
-                BottomRight = new PositionCoordinate(dragPoints.Points[bottomRightIdx].X, dragPoints.Points[bottomRightIdx].Y);
-
-                WeakReferenceMessenger.Default.Send<ScanAreaSelectionMessage>(new ScanAreaSelectionMessage((BottomLeft, TopLeft, TopRight, BottomRight)));
+                SendUpdate();
                 model.InvalidatePlot(false);
                 e.Handled = true;
             };
