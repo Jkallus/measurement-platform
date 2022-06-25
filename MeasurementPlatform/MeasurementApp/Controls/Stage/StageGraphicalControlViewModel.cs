@@ -118,13 +118,14 @@ namespace MeasurementApp.Controls
             targetLocationPoints.MarkerStrokeThickness = 1.5;
             model.Series.Add(targetLocationPoints);
 
-            ScatterPoint rectStartPoint;
-            ScatterPoint rectEndPoint;
-            RectangleAnnotation rectAnnotation;
-            bool currentlySelecting = false;
+            //ScatterPoint rectStartPoint;
+            //ScatterPoint rectEndPoint;
+            //RectangleAnnotation rectAnnotation;
+            //bool currentlySelecting = false;
 
             int indexOfPointToMove = -1;
 
+#pragma warning disable CS0618 // Type or member is obsolete
             targetLocationPoints.MouseDown += (s, e) =>
             {
                 if (e.ChangedButton == OxyMouseButton.Left)
@@ -150,9 +151,6 @@ namespace MeasurementApp.Controls
                     var point = targetLocationPoints.InverseTransform(e.Position);
                     targetLocationPoints.Points[indexOfPointToMove] = new ScatterPoint(point.X, point.Y);
                     model.InvalidatePlot(false);
-                    //targetX = point.X;
-                    //targetY = point.Y;
-                    //OnPropertyChanged("TargetLocation");
                     e.Handled = true;
                 }
             };
@@ -166,6 +164,7 @@ namespace MeasurementApp.Controls
                 model.InvalidatePlot(false);
                 e.Handled = true;
             };
+#pragma warning restore CS0618 // Type or member is obsolete
 
             return model;
         }
