@@ -36,7 +36,7 @@ namespace StageControl.Model
             _commandDelayMs = 50;
             _statusDelayMs = 10;
             _bootStepDelayMs = 100;
-            _moveDelayMs = 1000;
+            _moveDelayMs = 200;
 
             _xHomePosition = 298.000;
             _yHomePosition = 2.000;
