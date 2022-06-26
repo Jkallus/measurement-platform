@@ -14,7 +14,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MeasurementApp.Controls.JobSetup
+namespace MeasurementApp.Controls.RecipeSetup
 {
     public class ScanDisplayControlViewModel: ObservableObject
     {

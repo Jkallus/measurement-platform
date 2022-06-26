@@ -21,7 +21,7 @@ namespace MeasurementApp.Services
             Configure<HomeViewModel, HomePage>();
             Configure<StageDiagnosticsViewModel, StageDiagnosticsPage>();
             Configure<DAQDiagnosticsViewModel, DAQDiagnosticsPage>();
-            Configure<JobSetupViewModel, JobSetupPage>();
+            Configure<RecipeSetupViewModel, RecipeSetupPage>();
             Configure<JobRunViewModel, JobRunPage>();
             Configure<LogViewerViewModel, LogViewerPage>();
             Configure<RecipeManagerViewModel, RecipeManagerPage>();

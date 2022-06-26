@@ -1,6 +1,6 @@
 ﻿using System.IO;
 using System.Text;
-
+using Serilog;
 using MeasurementApp.Core.Contracts.Services;
 
 using Newtonsoft.Json;
@@ -10,14 +10,14 @@ namespace MeasurementApp.Core.Services
     public class FileService : IFileService
     {
         public T Read<T>(string folderPath, string fileName)
-        {
-            fileName += ".json";
+        {   
             var path = Path.Combine(folderPath, fileName);
             if (File.Exists(path))
             {
                 var json = File.ReadAllText(path);
                 return JsonConvert.DeserializeObject<T>(json);
             }
+            Log.ForContext<FileService>().Error("Invalid path {RecipePath}", path);
 
             return default;
         }

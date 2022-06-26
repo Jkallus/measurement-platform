@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using MeasurementApp.Core.Models;
 using Microsoft.Toolkit.Mvvm.Messaging.Messages;
 
-namespace MeasurementApp.Controls.JobSetup
+namespace MeasurementApp.Controls.RecipeSetup
 {
     public class ScanAreaSelectionMessage : ValueChangedMessage<(PositionCoordinate bottomLeft, PositionCoordinate topLeft, PositionCoordinate topRight, PositionCoordinate bottomRight)>
     {

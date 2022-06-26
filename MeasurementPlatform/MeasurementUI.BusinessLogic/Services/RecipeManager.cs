@@ -28,12 +28,14 @@ namespace MeasurementUI.BusinessLogic.Services
             _recipes = new List<ScanRecipe>();
             _storageDirectory = "C:\\temp\\data";
             LoadAllRecipes();
+            _logger.LogInformation("Recipe Manager constructed");
         }
 
         public void AddRecipe(ScanRecipe recipe)
         {
             _file.Save<ScanRecipe>(_storageDirectory, recipe.Name, recipe);
             _recipes.Add(recipe);
+            _logger.LogInformation($"Recipe {recipe.Name} added");
         }
 
         public List<ScanRecipe> GetRecipes()
@@ -45,6 +47,7 @@ namespace MeasurementUI.BusinessLogic.Services
         {
             _recipes.Remove(recipe);
             _file.Delete(_storageDirectory, recipe.Name);
+            _logger.LogInformation($"Recipe {recipe.Name} removed");
         }
 
         // Private methods
@@ -54,11 +57,12 @@ namespace MeasurementUI.BusinessLogic.Services
             {
                 Directory.CreateDirectory(_storageDirectory);
             }
-            string[] filenames = Directory.GetFiles(_storageDirectory);
+            List<string> filenames = Directory.GetFiles(_storageDirectory).Select(file => Path.GetFileName(file)).ToList<string>();
             foreach(string file in filenames)
             {
                 _recipes.Add(_file.Read<ScanRecipe>(_storageDirectory, file));
             }
+            _logger.LogInformation($"Loaded {filenames.Count} recipes from storage");
         }
     }
 }

@@ -11,7 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MeasurementApp.Controls.JobSetup
+namespace MeasurementApp.Controls.RecipeSetup
 {
     public class ScanSettingsControlViewModel: ObservableRecipient
     {
@@ -180,6 +180,7 @@ namespace MeasurementApp.Controls.JobSetup
 
         private void SaveRecipe()
         {
+            _logger.LogInformation("Saving recipe");
             _recipeManager.AddRecipe(new ScanRecipe(RecipeName, BottomLeft, TopLeft, TopRight, BottomRight, ScanPitch));
         }
 

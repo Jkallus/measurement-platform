@@ -1,6 +1,6 @@
 ﻿using Microsoft.UI.Xaml.Controls;
 
-namespace MeasurementApp.Controls.JobSetup
+namespace MeasurementApp.Controls.RecipeSetup
 {
     public sealed partial class ScanDisplayControl : UserControl
     {

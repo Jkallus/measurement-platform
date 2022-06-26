@@ -27,15 +27,16 @@
     <None Remove="Controls\Connection\ConnectionControl.xaml" />
     <None Remove="Controls\DAQ\DAQDiagnosticsControl.xaml" />
     <None Remove="Controls\Example\ExampleControl.xaml" />
-    <None Remove="Controls\JobSetup\ScanDisplayControl.xaml" />
-    <None Remove="Controls\JobSetup\ScanSettingsControl.xaml" />
+    <None Remove="Controls\RecipeSetup\ScanDisplayControl.xaml" />
+    <None Remove="Controls\RecipeSetup\ScanSettingsControl.xaml" />
+    <None Remove="Controls\RecipeManagement\RecipeManagementControl.xaml" />
     <None Remove="Controls\Stage\PositionReadoutControl.xaml" />
     <None Remove="Controls\Stage\StageGraphicalControl.xaml" />
     <None Remove="Controls\Stage\StagePositioningControl.xaml" />
     <None Remove="Views\JobRunPage.xaml" />
-    <None Remove="Views\JobSetupPage.xaml" />
     <None Remove="Views\LogViewerPage.xaml" />
     <None Remove="Views\RecipeManagerPage.xaml" />
+    <None Remove="Views\RecipeSetupPage.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -68,6 +69,9 @@
     <None Update="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <Page Update="Controls\RecipeManagement\RecipeManagementControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="Views\RecipeManagerPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -77,13 +81,13 @@
     <Page Update="Views\JobRunPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Update="Controls\JobSetup\ScanSettingsControl.xaml">
+    <Page Update="Controls\RecipeSetup\ScanSettingsControl.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Update="Controls\JobSetup\ScanDisplayControl.xaml">
+    <Page Update="Controls\RecipeSetup\ScanDisplayControl.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Update="Views\JobSetupPage.xaml">
+    <Page Update="Views\RecipeSetupPageRecipeSetup.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Update="Controls\Stage\StageGraphicalControl.xaml">

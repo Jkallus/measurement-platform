@@ -5,10 +5,12 @@
     xmlns:local="using:MeasurementApp.Views"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:MeasurementApp.Controls.RecipeManagement"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
-        <TextBlock Text="Recipe Manager Stub" FontSize="32" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+        <!--<TextBlock Text="Recipe Manager Stub" FontSize="32" VerticalAlignment="Center" HorizontalAlignment="Center"/>-->
+        <controls:RecipeManagementControl HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
     </Grid>
 </Page>

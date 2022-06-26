@@ -25,8 +25,9 @@ using DAQ.Interfaces;
 using DAQ.Model;
 using StageControl.Interfaces;
 using StageControl.Model;
-using MeasurementApp.Controls.JobSetup;
+using MeasurementApp.Controls.RecipeSetup;
 using MeasurementUI.BusinessLogic.Services;
+using MeasurementApp.Controls.RecipeManagement;
 
 // To learn more about WinUI3, see: https://docs.microsoft.com/windows/apps/winui/winui3/.
 namespace MeasurementApp
@@ -87,8 +88,8 @@ namespace MeasurementApp
                 services.AddTransient<LogViewerViewModel>();
                 services.AddTransient<JobRunPage>();
                 services.AddTransient<JobRunViewModel>();
-                services.AddTransient<JobSetupViewModel>();
-                services.AddTransient<JobSetupPage>();
+                services.AddTransient<RecipeSetupViewModel>();
+                services.AddTransient<RecipeSetupPage>();
                 services.AddTransient<DAQDiagnosticsViewModel>();
                 services.AddTransient<DAQDiagnosticsPage>();
                 services.AddTransient<StageDiagnosticsViewModel>();
@@ -107,6 +108,7 @@ namespace MeasurementApp
                 services.AddTransient<ExampleControlViewModel>();
                 services.AddTransient<ScanDisplayControlViewModel>();
                 services.AddTransient<ScanSettingsControlViewModel>();
+                services.AddTransient<RecipeManagementControlViewModel>();
 
                 // Configuration
                 services.Configure<LocalSettingsOptions>(context.Configuration.GetSection(nameof(LocalSettingsOptions)));

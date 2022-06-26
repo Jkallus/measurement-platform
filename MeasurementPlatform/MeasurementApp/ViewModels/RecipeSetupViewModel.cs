@@ -2,9 +2,9 @@
 
 namespace MeasurementApp.ViewModels
 {
-    public class JobSetupViewModel: ObservableRecipient
+    public class RecipeSetupViewModel: ObservableRecipient
     {
-        public JobSetupViewModel()
+        public RecipeSetupViewModel()
         {
 
         }

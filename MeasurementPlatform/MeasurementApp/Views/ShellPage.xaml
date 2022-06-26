@@ -50,7 +50,7 @@
                 </NavigationViewItem.Icon>
                 <NavigationViewItem.MenuItems>
 
-                    <NavigationViewItem x:Uid="Shell_JobSetup" helpers:NavigationHelper.NavigateTo="MeasurementApp.ViewModels.JobSetupViewModel">
+                    <NavigationViewItem x:Uid="Shell_RecipeSetup" helpers:NavigationHelper.NavigateTo="MeasurementApp.ViewModels.RecipeSetupViewModel">
                         <NavigationViewItem.Icon>
                             <FontIcon Glyph="&#xEE6F;"/>
                         </NavigationViewItem.Icon>
