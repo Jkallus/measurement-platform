@@ -1,4 +1,5 @@
-﻿using MeasurementApp.Core.Models;
+﻿using MeasurementApp.Controls.RecipeManagement;
+using MeasurementApp.Core.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Messaging;
@@ -9,6 +10,7 @@ using OxyPlot.Legends;
 using OxyPlot.Series;
 using StageControl.Model;
 using System;
+using MeasurementApp.Core.Oxyplot;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -29,9 +31,11 @@ namespace MeasurementApp.Controls.RecipeSetup
         private const int bottomRightIdx = 3;
 
         ScatterSeries dragPoints;
+        RectangleAnnotation samplingBox;
 
         // Public properties
-        public PlotModel Model { get; set; }
+        
+        public ViewResolvingPlotModel Model { get; set; }
 
         PositionCoordinate BottomLeft { get; set; }
         PositionCoordinate TopLeft { get; set; }
@@ -48,6 +52,28 @@ namespace MeasurementApp.Controls.RecipeSetup
             Model = CustomPlot();
             SendUpdate();
             _logger.LogInformation("Constructed ScanDisplayControlViewModel");
+            WeakReferenceMessenger.Default.Register<EditRecipeMessage>(this, (r, m) =>
+            {
+                BottomLeft = m.Recipe.BottomLeft;
+                TopLeft = m.Recipe.TopLeft;
+                TopRight = m.Recipe.TopRight;
+                BottomRight = m.Recipe.BottomRight;
+                dragPoints.Points[bottomLeftIdx] = new ScatterPoint(BottomLeft.X, BottomLeft.Y);
+                dragPoints.Points[topLeftIdx] = new ScatterPoint(TopLeft.X, TopLeft.Y);
+                dragPoints.Points[topRightIdx] = new ScatterPoint(TopRight.X, TopRight.Y);
+                dragPoints.Points[bottomRightIdx] = new ScatterPoint(BottomRight.X, BottomRight.Y);
+                samplingBox.MinimumX = BottomLeft.X;
+                samplingBox.MinimumY = BottomLeft.Y;
+                samplingBox.MaximumX = TopRight.X;
+                samplingBox.MaximumY = TopRight.Y;
+                Model.InvalidatePlot(false);
+            });
+        }
+
+        // Destructor
+        ~ScanDisplayControlViewModel()
+        {
+            WeakReferenceMessenger.Default.UnregisterAll(this);
         }
 
         // Private methods
@@ -60,9 +86,9 @@ namespace MeasurementApp.Controls.RecipeSetup
             WeakReferenceMessenger.Default.Send<ScanAreaSelectionMessage>(new ScanAreaSelectionMessage((BottomLeft, TopLeft, TopRight, BottomRight)));
         }
 
-        private PlotModel CustomPlot()
+        private ViewResolvingPlotModel CustomPlot()
         {
-            var model = new PlotModel();
+            var model = new ViewResolvingPlotModel();
             model.PlotType = PlotType.Cartesian;
 
             var l = new Legend
@@ -115,7 +141,7 @@ namespace MeasurementApp.Controls.RecipeSetup
             double centerX = _stageConfig.XAxisLength / 2;
             double centerY = _stageConfig.YAxisLength / 2;
             int defaultBoxSize = 50;
-            var samplingBox = new RectangleAnnotation
+            samplingBox = new RectangleAnnotation
             {
 
                 MinimumX = centerX - defaultBoxSize,

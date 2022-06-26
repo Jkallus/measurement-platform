@@ -106,8 +106,8 @@ namespace MeasurementApp
                 services.AddTransient<PositionReadoutControlViewModel>();
                 services.AddTransient<StageGraphicalControlViewModel>();
                 services.AddTransient<ExampleControlViewModel>();
-                services.AddTransient<ScanDisplayControlViewModel>();
-                services.AddTransient<ScanSettingsControlViewModel>();
+                services.AddSingleton<ScanDisplayControlViewModel>();
+                services.AddSingleton<ScanSettingsControlViewModel>();
                 services.AddTransient<RecipeManagementControlViewModel>();
 
                 // Configuration
