@@ -11,6 +11,7 @@ namespace MeasurementApp.Core.Services
     {
         public T Read<T>(string folderPath, string fileName)
         {
+            fileName += ".json";
             var path = Path.Combine(folderPath, fileName);
             if (File.Exists(path))
             {
@@ -23,6 +24,7 @@ namespace MeasurementApp.Core.Services
 
         public void Save<T>(string folderPath, string fileName, T content)
         {
+            fileName += ".json";
             if (!Directory.Exists(folderPath))
             {
                 Directory.CreateDirectory(folderPath);
@@ -34,6 +36,7 @@ namespace MeasurementApp.Core.Services
 
         public void Delete(string folderPath, string fileName)
         {
+            fileName += ".json";
             if (fileName != null && File.Exists(Path.Combine(folderPath, fileName)))
             {
                 File.Delete(Path.Combine(folderPath, fileName));

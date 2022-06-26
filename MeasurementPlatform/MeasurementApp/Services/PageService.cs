@@ -23,6 +23,8 @@ namespace MeasurementApp.Services
             Configure<DAQDiagnosticsViewModel, DAQDiagnosticsPage>();
             Configure<JobSetupViewModel, JobSetupPage>();
             Configure<JobRunViewModel, JobRunPage>();
+            Configure<LogViewerViewModel, LogViewerPage>();
+            Configure<RecipeManagerViewModel, RecipeManagerPage>();
         }
 
         public Type GetPageType(string key)

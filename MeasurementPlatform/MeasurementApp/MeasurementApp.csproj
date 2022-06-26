@@ -34,6 +34,8 @@
     <None Remove="Controls\Stage\StagePositioningControl.xaml" />
     <None Remove="Views\JobRunPage.xaml" />
     <None Remove="Views\JobSetupPage.xaml" />
+    <None Remove="Views\LogViewerPage.xaml" />
+    <None Remove="Views\RecipeManagerPage.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -66,6 +68,12 @@
     <None Update="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <Page Update="Views\RecipeManagerPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Views\LogViewerPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="Views\JobRunPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -138,4 +138,10 @@
   <data name="Shell_JobRun.Content" xml:space="preserve">
     <value>Job Run</value>
   </data>
+  <data name="Shell_LogViewer.Content" xml:space="preserve">
+    <value>Log Viewer</value>
+  </data>
+  <data name="Shell_RecipeManager.Content" xml:space="preserve">
+    <value>Recipe Manager</value>
+  </data>
 </root>

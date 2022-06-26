@@ -1,4 +1,5 @@
 ﻿using MeasurementApp.Core.Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,35 +10,42 @@ namespace MeasurementUI.BusinessLogic.Recipe
 {
     public class ScanRecipe
     {
+        public string Name { get; set; }
         public PositionCoordinate BottomLeft { get; set; }
         public PositionCoordinate TopLeft { get; set; }
         public PositionCoordinate TopRight { get; set; }
         public PositionCoordinate BottomRight { get; set; }
         public ScanDimension ScanPitch { get; set; }
+
+        [JsonIgnore]
         public ScanDimension XDimension
         {
             get => new ScanDimension(BottomRight.X - BottomLeft.X, Units.Millimeters);
         }
+        [JsonIgnore]
         public ScanDimension YDimension
         {
             get => new ScanDimension(TopLeft.Y - BottomLeft.Y, Units.Millimeters);
         }
+        [JsonIgnore]
         public ScanDimension ScanArea
         {
             get => new ScanDimension(XDimension.Value * YDimension.Value, Units.SquareMillimeters);
         }
 
-        public ScanRecipe(PositionCoordinate bottomLeft, PositionCoordinate topLeft, PositionCoordinate topRight, PositionCoordinate bottomRIght, ScanDimension samplePitch)
+        public ScanRecipe(string name, PositionCoordinate bottomLeft, PositionCoordinate topLeft, PositionCoordinate topRight, PositionCoordinate bottomRIght, ScanDimension scanPitch)
         {
+            Name = name;
             BottomLeft = bottomLeft;
             TopLeft = topLeft;
             TopRight = topRight;
             BottomRight = bottomRIght;
-            ScanPitch = samplePitch;
+            ScanPitch = scanPitch;
         }
 
         public ScanRecipe()
         {
+            Name = $"ScanRecipe_{DateTime.Now.ToString("yyyyMMddTHHmmss")}";
             BottomLeft = new(0, 0);
             TopLeft = new(0, 0);
             TopRight = new(0, 0);

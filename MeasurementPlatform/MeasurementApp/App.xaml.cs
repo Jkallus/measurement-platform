@@ -26,6 +26,7 @@ using DAQ.Model;
 using StageControl.Interfaces;
 using StageControl.Model;
 using MeasurementApp.Controls.JobSetup;
+using MeasurementUI.BusinessLogic.Services;
 
 // To learn more about WinUI3, see: https://docs.microsoft.com/windows/apps/winui/winui3/.
 namespace MeasurementApp
@@ -58,7 +59,7 @@ namespace MeasurementApp
 
                 // Application Custom Services
                 services.AddSingleton<MachineConfiguration>(context.Configuration.GetSection("MachineConfig").Get<MachineConfiguration>());
-
+                services.AddSingleton<IRecipeManager, RecipeManager>();
                 services.AddSingleton<StageSerialConfig>(context.Configuration.GetSection("MachineConfig:StageSerialConfig").Get<StageSerialConfig>());
                 services.AddSingleton<DAQSerialConfig>(context.Configuration.GetSection("MachineConfig:DAQSerialConfig").Get<DAQSerialConfig>());
                 services.AddSingleton<StageConfig>(context.Configuration.GetSection("MachineConfig:StageConfig").Get<StageConfig>());
@@ -80,6 +81,10 @@ namespace MeasurementApp
                 services.AddSingleton<IFileService, FileService>();
 
                 // Views and ViewModels
+                services.AddTransient<RecipeManagerPage>();
+                services.AddTransient<RecipeManagerViewModel>();
+                services.AddTransient<LogViewerPage>();
+                services.AddTransient<LogViewerViewModel>();
                 services.AddTransient<JobRunPage>();
                 services.AddTransient<JobRunViewModel>();
                 services.AddTransient<JobSetupViewModel>();

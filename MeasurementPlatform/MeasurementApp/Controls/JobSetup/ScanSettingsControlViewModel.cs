@@ -1,6 +1,9 @@
 ﻿using MeasurementApp.Core.Models;
+using MeasurementUI.BusinessLogic.Recipe;
+using MeasurementUI.BusinessLogic.Services;
 using Microsoft.Extensions.Logging;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
+using Microsoft.Toolkit.Mvvm.Input;
 using Microsoft.Toolkit.Mvvm.Messaging;
 using System;
 using System.Collections.Generic;
@@ -15,9 +18,24 @@ namespace MeasurementApp.Controls.JobSetup
         // Private member variables
         private readonly ILogger<ScanSettingsControlViewModel> _logger;
         private readonly IServiceProvider _service;
+        private readonly IRecipeManager _recipeManager;
+        private bool _dataReceived; // have we received data from the ScanDisplayControl yet or is it still populated with default values
 
 
         // Public properties
+        private string _recipeName;
+        public string RecipeName
+        {
+            get { return _recipeName; }
+            set 
+            {
+                if(SetProperty(ref _recipeName, value))
+                {
+                    SaveRecipeCommand.NotifyCanExecuteChanged();
+                }
+            }
+        }
+
         private PositionCoordinate _bottomLeft;
         public PositionCoordinate BottomLeft
         {
@@ -111,25 +129,29 @@ namespace MeasurementApp.Controls.JobSetup
             get => _ySampleCount;
             set => SetProperty(ref _ySampleCount, value);
         }
-
-        private int _totalSampleCount;
+        
         public int TotalSampleCount
         {
             get => XSampleCount * YSampleCount;
         }
+
+        public RelayCommand SaveRecipeCommand { get; private set; }
 
         // Constructor
         public ScanSettingsControlViewModel(IServiceProvider service, ILogger<ScanSettingsControlViewModel> logger)
         {
             _service = service;
             _logger = logger;
-
+            _recipeManager = _service.GetService(typeof(IRecipeManager)) as IRecipeManager;
             _bottomLeft = new PositionCoordinate(0, 0);
             _topLeft = new PositionCoordinate(0, 0);
             _topRight = new PositionCoordinate(0, 0);
             _bottomRight = new PositionCoordinate(0, 0);
             _scanPitch = new ScanDimension(1000, Units.Micrometers);
             _sliderValue = 0.5;
+            _recipeName = "";
+            _dataReceived = false;
+            SaveRecipeCommand = new RelayCommand(SaveRecipe, CanSaveRecipe);
 
             WeakReferenceMessenger.Default.Register<ScanAreaSelectionMessage>(this, (r, m) =>
             {
@@ -139,14 +161,30 @@ namespace MeasurementApp.Controls.JobSetup
                     TopLeft = m.Value.topLeft;
                     TopRight = m.Value.topRight;
                     BottomRight = m.Value.bottomRight;
+                    if(!_dataReceived)
+                    {
+                        _dataReceived = true;
+                        SaveRecipeCommand.NotifyCanExecuteChanged();
+                    }
                     UpdateCalculations();
+                    
                 });
                 
             });
         }
 
+        private bool CanSaveRecipe()
+        {
+            return RecipeName.Length > 0 && _dataReceived;
+        }
+
+        private void SaveRecipe()
+        {
+            _recipeManager.AddRecipe(new ScanRecipe(RecipeName, BottomLeft, TopLeft, TopRight, BottomRight, ScanPitch));
+        }
+
         // Public methods
-        
+
 
         // Private methods
         private void UpdateCalculations()

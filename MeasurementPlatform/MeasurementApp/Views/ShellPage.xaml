@@ -31,26 +31,52 @@
                     <FontIcon Glyph="&#xF0B9;"/>
                 </NavigationViewItem.Icon>
             </NavigationViewItem>
+            
             <NavigationViewItem x:Uid="Shell_StageDiagnostics" helpers:NavigationHelper.NavigateTo="MeasurementApp.ViewModels.StageDiagnosticsViewModel">
                 <NavigationViewItem.Icon>
                     <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xECE9;"/>
                 </NavigationViewItem.Icon>
             </NavigationViewItem>
+            
             <NavigationViewItem x:Uid="Shell_DAQDiagnostics" helpers:NavigationHelper.NavigateTo="MeasurementApp.ViewModels.DAQDiagnosticsViewModel">
                 <NavigationViewItem.Icon>
                     <FontIcon Glyph="&#xED5E;"/>
                 </NavigationViewItem.Icon>
             </NavigationViewItem>
-            <NavigationViewItem x:Uid="Shell_JobSetup" helpers:NavigationHelper.NavigateTo="MeasurementApp.ViewModels.JobSetupViewModel">
+
+            <NavigationViewItem Content="Recipe" x:Uid="Shell_Recipe">
                 <NavigationViewItem.Icon>
-                    <FontIcon Glyph="&#xEE6F;"/>
+                    <FontIcon Glyph="&#xEA37;"/>
                 </NavigationViewItem.Icon>
+                <NavigationViewItem.MenuItems>
+
+                    <NavigationViewItem x:Uid="Shell_JobSetup" helpers:NavigationHelper.NavigateTo="MeasurementApp.ViewModels.JobSetupViewModel">
+                        <NavigationViewItem.Icon>
+                            <FontIcon Glyph="&#xEE6F;"/>
+                        </NavigationViewItem.Icon>
+                    </NavigationViewItem>
+
+                    <NavigationViewItem x:Uid="Shell_RecipeManager" helpers:NavigationHelper.NavigateTo="MeasurementApp.ViewModels.RecipeManagerViewModel">
+                        <NavigationViewItem.Icon>
+                            <FontIcon Glyph="&#xEE6F;"/>
+                        </NavigationViewItem.Icon>
+                    </NavigationViewItem>
+
+                </NavigationViewItem.MenuItems>    
             </NavigationViewItem>
+
             <NavigationViewItem x:Uid="Shell_JobRun" helpers:NavigationHelper.NavigateTo="MeasurementApp.ViewModels.JobRunViewModel">
                 <NavigationViewItem.Icon>
                     <FontIcon Glyph="&#xE9F3;"/>
                 </NavigationViewItem.Icon>
             </NavigationViewItem>
+
+            <NavigationViewItem x:Uid="Shell_LogViewer" helpers:NavigationHelper.NavigateTo="MeasurementApp.ViewModels.LogViewerViewModel">
+                <NavigationViewItem.Icon>
+                    <FontIcon Glyph="&#xE9F3;"/>
+                </NavigationViewItem.Icon>
+            </NavigationViewItem>
+
         </NavigationView.MenuItems>
         <NavigationView.HeaderTemplate>
             <DataTemplate>
