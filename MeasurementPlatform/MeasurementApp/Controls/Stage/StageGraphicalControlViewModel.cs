@@ -3,17 +3,13 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Messaging;
 using OxyPlot;
-using OxyPlot.Annotations;
 using OxyPlot.Axes;
 using OxyPlot.Legends;
 using OxyPlot.Series;
 using StageControl.Events;
 using StageControl.Model;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using MeasurementApp.Core.Oxyplot;
 
 namespace MeasurementApp.Controls
 {
@@ -40,7 +36,7 @@ namespace MeasurementApp.Controls
             set => SetProperty(ref _targetYCoordinate, value);
         }
 
-        public PlotModel Model { get; set; }
+        public ViewResolvingPlotModel Model { get; set; }
 
         public StageGraphicalControlViewModel(IServiceProvider serviceProvider, ILogger<StageGraphicalControlViewModel> logger)
         {
@@ -63,9 +59,9 @@ namespace MeasurementApp.Controls
             });
         }
 
-        private PlotModel CustomPlot()
+        private ViewResolvingPlotModel CustomPlot()
         {
-            var model = new PlotModel();
+            var model = new ViewResolvingPlotModel();
             model.PlotType = PlotType.Cartesian;
 
 
