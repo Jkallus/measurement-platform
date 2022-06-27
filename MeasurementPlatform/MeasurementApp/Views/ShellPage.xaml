@@ -52,13 +52,13 @@
 
                     <NavigationViewItem x:Uid="Shell_RecipeSetup" helpers:NavigationHelper.NavigateTo="MeasurementApp.ViewModels.RecipeSetupViewModel">
                         <NavigationViewItem.Icon>
-                            <FontIcon Glyph="&#xEE6F;"/>
+                            <FontIcon Glyph="&#xE70F;"/>
                         </NavigationViewItem.Icon>
                     </NavigationViewItem>
 
                     <NavigationViewItem x:Uid="Shell_RecipeManager" helpers:NavigationHelper.NavigateTo="MeasurementApp.ViewModels.RecipeManagerViewModel">
                         <NavigationViewItem.Icon>
-                            <FontIcon Glyph="&#xEE6F;"/>
+                            <FontIcon Glyph="&#xE82D;"/>
                         </NavigationViewItem.Icon>
                     </NavigationViewItem>
 
@@ -73,7 +73,7 @@
 
             <NavigationViewItem x:Uid="Shell_LogViewer" helpers:NavigationHelper.NavigateTo="MeasurementApp.ViewModels.LogViewerViewModel">
                 <NavigationViewItem.Icon>
-                    <FontIcon Glyph="&#xE9F3;"/>
+                    <FontIcon Glyph="&#xF0E3;"/>
                 </NavigationViewItem.Icon>
             </NavigationViewItem>
 
