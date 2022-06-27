@@ -111,9 +111,14 @@ namespace MeasurementApp.Controls
 
         private async Task OnDisconnect()
         {
-            await _systemController.Deinitialize();
-            ConnectCommand.NotifyCanExecuteChanged();
-            DisconnectCommand.NotifyCanExecuteChanged();
+            bool? b = await App.MainRoot.ConfirmationDialogAsync("Are you sure you want to disconnect?");
+
+            if(b == true)
+            {
+                await _systemController.Deinitialize();
+                ConnectCommand.NotifyCanExecuteChanged();
+                DisconnectCommand.NotifyCanExecuteChanged();
+            }
         }
 
         private bool CanDisconnect()
