@@ -4,6 +4,7 @@ using MeasurementUI.BusinessLogic.Services;
 using Microsoft.Extensions.Logging;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
+using Microsoft.Toolkit.Mvvm.Messaging;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -33,6 +34,13 @@ namespace MeasurementApp.Controls.RecipeManagement
         public RelayCommand<ScanRecipe> RemoveRecipeCommand { get; private set; }
         public RelayCommand<ScanRecipe> EditRecipeCommand { get; private set; }
 
+        //private ScanRecipe _selectedRecipe;
+        //public ScanRecipe SelectedRecipe
+        //{
+        //    get => _selectedRecipe;
+        //    set => SetProperty(ref _selectedRecipe, value);
+        //}
+
         // Constructor
         public RecipeManagementControlViewModel(ILogger<RecipeManagementControlViewModel> logger, IServiceProvider service)
         {
@@ -49,22 +57,25 @@ namespace MeasurementApp.Controls.RecipeManagement
 
         private void EditRecipe(ScanRecipe obj)
         {
-            
+            _navigation.NavigateTo("MeasurementApp.ViewModels.RecipeSetupViewModel");
+            WeakReferenceMessenger.Default.Send<EditRecipeMessage>(new EditRecipeMessage(obj));
         }
 
         private bool CanEditRecipe(ScanRecipe obj)
         {
-            return false;
+            return obj != null;
         }
 
         private void RemoveRecipe(ScanRecipe obj)
         {
+            _recipeManager.RemoveRecipe(obj);
+            Recipes = new(_recipeManager.GetRecipes());
             
         }
 
         private bool CanRemoveRecipe(ScanRecipe obj)
         {
-            return false;
+            return obj != null;
         }
 
         private void AddRecipe()

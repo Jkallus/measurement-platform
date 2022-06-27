@@ -1,4 +1,5 @@
-﻿using MeasurementApp.Core.Models;
+﻿using MeasurementApp.Controls.RecipeManagement;
+using MeasurementApp.Core.Models;
 using MeasurementUI.BusinessLogic.Recipe;
 using MeasurementUI.BusinessLogic.Services;
 using Microsoft.Extensions.Logging;
@@ -20,7 +21,8 @@ namespace MeasurementApp.Controls.RecipeSetup
         private readonly IServiceProvider _service;
         private readonly IRecipeManager _recipeManager;
         private bool _dataReceived; // have we received data from the ScanDisplayControl yet or is it still populated with default values
-
+        private bool _isEditing;
+        private ScanRecipe? _oldRecipe;
 
         // Public properties
         private string _recipeName;
@@ -151,6 +153,8 @@ namespace MeasurementApp.Controls.RecipeSetup
             _sliderValue = 0.5;
             _recipeName = "";
             _dataReceived = false;
+            _isEditing = false;
+            _oldRecipe = null;
             SaveRecipeCommand = new RelayCommand(SaveRecipe, CanSaveRecipe);
 
             WeakReferenceMessenger.Default.Register<ScanAreaSelectionMessage>(this, (r, m) =>
@@ -169,19 +173,51 @@ namespace MeasurementApp.Controls.RecipeSetup
                     UpdateCalculations();
                     
                 });
-                
             });
+
+            WeakReferenceMessenger.Default.Register<EditRecipeMessage>(this, (r, m) =>
+            {
+                App.MainRoot.DispatcherQueue.TryEnqueue(() =>
+                {
+                    BottomLeft = m.Recipe.BottomLeft;
+                    TopLeft = m.Recipe.TopLeft;
+                    TopRight = m.Recipe.TopRight;
+                    BottomRight = m.Recipe.BottomRight;
+                    ScanPitch = m.Recipe.ScanPitch;
+                    RecipeName = m.Recipe.Name;
+                    _isEditing = true;
+                    _oldRecipe = m.Recipe;
+                    UpdateCalculations();
+                });
+            });
+        }
+
+        // Destructor
+        ~ScanSettingsControlViewModel()
+        {
+            WeakReferenceMessenger.Default.UnregisterAll(this);
         }
 
         private bool CanSaveRecipe()
         {
-            return RecipeName.Length > 0 && _dataReceived;
+            return RecipeName.Length > 0 && (_dataReceived || _isEditing);
         }
 
         private void SaveRecipe()
         {
-            _logger.LogInformation("Saving recipe");
-            _recipeManager.AddRecipe(new ScanRecipe(RecipeName, BottomLeft, TopLeft, TopRight, BottomRight, ScanPitch));
+            if(_isEditing)
+            {
+                _logger.LogInformation("Updating recipe");
+                _recipeManager.UpdateRecipe(_oldRecipe, new ScanRecipe(RecipeName, BottomLeft, TopLeft, TopRight, BottomRight, ScanPitch));
+                _oldRecipe = null;
+            }
+            else
+            {
+                _logger.LogInformation("Saving recipe");
+                _recipeManager.AddRecipe(new ScanRecipe(RecipeName, BottomLeft, TopLeft, TopRight, BottomRight, ScanPitch));
+            }
+            
+            
         }
 
         // Public methods

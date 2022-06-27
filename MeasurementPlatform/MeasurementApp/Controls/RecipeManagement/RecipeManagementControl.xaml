@@ -13,7 +13,7 @@
             <ColumnDefinition Width="100"/>
         </Grid.ColumnDefinitions>
 
-        <GridView x:Name="RecipeView" Grid.Column="0" ItemsSource="{x:Bind ViewModel.Recipes, Mode=OneWay}" Margin="20 20 20 20">
+        <GridView x:Name="RecipeView" Grid.Column="0" ItemsSource="{x:Bind ViewModel.Recipes, Mode=OneWay}"  Margin="20 20 20 20">
             <!--<GridView.ItemContainerStyle>
                 <Style TargetType="GridViewItem">
                     <Setter Property="Margin" Value="10"/>
@@ -39,13 +39,13 @@
                 </Button.Content>
             </Button>
 
-            <Button HorizontalAlignment="Center" Width="60" Height="60"  CornerRadius="30" Margin="0 10 0 0" Command="{x:Bind ViewModel.RemoveRecipeCommand}" CommandParameter="{x:Bind RecipeView.SelectedItem}">
+            <Button HorizontalAlignment="Center" Width="60" Height="60"  CornerRadius="30" Margin="0 10 0 0" Command="{x:Bind ViewModel.RemoveRecipeCommand}" CommandParameter="{x:Bind RecipeView.SelectedItem, Mode=OneWay}">
                 <Button.Content>
                     <FontIcon Glyph="&#xE74D;"/>
                 </Button.Content>
             </Button>
 
-            <Button HorizontalAlignment="Center" Width="60" Height="60"  CornerRadius="30" Margin="0 10 0 0" Command="{x:Bind ViewModel.EditRecipeCommand}" CommandParameter="{x:Bind RecipeView.SelectedItem}">
+            <Button HorizontalAlignment="Center" Width="60" Height="60"  CornerRadius="30" Margin="0 10 0 0" Command="{x:Bind ViewModel.EditRecipeCommand}" CommandParameter="{x:Bind RecipeView.SelectedItem, Mode=OneWay}">
                 <Button.Content>
                     <FontIcon Glyph="&#xE70F;"/>
                 </Button.Content>

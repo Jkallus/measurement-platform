@@ -50,6 +50,12 @@ namespace MeasurementUI.BusinessLogic.Services
             _logger.LogInformation($"Recipe {recipe.Name} removed");
         }
 
+        public void UpdateRecipe(ScanRecipe oldRecipe, ScanRecipe newRecipe)
+        {
+            RemoveRecipe(oldRecipe);
+            AddRecipe(newRecipe);
+        }
+
         // Private methods
         private void LoadAllRecipes()
         {
