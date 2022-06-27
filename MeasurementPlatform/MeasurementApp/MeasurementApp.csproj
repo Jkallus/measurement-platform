@@ -27,12 +27,14 @@
     <None Remove="Controls\Connection\ConnectionControl.xaml" />
     <None Remove="Controls\DAQ\DAQDiagnosticsControl.xaml" />
     <None Remove="Controls\Example\ExampleControl.xaml" />
+    <None Remove="Controls\JobRun\JobRunControl.xaml" />
     <None Remove="Controls\RecipeSetup\ScanDisplayControl.xaml" />
     <None Remove="Controls\RecipeSetup\ScanSettingsControl.xaml" />
     <None Remove="Controls\RecipeManagement\RecipeManagementControl.xaml" />
     <None Remove="Controls\Stage\PositionReadoutControl.xaml" />
     <None Remove="Controls\Stage\StageGraphicalControl.xaml" />
     <None Remove="Controls\Stage\StagePositioningControl.xaml" />
+    <None Remove="Services\RecipeSelect\RecipeSelectContentDialog.xaml" />
     <None Remove="Views\JobRunPage.xaml" />
     <None Remove="Views\LogViewerPage.xaml" />
     <None Remove="Views\RecipeManagerPage.xaml" />
@@ -69,6 +71,12 @@
     <None Update="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <Page Update="Services\RecipeSelect\RecipeSelectContentDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Controls\JobRun\JobRunControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="Controls\RecipeManagement\RecipeManagementControl.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>

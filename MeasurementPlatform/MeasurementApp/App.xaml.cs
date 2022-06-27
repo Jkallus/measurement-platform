@@ -28,6 +28,8 @@ using StageControl.Model;
 using MeasurementApp.Controls.RecipeSetup;
 using MeasurementUI.BusinessLogic.Services;
 using MeasurementApp.Controls.RecipeManagement;
+using MeasurementApp.Controls.JobRun;
+using MeasurementApp.Services.RecipeSelect;
 
 // To learn more about WinUI3, see: https://docs.microsoft.com/windows/apps/winui/winui3/.
 namespace MeasurementApp
@@ -61,6 +63,7 @@ namespace MeasurementApp
                 // Application Custom Services
                 services.AddSingleton<MachineConfiguration>(context.Configuration.GetSection("MachineConfig").Get<MachineConfiguration>());
                 services.AddSingleton<IRecipeManager, RecipeManager>();
+                services.AddSingleton<RecipeSelectService>();
                 services.AddSingleton<StageSerialConfig>(context.Configuration.GetSection("MachineConfig:StageSerialConfig").Get<StageSerialConfig>());
                 services.AddSingleton<DAQSerialConfig>(context.Configuration.GetSection("MachineConfig:DAQSerialConfig").Get<DAQSerialConfig>());
                 services.AddSingleton<StageConfig>(context.Configuration.GetSection("MachineConfig:StageConfig").Get<StageConfig>());
@@ -70,6 +73,7 @@ namespace MeasurementApp
                 services.AddSingleton(typeof(IMachineControl), simulationMode ? typeof(FNCMachineControlSim) : typeof(FNCMachineControl));
 
                 // Services
+                
                 services.AddSingleton<IThemeSelectorService, ThemeSelectorService>();
                 services.AddSingleton<ILocalSettingsService, LocalSettingsServicePackaged>();
                 services.AddTransient<INavigationViewService, NavigationViewService>();
@@ -105,6 +109,8 @@ namespace MeasurementApp
                 services.AddTransient<PositionReadoutControlViewModel>();
                 services.AddTransient<RecipeManagementControlViewModel>();
                 services.AddTransient<ExampleControlViewModel>();
+                services.AddTransient<JobRunControlViewModel>();
+                services.AddTransient<RecipeSelectContentDialogViewModel>();
                 
                 services.AddSingleton<ScanDisplayControlViewModel>();
                 services.AddSingleton<StageGraphicalControlViewModel>();
@@ -166,6 +172,7 @@ namespace MeasurementApp
             var activationService = App.GetService<IActivationService>();
             await activationService.ActivateAsync(args);
             MainRoot = MainWindow.Content as FrameworkElement; // Content should be the shell page which is a framework element
+            
         }
     }
 }
