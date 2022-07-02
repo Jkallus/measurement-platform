@@ -140,7 +140,8 @@ namespace MeasurementApp.Controls
             try
             {
                 IsBusy = true;
-                await _systemController.Jog( (int)(_targetPosition.XCoordinate * 1000), (int)(_targetPosition.YCoordinate * 1000), JogType.Absolute);
+                //await _systemController.Jog( (int)(_targetPosition.XCoordinate * 1000), (int)(_targetPosition.YCoordinate * 1000), JogType.Absolute, this);
+                await _systemController.MoveTo(_targetPosition.XCoordinate, _targetPosition.YCoordinate, StageControl.Model.BlockingType.NonBlocking, this);
             }
             finally
             {
@@ -202,7 +203,7 @@ namespace MeasurementApp.Controls
                     y = -_realStepSize;
 
                 IsBusy = true;
-                await _systemController.Jog(x, y, JogType.Incremental);
+                await _systemController.Jog(x, y, JogType.Incremental, this);
             }
             finally
             {
@@ -217,7 +218,7 @@ namespace MeasurementApp.Controls
             try
             {
                 IsBusy = true;
-                await _systemController.Home(axes);
+                await _systemController.Home(axes, this);
             }
             finally
             {

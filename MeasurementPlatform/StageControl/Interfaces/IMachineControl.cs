@@ -23,6 +23,10 @@ namespace StageControl.Interfaces
         public Task<bool> Home(HomingAxes axes);
         public Task<bool> Jog(int X, int Y, JogType type);
 
+        public Task<bool> MoveTo(double X, double Y); // always absolute coordinates
+
+        public Task<bool> MoveToNonBlocking(double X, double Y);
+
         public double XPosition { get; }
         public double YPosition { get; }
 

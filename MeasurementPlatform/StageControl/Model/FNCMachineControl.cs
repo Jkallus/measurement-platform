@@ -13,21 +13,23 @@ namespace StageControl.Model
 {
     public class FNCMachineControl: IMachineControl
     {
-        #region Private Members
+        // Private members
         private FluidNCController controller;
         private MachineState state;
         private readonly ILogger<FNCMachineControl> _logger;
 
-        #endregion
-
-        #region Public Properties
+        // Public properties
         public event EventHandler<FNCStateChangedEventArgs>? StateChanged
         {
             add => this.controller.FNCStateChanged += value;
             remove => this.controller.FNCStateChanged -= value;
         }
 
-        public event EventHandler<PositionChangedEventArgs>? PositionChanged;
+        public event EventHandler<PositionChangedEventArgs>? PositionChanged
+        {
+            add => this.controller.PositionChanged += value;
+            remove => this.controller.PositionChanged -= value;
+        }
 
         public event EventHandler<RequestCompleteEventArgs>? RequestComplete
         {
@@ -50,7 +52,6 @@ namespace StageControl.Model
         }
 
         public event EventHandler<EventArgs>? HomingComplete;
-
         public double XPosition => state.XAxis.Position.GetValueOrDefault();
         public double YPosition => state.YAxis.Position.GetValueOrDefault();
         public bool RequestPending => controller.RequestPending;
@@ -59,23 +60,18 @@ namespace StageControl.Model
         public bool IsYAxisHomed => state.YAxis.IsHomed;
         public bool IsHomed => state.XAxis.IsHomed && state.YAxis.IsHomed;
 
-        #endregion
-
-
-        #region Constructors
+        // Constructor
         public FNCMachineControl(StageSerialConfig serialConf, StageConfig stageConf, ILogger<FNCMachineControl> topLogger, ILogger<FluidNCController> middleLogger, ILogger<SerialController> bottomLogger)
         {
             _logger = topLogger;
             controller = new FluidNCController(serialConf, middleLogger, bottomLogger);
             state = new MachineState(stageConf);
-            controller.FNCStateChanged += Controller_StateChanged;
-            controller.ReceivedStatusUpdate += StatusUpdateReceived;
             controller.RequestComplete += Controller_RequestComplete;
+            controller.PositionChanged += Controller_PositionChanged;
             _logger.LogInformation("FNCMachineControl constructed");
         }
-        #endregion
 
-        #region Public Methods
+        // Public methods
         public async Task<bool> Initialize()
         {
             _logger.LogInformation("Initializing Stage");
@@ -109,9 +105,44 @@ namespace StageControl.Model
         {
             return await Request(new HomingRequest(axes));
         }
-        #endregion
 
-        #region Private Methods
+        public async Task<bool> MoveTo(double X, double Y)
+        {
+            return await Request(new MoveToRequest(X, Y, BlockingType.ExternallyBlocking));
+        }
+
+        public async Task<bool> MoveToNonBlocking(double X, double Y)
+        {
+            return await Request(new MoveToRequest(X, Y, BlockingType.NonBlocking));
+        }
+
+        public static string ConvertControllerStateToStatus(LifetimeFNCState state)
+        {
+            switch (state)
+            {
+                case LifetimeFNCState.Unknown:
+                    return "Unknown State";
+                case LifetimeFNCState.FirstBoot:
+                    return "Booting Stage 1";
+                case LifetimeFNCState.SecondBoot:
+                    return "Booting Stage 2";
+                case LifetimeFNCState.FNCInitStart:
+                    return "Initialization Start";
+                case LifetimeFNCState.FNCInitFinish:
+                    return "Initialization Finish";
+                case LifetimeFNCState.FNCReady:
+                    return "Online";
+                default:
+                    return "Other";
+            }
+        }
+
+        // Private methods
+        private void Controller_PositionChanged(object? sender, PositionChangedEventArgs e)
+        {
+            state.XAxis.Position = e.X;
+            state.YAxis.Position = e.Y;
+        }
 
         private void Controller_RequestComplete(object? sender, RequestCompleteEventArgs e)
         {
@@ -147,49 +178,12 @@ namespace StageControl.Model
             }
         }
 
-        private void Controller_StateChanged(object? sender, FNCStateChangedEventArgs e) // event receiving code for inside the module
-        {
-            //Console.WriteLine(e.State.ToString());
-        }
-
-        public static string ConvertControllerStateToStatus(LifetimeFNCState state)
-        {
-            switch (state)
-            {
-                case LifetimeFNCState.Unknown:
-                    return "Unknown State";
-                case LifetimeFNCState.FirstBoot:
-                    return "Booting Stage 1";
-                case LifetimeFNCState.SecondBoot:
-                    return "Booting Stage 2";
-                case LifetimeFNCState.FNCInitStart:
-                    return "Initialization Start";
-                case LifetimeFNCState.FNCInitFinish:
-                    return "Initialization Finish";
-                case LifetimeFNCState.FNCReady:
-                    return "Online";
-                default:
-                    return "Other";
-
-            }
-        }
-
-
         protected virtual void OnRequestInProcess(EventArgs e)
         {
             if(RequestInProcess != null)
             {
                 EventHandler<EventArgs> handler = RequestInProcess;
-                handler?.Invoke(this, e);
-            }
-        }
-
-        protected virtual void OnPositionChanged(PositionChangedEventArgs e)
-        {
-            if(PositionChanged != null)
-            {
-                EventHandler<PositionChangedEventArgs> handler = PositionChanged;
-                handler?.Invoke(this, e);
+                handler(this, e);
             }
         }
 
@@ -198,60 +192,24 @@ namespace StageControl.Model
             if(HomingComplete != null)
             {
                 EventHandler<EventArgs> handler = HomingComplete;
-                handler?.Invoke(this, e);
+                handler(this, e);
             }
-        }
-
-
-        /*
-         * Possible Strings
-         * <Idle|MPos:2.000,2.000,0.000|FS:0,0>
-         * <Idle|MPos:2.000,2.000,0.000|FS:0,0|Ov:100,100,100>
-         * <Idle|MPos:2.000,2.000,0.000|FS:0,0|WCO:0.000,0.000,0.000>
-         * <Home|MPos:2.000,1.889,0.000|FS:100,0|Ov:100,100,100>
-         * <Home|MPos:2.000,1.736,0.000|FS:100,0|WCO:0.000,0.000,0.000>
-         * <Home|MPos:2.000,-1.922,0.000|FS:100,0|Pn:Y>
-         * <Home|MPos:0.186,0.000,0.000|FS:100,0|Pn:X>
-         * */
-        private void UpdateState(StatusUpdateEventArgs e)
-        {
-            if (e.Update.Data != null)
-            {
-                string data = e.Update.Data;
-                data = data.Trim(new char[] { '<', '>' });
-                string[] parts = data.Split('|');
-                string machineState = parts[0];
-                string MPos = parts[1];
-                string[] coordinateStrings = MPos.Substring(MPos.IndexOf(':') + 1).Split(',');
-                double x = double.Parse(coordinateStrings[0]);
-                double y = double.Parse(coordinateStrings[1]);
-                double z = double.Parse(coordinateStrings[2]);
-                state.XAxis.Position = x;
-                state.YAxis.Position = y;
-
-                PositionChangedEventArgs args = new PositionChangedEventArgs(state.XAxis.Position.GetValueOrDefault(), state.YAxis.Position.GetValueOrDefault());
-                OnPositionChanged(args);
-            }
-        }
-
-        private void StatusUpdateReceived(object? sender, StatusUpdateEventArgs e)
-        {
-            //Console.WriteLine(e.Update.ToString());
-            UpdateState(e);
         }
 
         private async Task<bool> Request(Request req)
         {
             TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
-            controller.RequestComplete += (sender, e) =>
+            EventHandler<RequestCompleteEventArgs>? RequestCompleteEventHandler = null;
+            RequestCompleteEventHandler = (sender, e) =>
             {
-                tcs.TrySetResult(true);
+                controller.RequestComplete -= RequestCompleteEventHandler;
+                tcs.TrySetResult(true); // TODO add feedback here, don't always return true, area to add exception throwing
             };
 
+            controller.RequestComplete += RequestCompleteEventHandler;
             OnRequestInProcess(EventArgs.Empty);
             controller.Request(req);
             return await tcs.Task;
         }
-        #endregion
     }
 }

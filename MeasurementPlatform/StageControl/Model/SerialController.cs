@@ -14,12 +14,6 @@ namespace StageControl.Model
         {
             Item = item;
         }
-
-        public SerialDataItemReceivedEventArgs()
-        {
-
-        }
-
     }
 
     public class SerialController
@@ -29,8 +23,10 @@ namespace StageControl.Model
         private string currentMessage;
         private readonly ILogger<SerialController> _logger;
 
+        // Public properties
         public event EventHandler<SerialDataItemReceivedEventArgs>? SerialDataItemReceived;
 
+        // Constructor
         public SerialController(SerialConfig serialConf, ILogger<SerialController> bottomLogger)
         {
             _logger = bottomLogger;
@@ -39,13 +35,7 @@ namespace StageControl.Model
             _logger.LogInformation("Stage SerialController constructed");
         }
 
-        private void triggerReboot()
-        {
-            port.RtsEnable = true;
-            Thread.Sleep(10);
-            port.RtsEnable = false;
-        }
-
+        // Public methods
         public void Disconnect()
         {
             port.Close();
@@ -68,7 +58,15 @@ namespace StageControl.Model
         {
             port.Write("?");
         }
-        
+
+        // Private methods
+        private void triggerReboot()
+        {
+            port.RtsEnable = true;
+            Thread.Sleep(10);
+            port.RtsEnable = false;
+        }
+
         protected virtual void OnSerialDataItemReceived(SerialDataItemReceivedEventArgs e)
         {
             if(SerialDataItemReceived != null)
@@ -77,11 +75,11 @@ namespace StageControl.Model
                 handler(this, e);
             }
         }
-
-        private void RaiseSerialDataItemReceivedEvent(SerialDataItem item)
+        private void DataReceivedHandler(object sender, SerialDataReceivedEventArgs e)
         {
-            SerialDataItemReceivedEventArgs args = new SerialDataItemReceivedEventArgs(item);
-            OnSerialDataItemReceived(args);
+            SerialPort sp = (SerialPort)sender;
+            currentMessage += sp.ReadExisting();
+            ParseData();
         }
 
         private void ParseData()
@@ -93,7 +91,7 @@ namespace StageControl.Model
                 {
                     int endIndex = currentMessage.IndexOf(SerialDataConsts.DoubleLineBreak);
                     SerialDataItem item = new SerialDataItem(currentMessage.Substring(0, endIndex + 4), DateTime.Now, SerialDataType.ESPFirstBootMessage);
-                    RaiseSerialDataItemReceivedEvent(item);
+                    OnSerialDataItemReceived(new SerialDataItemReceivedEventArgs(item));
                     currentMessage = currentMessage.Remove(0, endIndex + 4);
                     continue;
                 }
@@ -101,7 +99,7 @@ namespace StageControl.Model
                 {
                     int endIndex = currentMessage.IndexOf(SerialDataConsts.DoubleLineBreak);
                     SerialDataItem item = new SerialDataItem(currentMessage.Substring(0, endIndex + 4), DateTime.Now, SerialDataType.ESPBootloader);
-                    RaiseSerialDataItemReceivedEvent(item);
+                    OnSerialDataItemReceived(new SerialDataItemReceivedEventArgs(item));
                     currentMessage = currentMessage.Remove(0, endIndex + 4);
                     continue;
                 }
@@ -113,7 +111,7 @@ namespace StageControl.Model
                     if (currentMessage.Substring(endIndex).StartsWith(SerialDataConsts.LineBreak))
                         endIndex += 2;
                     SerialDataItem item = new SerialDataItem(currentMessage.Substring(0, endIndex), DateTime.Now, SerialDataType.MSGINFO);
-                    RaiseSerialDataItemReceivedEvent(item);
+                    OnSerialDataItemReceived(new SerialDataItemReceivedEventArgs(item));
                     currentMessage = currentMessage.Remove(0, endIndex);
                     continue;
                 }
@@ -125,7 +123,7 @@ namespace StageControl.Model
                     if (currentMessage.Substring(endIndex).StartsWith(SerialDataConsts.LineBreak))
                         endIndex += 2;
                     SerialDataItem item = new SerialDataItem(currentMessage.Substring(0, endIndex), DateTime.Now, SerialDataType.MSGDBG);
-                    RaiseSerialDataItemReceivedEvent(item);
+                    OnSerialDataItemReceived(new SerialDataItemReceivedEventArgs(item));
                     currentMessage = currentMessage.Remove(0, endIndex);
                     continue;
                 }
@@ -133,7 +131,7 @@ namespace StageControl.Model
                 {
                     int endIndex = currentMessage.IndexOf(SerialDataConsts.LineBreak);
                     SerialDataItem item = new SerialDataItem(currentMessage.Substring(0, endIndex + 2), DateTime.Now, SerialDataType.FNCEntryPrompt);
-                    RaiseSerialDataItemReceivedEvent(item);
+                    OnSerialDataItemReceived(new SerialDataItemReceivedEventArgs(item));
                     currentMessage = currentMessage.Remove(0, endIndex + 2);
                     continue;
                 }
@@ -143,21 +141,21 @@ namespace StageControl.Model
                     if (currentMessage.Substring(endIndex).StartsWith(SerialDataConsts.LineBreak))
                         endIndex += 2;
                     SerialDataItem item = new SerialDataItem(currentMessage.Substring(0, endIndex), DateTime.Now, SerialDataType.Status);
-                    RaiseSerialDataItemReceivedEvent(item);
+                    OnSerialDataItemReceived(new SerialDataItemReceivedEventArgs(item));
                     currentMessage = currentMessage.Remove(0, endIndex);
                 }
                 else if(currentMessage.StartsWith(SerialDataConsts.RequestCompleteMessageMarker) && currentMessage.Contains(SerialDataConsts.LineBreak))
                 {
                     int endIndex = currentMessage.IndexOf(SerialDataConsts.LineBreak);
                     SerialDataItem item = new SerialDataItem(currentMessage.Substring(0, endIndex), DateTime.Now, SerialDataType.RequestComplete);
-                    RaiseSerialDataItemReceivedEvent(item);
+                    OnSerialDataItemReceived(new SerialDataItemReceivedEventArgs(item));
                     currentMessage = currentMessage.Remove(0, endIndex + 2);
                 }
                 else if(currentMessage.StartsWith(SerialDataConsts.RuntimeErrorMessageMarker) && currentMessage.Contains(SerialDataConsts.Newline))
                 {
                     int endIndex = currentMessage.IndexOf(SerialDataConsts.Newline);
                     SerialDataItem item = new SerialDataItem(currentMessage.Substring(0, endIndex), DateTime.Now, SerialDataType.RuntimeError);
-                    RaiseSerialDataItemReceivedEvent(item);
+                    OnSerialDataItemReceived(new SerialDataItemReceivedEventArgs(item));
                     currentMessage = currentMessage.Remove(0, endIndex + 1);
                 }
                 else if (currentMessage.StartsWith(SerialDataConsts.LineBreak))
@@ -167,16 +165,8 @@ namespace StageControl.Model
                 else // was not able to match any marker so exit look and wait for more serial data to come in
                 {
                     canContinue = false;
-                }
-                
+                }   
             }
-        }
-
-        private void DataReceivedHandler(object sender, SerialDataReceivedEventArgs e)
-        {
-            SerialPort sp = (SerialPort)sender;
-            currentMessage += sp.ReadExisting();
-            ParseData();
         }
     }
 }

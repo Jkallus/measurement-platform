@@ -5,51 +5,202 @@ using StageControl.Enums;
 using StageControl.Events;
 using StageControl.Interfaces;
 using StageControl.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using DAQ.Model;
 using DAQ.Enums;
 using MeasurementUI.BusinessLogic.SystemControl.Enums;
 using Microsoft.Extensions.Logging;
-using Serilog;
 
 namespace MeasurementUI.BusinessLogic.SystemControl
 {
     public class SystemController: ObservableObject, ISystemController
     {
-        #region Private Members
+        // Private members
         private readonly IServiceProvider _serviceProvider;
         private readonly MachineConfiguration _machineConfiguration;
         private readonly ILogger<SystemController> _systemLogger;
+        //private readonly JobRunner _jobRunner;
+        private bool _hwBusy;
+        private object? _hwOwner;
+       
         
-        #endregion
-
-        
+        // Public properties
         public readonly IMachineControl MotionController;
         public readonly IDAQ DAQ;
 
-        #region Constructor
+        private string _motionControllerStatus;
+        public string MotionControllerStatus
+        {
+            get => _motionControllerStatus;
+            private set => SetProperty(ref _motionControllerStatus, value);
+        }
+
+        private ModuleInitializationState _daqInitializationState;
+        public ModuleInitializationState DAQInitializationState
+        {
+            get => _daqInitializationState;
+            set => SetProperty(ref _daqInitializationState, value);
+        }
+
+        private ModuleInitializationState _motionControllerInitializationState;
+        public ModuleInitializationState MotionControllerInitializationState
+        {
+            get => _motionControllerInitializationState;
+            set => SetProperty(ref _motionControllerInitializationState, value);
+        }
+
+        private string _daqStatus;
+        public string DAQStatus
+        {
+            get => _daqStatus;
+            private set => SetProperty(ref _daqStatus, value);
+        }
+
+        public bool IsMotionControllerConnected
+        {
+            get => MotionController.IsConnected;
+        }
+
+
+        // Constructor
         public SystemController(IServiceProvider serviceProvider, ILogger<SystemController> logger)
         {
             _serviceProvider = serviceProvider;
             _systemLogger = logger;
             _systemLogger.LogInformation("System Controller object constructed");
-            _machineConfiguration = _serviceProvider.GetService(typeof(MachineConfiguration)) as MachineConfiguration;
-            _motionControllerStatus = "";
-            //MotionController = new FNCMachineControl(_machineConfiguration.StageSerialConfig, _machineConfiguration.StageConfig, Log.ForContext<FNCMachineControl>());
-            MotionController = _serviceProvider.GetService(typeof(IMachineControl)) as IMachineControl;
+
+            _machineConfiguration = _serviceProvider.GetService(typeof(MachineConfiguration)) as MachineConfiguration ?? throw new ArgumentNullException("MachineConfiguration", "MachineConfiguration instance was null");
+            
+            MotionController = _serviceProvider.GetService(typeof(IMachineControl)) as IMachineControl ?? throw new ArgumentNullException("MachineController", "MachineController instance was null"); ;
             MotionController.StateChanged += MotionController_StateChanged;
             MotionController.UnexpectedRestart += MotionController_UnexpectedRestart;
+            _motionControllerStatus = "";
 
-            //DAQ = new ESPDAQ(_machineConfiguration.DAQSerialConfig);
-            DAQ = _serviceProvider.GetService(typeof(IDAQ)) as IDAQ;
+            DAQ = _serviceProvider.GetService(typeof(IDAQ)) as IDAQ ?? throw new ArgumentNullException("IDAQ", "IDAQ instance was null");
             DAQ.StateChanged += DAQ_StateChanged;
-           
+            _daqStatus = (new DAQStateEventArgs(DAQState.Uninitialized)).ToFriendlyString();
+
+            //_jobRunner = _serviceProvider.GetService(typeof(JobRunner)) as JobRunner ?? throw new ArgumentNullException("JobRunner", "JobRunner instance was null");
+
+            _hwBusy = false;
+            _hwOwner = null;
+            _systemLogger.LogInformation("Constructor finished");
         }
 
+        // Public properties
+        //public async Task ExecuteJob(Job job)
+        //{
+        //    if(_hwBusy)
+        //    {
+        //        throw new ResourceBusyException(_hwOwner!);
+        //    }
+        //    else
+        //    {
+        //        _hwBusy = true;
+        //        _hwOwner = _jobRunner;
+        //        _systemLogger.LogInformation("ExecuteJob requested");
+        //        _jobRunner.Job = job;
+        //        await _jobRunner.ExecuteJob();
+        //        _hwBusy = false;
+        //        _hwOwner = null;
+        //    }
+        //}
+
+        public async Task Home(HomingAxes axes, object caller)
+        {
+            if(_hwBusy)
+            {
+                throw new ResourceBusyException(_hwOwner!);
+            }
+            else
+            {
+                _hwBusy = true;
+                _hwOwner = caller;
+                _systemLogger.LogInformation("Homing {Axis}", axes.ToString());
+                await MotionController.Home(axes);
+                _hwBusy = false;
+                _hwOwner = null;
+            }
+        }
+
+        public async Task Jog(int x, int y, JogType type, object caller)
+        {
+            if (_hwBusy)
+            {
+                throw new ResourceBusyException(_hwOwner!);
+            }
+            else
+            {
+                _hwBusy = true;
+                _hwOwner = caller;
+                _systemLogger.LogInformation("Jogging {Xcoords},{Ycoords},{JogType}", x, y, type.ToString());
+                await MotionController.Jog(x, y, type);
+                _hwBusy = false;
+                _hwOwner = null;
+            }
+        }
+
+        public async Task MoveTo(double x, double y, BlockingType blocking, object caller)
+        {
+            if(_hwBusy)
+            {
+                throw new ResourceBusyException(_hwOwner!);
+            }
+            else
+            {
+                _hwBusy = true;
+                _hwOwner = caller;
+                _systemLogger.LogInformation("Moving to {Xcoords}, {Ycoords} in {Blocking} move",x, y, blocking.ToString());
+                if(blocking == BlockingType.ExternallyBlocking)
+                {
+                    await MotionController.MoveTo(x, y);
+                }
+                else
+                {
+                    await MotionController.MoveToNonBlocking(x, y);
+                }
+                _hwBusy = false;
+                _hwOwner = null;
+            }
+        }
+
+        public async Task Initialize(object caller)
+        {
+            try
+            {
+                _hwBusy = true;
+                _hwOwner = caller;
+                _systemLogger.LogInformation("Initializing system");
+                var task1 = MotionController.Initialize();
+                var task2 = DAQ.Initialize();
+                await Task.WhenAll(task1, task2);
+            }
+            catch (DAQException ex)
+            {
+                if (ex.DAQError != ErrorCode.AlreadyInitialized)
+                {
+                    _systemLogger.LogError(ex, "Caught DAQError");
+                    throw ex;
+                }
+            }
+            finally
+            {
+                _hwBusy = false;
+                _hwOwner = null;
+            }
+        }
+
+        public async Task Deinitialize(object caller)
+        {
+            _hwBusy = true;
+            _hwOwner = caller;
+            _systemLogger.LogInformation("Deinitializing system");
+            MotionController.Deinitialize();
+            await DAQ.Deinitialize();
+            _hwBusy = false;
+            _hwOwner = caller;
+        }
+
+        // Event handlers
         private void MotionController_UnexpectedRestart(object? sender, EventArgs e)
         {
             
@@ -93,86 +244,5 @@ namespace MeasurementUI.BusinessLogic.SystemControl
         {
             
         }
-        #endregion
-
-        #region Public Methods
-        public async Task Home(HomingAxes axes)
-        {
-            _systemLogger.LogInformation("Homing {Axis}", axes.ToString());
-            await MotionController.Home(axes);
-        }
-
-        public async Task Jog(int x, int y, JogType type)
-        {
-            _systemLogger.LogInformation("Jogging {Xcoords},{Ycoords},{JogType}", x, y, type.ToString());
-            await MotionController.Jog(x, y, type);
-        }
-
-
-        public async Task Initialize()
-        {
-            try
-            {
-                _systemLogger.LogInformation("Initializing system");
-                var task1 = MotionController.Initialize();
-                var task2 = DAQ.Initialize();
-                await Task.WhenAll(task1, task2);
-            }
-            catch (DAQException ex)
-            {
-                if (ex.DAQError != ErrorCode.AlreadyInitialized)
-                {
-                    _systemLogger.LogError(ex, "Caught DAQError");
-                    throw ex;
-                }
-            }
-            
-        }
-
-        public async Task Deinitialize()
-        {
-            _systemLogger.LogInformation("Deinitializing system");
-            MotionController.Deinitialize();
-            await DAQ.Deinitialize();
-        }
-        #endregion
-
-        #region Public Properties
-
-        private string _motionControllerStatus; 
-        public string MotionControllerStatus
-        {
-            get { return _motionControllerStatus; }
-            private set { SetProperty(ref _motionControllerStatus, value); }
-        }
-
-        private ModuleInitializationState _daqInitializationState;
-        public ModuleInitializationState DAQInitializationState
-        {
-            get { return _daqInitializationState; }
-            set { SetProperty(ref _daqInitializationState, value); }
-        }
-
-        private ModuleInitializationState _motionControllerInitializationState;
-        public ModuleInitializationState MotionControllerInitializationState
-        {
-            get { return _motionControllerInitializationState; }
-            set { SetProperty(ref _motionControllerInitializationState, value); }
-        }
-
-        private string _daqStatus;
-        public string DAQStatus
-        {
-            get { return _daqStatus; }
-            private set { SetProperty(ref _daqStatus, value); }
-        }
-
-        public bool IsMotionControllerConnected
-        {
-            get { return MotionController.IsConnected; }
-        }
-
-        #endregion
-
     }
 }

@@ -11,82 +11,79 @@ using Microsoft.Extensions.Logging;
 
 namespace StageControl.Model
 {
-    
     public class FluidNCController
     {
-
-        #region Member Variables
-
-        private readonly SerialController serial;
-        private readonly List<SerialDataItem> incomingMessages;
-        private readonly List<SerialDataItem> outgoingMessages;
-        private readonly Timer statusTimer;
+        // Private member variables
+        private readonly SerialController _serial;
+        private readonly List<SerialDataItem> _incomingMessages;
+        private readonly List<SerialDataItem> _outgoingMessages;
+        private readonly Timer _statusTimer;
         private readonly ILogger<FluidNCController> _logger;
+        private bool _initPending;
+        private Request? _activeRequest;
+        private double _compareThreshold;
 
-        private bool initPending;
-        private bool requestPending;
-        private Request? activeRequest;
-        private bool isConnected;
-
+        // Public properties
         public event EventHandler<FNCStateChangedEventArgs>? FNCStateChanged;
         public event EventHandler<RequestCompleteEventArgs>? RequestComplete;
-        public event EventHandler<StatusUpdateEventArgs>? ReceivedStatusUpdate;
+        public event EventHandler<PositionChangedEventArgs>? PositionChanged;
         public event EventHandler<EventArgs>? InitializationComplete;
         public event EventHandler<EventArgs>? UnexpectedRestart;
         public event EventHandler<RuntimeErrorEventArgs>? RuntimeError;
 
-        #endregion
 
-        #region Public Properties
-        private LifetimeFNCState controllerState;
+        private LifetimeFNCState _controllerState;
         public LifetimeFNCState ControllerState
         {
-            get { return controllerState; }
-            private set { controllerState = value; }  
+            get { return _controllerState; }
+            private set { _controllerState = value; }  
         }
 
-        public bool RequestPending { get => requestPending; }
+        private bool _requestPending;
+        public bool RequestPending { get => _requestPending; }
+
+        private bool _isConnected;
         public bool IsConnected 
         {
-            get => isConnected;
-            private set => isConnected = value; 
+            get => _isConnected;
+            private set => _isConnected = value; 
         }
 
-        #endregion
-
-        #region Constructors
+        // Constructors
         public FluidNCController(SerialConfig serialConf, ILogger<FluidNCController> middleLogger, ILogger<SerialController> bottomLogger)
         {
             _logger = middleLogger;
-            serial = new SerialController(serialConf, bottomLogger);
-            incomingMessages = new List<SerialDataItem>();
-            outgoingMessages = new List<SerialDataItem>();
-            initPending = false;
-            requestPending = false;
-            isConnected = false;
-            statusTimer = new Timer();
-            initTimer();
-            controllerState = LifetimeFNCState.Unknown;
+            _serial = new SerialController(serialConf, bottomLogger);
+            _incomingMessages = new List<SerialDataItem>();
+            _outgoingMessages = new List<SerialDataItem>();
+            _initPending = false;
+            _requestPending = false;
+            _isConnected = false;
+            _compareThreshold = 0.0001;
+            _statusTimer = new Timer();
+            InitTimer();
+            _controllerState = LifetimeFNCState.Unknown; // disconnected state is always Unknown
             _logger.LogInformation("FluidNCController constructed");
         }
-        #endregion
-
-        #region Public Methods
-
+        
+        // Public methods
         public void Disconnect()
         {
-            statusTimer.Stop();
-            serial.Disconnect();
-            controllerState = LifetimeFNCState.Unknown;
+            _statusTimer.Stop();
+            _serial.Disconnect();
+            _controllerState = LifetimeFNCState.Unknown;
             OnFNCStateChanged(new FNCStateChangedEventArgs(ControllerState));
             IsConnected = false;
         }
 
+        /// <summary>
+        /// This synchronous function sends the message over serial that begins the move/operation
+        /// </summary>
         public void Request(Request req)
         {
             _logger.LogInformation("Processing request");
-            requestPending = true;
-            activeRequest = req;
+            _requestPending = true;
+            _activeRequest = req;
             if(req != null && req is HomingRequest)
             {   
                 HomingRequest homingRequest = (HomingRequest)req;
@@ -103,8 +100,8 @@ namespace StageControl.Model
                     {
                         throw new Exception();
                     }
-                    serial.SendSerialData(reqText);
-                    outgoingMessages.Add(new SerialDataItem(reqText, DateTime.Now, SerialDataType.OutgoingMessage));
+                    _serial.SendSerialData(reqText);
+                    _outgoingMessages.Add(new SerialDataItem(reqText, DateTime.Now, SerialDataType.OutgoingMessage));
                 }
             }
             else if(req != null && req is JogRequest)
@@ -127,30 +124,77 @@ namespace StageControl.Model
                     reqText += $"X{x_mm.ToString("0.000")} ";
                     reqText += $"Y{y_mm.ToString("0.000")}";
 
-                    serial.SendSerialData(reqText);
-                    outgoingMessages.Add(new SerialDataItem(reqText, DateTime.Now, SerialDataType.OutgoingMessage));
+                    _serial.SendSerialData(reqText);
+                    _outgoingMessages.Add(new SerialDataItem(reqText, DateTime.Now, SerialDataType.OutgoingMessage));
                 }
             }
-        }
+            else if(req != null && req is MoveToRequest)
+            {
+                MoveToRequest moveToRequest = (MoveToRequest)req;
+                if(moveToRequest != null)
+                {
+                    string reqText = "G1 "; // Gcode linear move command
+                    reqText += " G90 "; // always absolute coordinates
+                    reqText += $"X{moveToRequest.X.ToString("0.000")} ";
+                    reqText += $"Y{moveToRequest.Y.ToString("0.000")} ";
+                    reqText += "F700";
 
-        
+                    if(moveToRequest.Blocking == BlockingType.ExternallyBlocking)
+                    {
+                        PositionChanged += FluidNCController_PositionChanged; // TODO should this be done before sending over serial?
+                    }
+
+                    _serial.SendSerialData(reqText);
+                    _outgoingMessages.Add(new SerialDataItem(reqText, DateTime.Now, SerialDataType.OutgoingMessage));
+                }
+            }
+
+            //if(req!.Blocking == BlockingType.InternallyBlocking)
+            //{
+
+            //}
+            //else if(req.Blocking == BlockingType.NonBlocking)
+            //{
+
+            //}
+            //else if(req.Blocking == BlockingType.ExternallyBlocking)
+            //{
+                
+            //}
+        }
 
         public void Connect()
         {
             _logger.LogInformation("Connecting to FluidNC");
-            serial.SerialDataItemReceived += DataReceived;
-            initPending = true;
-            serial.Connect();
+            _serial.SerialDataItemReceived += DataReceived;
+            _initPending = true;
+            _serial.Connect();
             IsConnected = true;
         }
 
-        #endregion
-
-        #region Event Handlers
+        // Event handlers
+        private void FluidNCController_PositionChanged(object? sender, PositionChangedEventArgs e)
+        {
+            if(_activeRequest != null && _requestPending)
+            {
+                if(_activeRequest is MoveToRequest && _activeRequest.Blocking == BlockingType.ExternallyBlocking)
+                {
+                    MoveToRequest moveReq = (MoveToRequest)_activeRequest;
+                    if (PositionEquality(e.X, moveReq.X) && PositionEquality(e.Y, moveReq.Y))
+                    {
+                        OnRequestComplete(new RequestCompleteEventArgs(_activeRequest));
+                        _activeRequest = null;
+                        _requestPending = false;
+                        PositionChanged -= FluidNCController_PositionChanged;
+                    }
+                }
+            }
+        }
 
         private void statusTimerTick(object? sender, EventArgs e)
         {
-            RequestStatus();
+            _logger.LogDebug("Sending Status Request");
+            _serial.SendStatusRequest();
         }
 
         private void DataReceived(object? sender, SerialDataItemReceivedEventArgs e)
@@ -158,19 +202,15 @@ namespace StageControl.Model
             if(e.Item != null)
             {
                 ProcessIncomingSerialDataItem(e.Item);
-                //Console.WriteLine(e.Item.ToString());
             }
         }
 
-        #endregion
-
-        #region Event Sources
-
-        protected virtual void OnReceivedStatusUpdate(StatusUpdateEventArgs e)
+        // Event sources
+        protected virtual void OnPositionChanged(PositionChangedEventArgs e)
         {
-            if(ReceivedStatusUpdate != null)
+            if(PositionChanged != null)
             {
-                EventHandler<StatusUpdateEventArgs> handler = ReceivedStatusUpdate;
+                EventHandler<PositionChangedEventArgs> handler = PositionChanged;
                 handler(this, e);
             }
         }
@@ -224,91 +264,135 @@ namespace StageControl.Model
             }
         }
 
-        #endregion
-
-        #region Private Methods
-
-        private void RequestStatus()
+        // Private methods
+        private void InitTimer()
         {
-            serial.SendStatusRequest();
-        }
-
-        private void initTimer()
-        {
-            statusTimer.Interval = 200;
-            statusTimer.AutoReset = true;
-            statusTimer.Elapsed += statusTimerTick;
+            _statusTimer.Interval = 200;
+            _statusTimer.AutoReset = true;
+            _statusTimer.Elapsed += statusTimerTick;
         }
 
         private void ProcessIncomingSerialDataItem(SerialDataItem item)
         {
             _logger.LogDebug("Received SerialDataItem {SDI}", item);
-            if(controllerState == LifetimeFNCState.FNCReady && item.Type == SerialDataType.Status) // regular status update case, put first because most messages will be this
+            if(_controllerState == LifetimeFNCState.FNCReady && item.Type == SerialDataType.Status) // regular status update case, put first because most messages will be this
             {
-                OnReceivedStatusUpdate(new StatusUpdateEventArgs(item));
+                ProcessStatusUpdate(item);
             }
-            else if(controllerState == LifetimeFNCState.Unknown && item.Type == SerialDataType.ESPFirstBootMessage) // expected transition when starting up
+            else if(_controllerState == LifetimeFNCState.Unknown && item.Type == SerialDataType.ESPFirstBootMessage) // expected transition when starting up
             {
-                controllerState = LifetimeFNCState.FirstBoot;
-                OnFNCStateChanged(new FNCStateChangedEventArgs(controllerState));
+                _controllerState = LifetimeFNCState.FirstBoot;
+                OnFNCStateChanged(new FNCStateChangedEventArgs(_controllerState));
             }
-            else if(controllerState != LifetimeFNCState.Unknown && item.Type == SerialDataType.ESPFirstBootMessage) // if we get this at any other point that means a reset occured and FNC state is lost
+            else if(_controllerState != LifetimeFNCState.Unknown && item.Type == SerialDataType.ESPFirstBootMessage) // if we get this at any other point that means a reset occured and FNC state is lost
             {
-                controllerState = LifetimeFNCState.FirstBoot;
-                OnFNCStateChanged(new FNCStateChangedEventArgs(controllerState));
+                _controllerState = LifetimeFNCState.FirstBoot;
+                OnFNCStateChanged(new FNCStateChangedEventArgs(_controllerState));
                 OnUnexpectedRestart(EventArgs.Empty);
             }
-            else if(controllerState == LifetimeFNCState.FirstBoot && item.Type == SerialDataType.ESPBootloader) // next state in startup routine
+            else if(_controllerState == LifetimeFNCState.FirstBoot && item.Type == SerialDataType.ESPBootloader) // next state in startup routine
             {
-                controllerState = LifetimeFNCState.SecondBoot;
-                OnFNCStateChanged(new FNCStateChangedEventArgs(controllerState));
+                _controllerState = LifetimeFNCState.SecondBoot;
+                OnFNCStateChanged(new FNCStateChangedEventArgs(_controllerState));
             }
-            else if(controllerState == LifetimeFNCState.SecondBoot && item.Type == SerialDataType.MSGINFO) // first MSGINFO arrives marks actual firmware loaded
+            else if(_controllerState == LifetimeFNCState.SecondBoot && item.Type == SerialDataType.MSGINFO) // first MSGINFO arrives marks actual firmware loaded
             {
-                controllerState = LifetimeFNCState.FNCInitStart;
-                OnFNCStateChanged(new FNCStateChangedEventArgs(controllerState));
+                _controllerState = LifetimeFNCState.FNCInitStart;
+                OnFNCStateChanged(new FNCStateChangedEventArgs(_controllerState));
             }
-            else if(controllerState == LifetimeFNCState.FNCInitStart && item.Type == SerialDataType.FNCEntryPrompt)
+            else if(_controllerState == LifetimeFNCState.FNCInitStart && item.Type == SerialDataType.FNCEntryPrompt)
             {
-                controllerState = LifetimeFNCState.FNCInitFinish;
-                OnFNCStateChanged(new FNCStateChangedEventArgs(controllerState));
+                _controllerState = LifetimeFNCState.FNCInitFinish;
+                OnFNCStateChanged(new FNCStateChangedEventArgs(_controllerState));
             }
-            else if(controllerState == LifetimeFNCState.FNCInitFinish && item.Type == SerialDataType.MSGINFO)
+            else if(_controllerState == LifetimeFNCState.FNCInitFinish && item.Type == SerialDataType.MSGINFO)
             {
-                controllerState = LifetimeFNCState.FNCReady;
-                OnFNCStateChanged(new FNCStateChangedEventArgs(controllerState));
-                if(initPending)
+                _controllerState = LifetimeFNCState.FNCReady;
+                OnFNCStateChanged(new FNCStateChangedEventArgs(_controllerState));
+                if(_initPending)
                 {
                     OnInitializationComplete(new EventArgs());
-                    initPending = false;
+                    _initPending = false;
                 }
-                statusTimer.Enabled = true;       
+                _statusTimer.Enabled = true;       
             }
-            else if(controllerState == LifetimeFNCState.FNCReady && item.Type == SerialDataType.RequestComplete)
+            else if(_controllerState == LifetimeFNCState.FNCReady && item.Type == SerialDataType.RequestComplete)
             {
-                if (requestPending && activeRequest != null)
-                {
-                    OnRequestComplete(new RequestCompleteEventArgs(activeRequest));
-                    requestPending = false;
-                    activeRequest = null;
-
-                }
+                ProcessRequestComplete();
             }
-            else if(controllerState == LifetimeFNCState.FNCReady && item.Type == SerialDataType.RuntimeError)
+            else if(_controllerState == LifetimeFNCState.FNCReady && item.Type == SerialDataType.RuntimeError)
             {
-                string message = incomingMessages.Last().Data!;
+                string message = _incomingMessages.Last().Data!;
                 string[] parts = item.Data!.Split(':');
                 int id = int.Parse(parts[1]);
                 OnRuntimeErrorReceived(new RuntimeErrorEventArgs(message, id));
-                if(requestPending && activeRequest != null)
+                if(_requestPending && _activeRequest != null) // TODO this needs to be looked at, possible incorrect behavior with ending the request like this
                 {
-                    OnRequestComplete(new RequestCompleteEventArgs(activeRequest));
-                    requestPending = false;
-                    activeRequest = null;
+                    OnRequestComplete(new RequestCompleteEventArgs(_activeRequest)); // Maybe here throw exception to be caught by TaskCompletionSource
+                    _requestPending = false;
+                    _activeRequest = null;
                 }
             }
-            incomingMessages.Add(item);
+            _incomingMessages.Add(item);
         }
-        #endregion
+
+        private void ProcessRequestComplete()
+        {
+            if(_requestPending && _activeRequest != null)
+            {
+                if(_activeRequest.Blocking == BlockingType.InternallyBlocking) // internally blocking is simple, homing or other strictly blocking request is complete
+                {
+                    OnRequestComplete(new RequestCompleteEventArgs(_activeRequest));
+                    _requestPending = false;
+                    _activeRequest = null;
+                }
+                else if(_activeRequest.Blocking == BlockingType.NonBlocking) // non blocking like Jog can return once "ok" is received even if the move isn't finished
+                {
+                    OnRequestComplete(new RequestCompleteEventArgs(_activeRequest));
+                    _requestPending = false;
+                    _activeRequest = null;
+                }
+                else if(_activeRequest.Blocking == BlockingType.ExternallyBlocking) // Externally blocking for MoveTo returns when position reached, not when "ok" received
+                {
+                    // If externally blocking then request complete will happen in PositionChanged handler inside FluidNCController
+                }
+            }
+        }
+
+        private void ProcessStatusUpdate(SerialDataItem item)
+        {
+            /*
+            * Possible Strings
+            * <Idle|MPos:2.000,2.000,0.000|FS:0,0>
+            * <Idle|MPos:2.000,2.000,0.000|FS:0,0|Ov:100,100,100>
+            * <Idle|MPos:2.000,2.000,0.000|FS:0,0|WCO:0.000,0.000,0.000>
+            * <Home|MPos:2.000,1.889,0.000|FS:100,0|Ov:100,100,100>
+            * <Home|MPos:2.000,1.736,0.000|FS:100,0|WCO:0.000,0.000,0.000>
+            * <Home|MPos:2.000,-1.922,0.000|FS:100,0|Pn:Y>
+            * <Home|MPos:0.186,0.000,0.000|FS:100,0|Pn:X>
+            * */
+            if (item.Data != null)
+            {
+                string data = item.Data;
+                data = data.Trim(new char[] { '<', '>' });
+                string[] parts = data.Split('|');
+                string machineState = parts[0];
+                string MPos = parts[1];
+                string[] coordinateStrings = MPos.Substring(MPos.IndexOf(':') + 1).Split(',');
+                double x = double.Parse(coordinateStrings[0]);
+                double y = double.Parse(coordinateStrings[1]);
+                double z = double.Parse(coordinateStrings[2]);
+                PositionChangedEventArgs args = new PositionChangedEventArgs(x, y);
+                OnPositionChanged(args);
+            }
+        }
+
+        private bool PositionEquality(double a, double b)
+        {
+            if (Math.Abs(a - b) < _compareThreshold)
+                return true;
+            else
+                return false;
+        }
     }
 }
