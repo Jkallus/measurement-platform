@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "DAQ": {
+      "commandName": "Project",
+      "nativeDebugging": false
+    }
+  }
+}

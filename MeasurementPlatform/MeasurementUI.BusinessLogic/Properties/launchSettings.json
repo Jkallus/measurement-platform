@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "MeasurementUI.BusinessLogic": {
+      "commandName": "Project",
+      "nativeDebugging": false
+    }
+  }
+}

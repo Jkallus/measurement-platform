@@ -14,7 +14,7 @@
     "MeasurementApp (Hardware)": {
       "commandName": "MsixPackage",
       "commandLineArgs": "Hardware",
-      "nativeDebugging": true
+      "nativeDebugging": false
     }
   }
 }

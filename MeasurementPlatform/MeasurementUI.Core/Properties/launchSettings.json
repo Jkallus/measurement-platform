@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "MeasurementUI.Core": {
+      "commandName": "Project",
+      "nativeDebugging": false
+    }
+  }
+}

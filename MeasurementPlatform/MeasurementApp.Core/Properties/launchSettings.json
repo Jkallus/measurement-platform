@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "MeasurementApp.Core": {
+      "commandName": "Project",
+      "nativeDebugging": false
+    }
+  }
+}
