@@ -57,8 +57,8 @@ namespace MeasurementUI.BusinessLogic.Recipe
         {
             List<(double x, double y)> points = new();
 
-            int xSampleCount = (int)(XDimension.Value / ScanPitch.Value);
-            int ySampleCount = (int)(YDimension.Value / ScanPitch.Value);
+            int xSampleCount = (int)(XDimension.Value / (ScanPitch.Value / 1000.0));
+            int ySampleCount = (int)(YDimension.Value / (ScanPitch.Value / 1000.0));
 
             double xPoint = BottomLeft.X;
             double yPoint = BottomLeft.Y;
@@ -67,7 +67,7 @@ namespace MeasurementUI.BusinessLogic.Recipe
             {
                 for (int xSamples = 0; xSamples < xSampleCount; xSamples++)
                 {
-                    points.Add((xPoint + (xSamples * ScanPitch.Value), yPoint + (ySamples * ScanPitch.Value)));
+                    points.Add((xPoint + (xSamples * (ScanPitch.Value / 1000.0)), yPoint + (ySamples * (ScanPitch.Value / 1000.0))));
                 }
             }
 

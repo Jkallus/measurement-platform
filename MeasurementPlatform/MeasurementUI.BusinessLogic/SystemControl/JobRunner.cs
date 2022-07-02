@@ -29,12 +29,25 @@ namespace MeasurementUI.BusinessLogic.SystemControl
 
         public async Task ExecuteJob()
         {
-            _logger.LogInformation("Job Starting: {Recipe}", Job.Recipe.Name);
-            List<(double x, double y)> locs = Job.Recipe.GetScanPoints();
-            foreach(var loc in locs)
+            if (Job != null)
             {
-                //_controller.MotionController.G
+                _logger.LogInformation("Job Starting: {Recipe}", Job.Recipe.Name);
+                List<(double x, double y)> locs = Job.Recipe.GetScanPoints();
+                foreach (var loc in locs)
+                {
+                    await _controller!.MoveTo(loc.x, loc.y, StageControl.Model.BlockingType.ExternallyBlocking, this); // TODO add better controller null check
+                    var counts = await _controller.GetEncoderCounts(this);
+                    var volts = await _controller.GetVolts(this);
+                    if (counts != null && volts != null)
+                    {
+                        Job.Result.ResultData.Add(new Sample(counts.Item1, counts.Item2, volts.Value));
+                    }
+                }
             }
+            else
+            {
+                // TODO add job null case
+            }            
         }
     }
 }

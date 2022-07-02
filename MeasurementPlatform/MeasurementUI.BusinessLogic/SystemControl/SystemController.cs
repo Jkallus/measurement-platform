@@ -18,7 +18,6 @@ namespace MeasurementUI.BusinessLogic.SystemControl
         private readonly IServiceProvider _serviceProvider;
         private readonly MachineConfiguration _machineConfiguration;
         private readonly ILogger<SystemController> _systemLogger;
-        //private readonly JobRunner _jobRunner;
         private bool _hwBusy;
         private object? _hwOwner;
        
@@ -79,31 +78,10 @@ namespace MeasurementUI.BusinessLogic.SystemControl
             DAQ.StateChanged += DAQ_StateChanged;
             _daqStatus = (new DAQStateEventArgs(DAQState.Uninitialized)).ToFriendlyString();
 
-            //_jobRunner = _serviceProvider.GetService(typeof(JobRunner)) as JobRunner ?? throw new ArgumentNullException("JobRunner", "JobRunner instance was null");
-
             _hwBusy = false;
             _hwOwner = null;
             _systemLogger.LogInformation("Constructor finished");
         }
-
-        // Public properties
-        //public async Task ExecuteJob(Job job)
-        //{
-        //    if(_hwBusy)
-        //    {
-        //        throw new ResourceBusyException(_hwOwner!);
-        //    }
-        //    else
-        //    {
-        //        _hwBusy = true;
-        //        _hwOwner = _jobRunner;
-        //        _systemLogger.LogInformation("ExecuteJob requested");
-        //        _jobRunner.Job = job;
-        //        await _jobRunner.ExecuteJob();
-        //        _hwBusy = false;
-        //        _hwOwner = null;
-        //    }
-        //}
 
         public async Task Home(HomingAxes axes, object caller)
         {
@@ -198,6 +176,52 @@ namespace MeasurementUI.BusinessLogic.SystemControl
             await DAQ.Deinitialize();
             _hwBusy = false;
             _hwOwner = caller;
+        }
+
+        public async Task<Tuple<int, int>?> GetEncoderCounts(object caller)
+        {
+            Tuple<int, int>? counts;
+            try
+            {
+                _hwBusy = true;
+                _hwOwner = caller;
+                counts = await DAQ.GetEncoderCounts();
+            }
+            catch(DAQException ex)
+            {
+                _systemLogger.LogError(ex, "Caught DAQError");
+                throw ex;
+            }
+            finally
+            {
+                _hwBusy = false;
+                _hwOwner = null;
+            }
+
+            return counts;
+        }
+
+        public async Task<double?> GetVolts(object caller)
+        {
+            double? volts;
+            try
+            {
+                _hwBusy = true;
+                _hwOwner = caller;
+                volts = await DAQ.GetVolts();
+            }
+            catch(DAQException ex)
+            {
+                _systemLogger.LogError(ex, "Caught DAQError");
+                throw ex;
+            }
+            finally
+            {
+                _hwBusy = false;
+                _hwOwner = null;
+            }
+
+            return volts;
         }
 
         // Event handlers

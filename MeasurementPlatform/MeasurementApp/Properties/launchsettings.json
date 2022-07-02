@@ -8,11 +8,13 @@
     },
     "MeasurementApp (Simulation)": {
       "commandName": "MsixPackage",
-      "commandLineArgs": "Simulation"
+      "commandLineArgs": "Simulation",
+      "nativeDebugging": true
     },
     "MeasurementApp (Hardware)": {
       "commandName": "MsixPackage",
-      "commandLineArgs": "Hardware"
+      "commandLineArgs": "Hardware",
+      "nativeDebugging": true
     }
   }
 }

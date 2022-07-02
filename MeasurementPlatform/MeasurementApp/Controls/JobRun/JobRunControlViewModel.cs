@@ -1,5 +1,7 @@
-﻿using MeasurementApp.Services.RecipeSelect;
+﻿using MeasurementApp.Services;
+using MeasurementApp.Services.RecipeSelect;
 using MeasurementUI.BusinessLogic.Recipe;
+using MeasurementUI.BusinessLogic.SystemControl;
 using Microsoft.Extensions.Logging;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
@@ -17,35 +19,53 @@ namespace MeasurementApp.Controls.JobRun
         private readonly IServiceProvider _service;
         private readonly ILogger _logger;
         private readonly RecipeSelectService _recipeSelect;
+        private readonly JobRunner _jobRunner;
 
         // Public properties
         private ScanRecipe _recipe;
         public ScanRecipe Recipe
         {
             get => _recipe;
-            set => SetProperty(ref _recipe, value);
+            set
+            {
+                if(SetProperty(ref _recipe, value))
+                {
+                    RunJobCommand.NotifyCanExecuteChanged();
+                }
+            }
         }
 
         public IAsyncRelayCommand SelectRecipeCommand { get; private set; }
-        public IAsyncRelayCommand ExecuteRecipeCommand { get; private set; }
+        public IAsyncRelayCommand RunJobCommand { get; private set; }
 
         public JobRunControlViewModel(IServiceProvider service, ILogger<JobRunControlViewModel> logger)
         {
             _service = service;
             _logger = logger;
+            _recipe = null;
             _recipeSelect = _service.GetService(typeof(RecipeSelectService)) as RecipeSelectService;
+            _jobRunner = _service.GetService(typeof(JobRunner)) as JobRunner;
             SelectRecipeCommand = new AsyncRelayCommand(SelectRecipe);
-            ExecuteRecipeCommand = new AsyncRelayCommand(ExecuteRecipe, CanExecuteRecipe);
+            RunJobCommand = new AsyncRelayCommand(RunJob, CanRunJob);
         }
 
-        private Task ExecuteRecipe()
+        private async Task RunJob()
         {
-            throw new NotImplementedException();
+            try
+            {
+                _jobRunner.Job = new Job(Recipe);
+                await _jobRunner.ExecuteJob();
+            }
+            catch(Exception ex)
+            {
+                await App.MainRoot.MessageDialogAsync("Exception", ex.Message);
+            }
+            
         }
 
-        private bool CanExecuteRecipe()
+        private bool CanRunJob()
         {
-            throw new NotImplementedException();
+            return Recipe != null;
         }
 
         // Private methods
