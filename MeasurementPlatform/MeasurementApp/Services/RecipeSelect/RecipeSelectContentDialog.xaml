@@ -5,25 +5,29 @@
     xmlns:local="using:MeasurementApp.Services.RecipeSelect"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d">
+    MinHeight="300" MinWidth="500"
+    mc:Ignorable="d"
+    IsPrimaryButtonEnabled="{x:Bind ViewModel.CanOpen, Mode=OneWay}">   
+    
 
-    <Grid>
-        <GridView 
+    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <Border BorderBrush="DimGray" BorderThickness="2" CornerRadius="5">
+            <GridView Margin="20 20 20 20"
             HorizontalAlignment="Stretch"
             VerticalAlignment="Stretch"
             ItemsSource="{x:Bind ViewModel.Recipes, Mode=OneWay}"
             SelectedItem="{x:Bind ViewModel.Selection, Mode=TwoWay}">
 
-            <GridView.ItemTemplate>
-                <DataTemplate>
-                    <Grid>
-                        <Border Background="LightGray" Width="160" Height="70" CornerRadius="10">
-                            <TextBlock Text="{Binding Name}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20 0 20 0"/>
-                        </Border>
-                    </Grid>
-                </DataTemplate>
-            </GridView.ItemTemplate>
-            
-        </GridView>
+                <GridView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Border Background="LightGray" Width="160" Height="70" CornerRadius="10">
+                                <TextBlock Text="{Binding Name}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20 0 20 0"/>
+                            </Border>
+                        </Grid>
+                    </DataTemplate>
+                </GridView.ItemTemplate>
+            </GridView>
+        </Border>
     </Grid>
 </ContentDialog>

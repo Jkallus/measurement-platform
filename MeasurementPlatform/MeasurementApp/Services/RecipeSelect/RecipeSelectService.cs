@@ -27,8 +27,20 @@ namespace MeasurementApp.Services.RecipeSelect
             };
 
             var result = await dialog.ShowAsync();
+            if(result == ContentDialogResult.Primary)
+            {
+                return dialog.Selection;
+            }
+            else if(result == ContentDialogResult.Secondary)
+            {
+                return null;
+            }
+            else
+            {
+                throw new Exception("Invalid ContentDialogResult");
+            }
 
-            return dialog.Selection;
+            
         }
     }
 }

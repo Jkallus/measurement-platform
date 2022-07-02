@@ -19,7 +19,18 @@ namespace MeasurementApp.Services.RecipeSelect
         public ScanRecipe Selection
         {
             get { return _selection; }
-            set { SetProperty(ref _selection, value); }
+            set 
+            {
+                if(SetProperty(ref _selection, value))
+                {
+                    OnPropertyChanged("CanOpen");
+                }
+            }
+        }
+
+        public bool CanOpen
+        {
+            get => Selection != null;
         }
 
         private ObservableCollection<ScanRecipe> _recipes;
