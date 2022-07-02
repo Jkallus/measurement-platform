@@ -8,9 +8,30 @@
     mc:Ignorable="d">
 
     <Grid>
-        <StackPanel>
-            <Button Content="Select Recipe" Command="{x:Bind ViewModel.SelectRecipeCommand}"/>
-            <TextBlock Text="{x:Bind ViewModel.RunRecipe.Name, Mode=OneWay}"/>
-        </StackPanel>
+
+        <Border BorderBrush="DimGray" BorderThickness="2" HorizontalAlignment="Center" VerticalAlignment="Center" CornerRadius="5">
+            <Grid Margin="5 5 5 5">
+                <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="135"/>
+                    </Grid.ColumnDefinitions>
+            
+                    <TextBlock Text="Recipe:" Margin="0 0 5 0" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center"/>
+                    <TextBox Text="{x:Bind ViewModel.Recipe.Name, Mode=OneWay}" Grid.Row="0" Grid.Column="1" IsReadOnly="True" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
+                    <Button Content="Select Recipe" Command="{x:Bind ViewModel.SelectRecipeCommand}" Grid.Row="1" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" Margin="0 5 0 0"/>
+
+                <Button Command="{x:Bind ViewModel.ExecuteRecipeCommand}" Grid.Row="2" Width="90" Grid.ColumnSpan="2" HorizontalAlignment="Center" Margin="0 10 0 0">
+                    <Button.Content>
+                        <FontIcon Glyph="&#xE768;"/>
+                    </Button.Content>
+                </Button>
+            </Grid>
+        </Border>
+
     </Grid>
 </UserControl>

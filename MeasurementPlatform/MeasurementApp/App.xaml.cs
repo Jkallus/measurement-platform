@@ -63,6 +63,7 @@ namespace MeasurementApp
                 // Application Custom Services
                 services.AddSingleton<MachineConfiguration>(context.Configuration.GetSection("MachineConfig").Get<MachineConfiguration>());
                 services.AddSingleton<IRecipeManager, RecipeManager>();
+                services.AddSingleton<JobRunner>();
                 services.AddSingleton<RecipeSelectService>();
                 services.AddSingleton<StageSerialConfig>(context.Configuration.GetSection("MachineConfig:StageSerialConfig").Get<StageSerialConfig>());
                 services.AddSingleton<DAQSerialConfig>(context.Configuration.GetSection("MachineConfig:DAQSerialConfig").Get<DAQSerialConfig>());

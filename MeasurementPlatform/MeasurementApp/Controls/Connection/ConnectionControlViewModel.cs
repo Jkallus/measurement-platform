@@ -81,7 +81,7 @@ namespace MeasurementApp.Controls
             {
                 IsBusy = true;
                 _logger.LogInformation("Connecting to system");
-                await _systemController.Initialize();
+                await _systemController.Initialize(this);
             }
             catch(DAQException ex)
             {
@@ -115,7 +115,7 @@ namespace MeasurementApp.Controls
 
             if(b == true)
             {
-                await _systemController.Deinitialize();
+                await _systemController.Deinitialize(this);
                 ConnectCommand.NotifyCanExecuteChanged();
                 DisconnectCommand.NotifyCanExecuteChanged();
             }

@@ -19,14 +19,15 @@ namespace MeasurementApp.Controls.JobRun
         private readonly RecipeSelectService _recipeSelect;
 
         // Public properties
-        private ScanRecipe _runRecipe;
-        public ScanRecipe RunRecipe
+        private ScanRecipe _recipe;
+        public ScanRecipe Recipe
         {
-            get => _runRecipe;
-            set => SetProperty(ref _runRecipe, value);
+            get => _recipe;
+            set => SetProperty(ref _recipe, value);
         }
 
         public IAsyncRelayCommand SelectRecipeCommand { get; private set; }
+        public IAsyncRelayCommand ExecuteRecipeCommand { get; private set; }
 
         public JobRunControlViewModel(IServiceProvider service, ILogger<JobRunControlViewModel> logger)
         {
@@ -34,12 +35,23 @@ namespace MeasurementApp.Controls.JobRun
             _logger = logger;
             _recipeSelect = _service.GetService(typeof(RecipeSelectService)) as RecipeSelectService;
             SelectRecipeCommand = new AsyncRelayCommand(SelectRecipe);
+            ExecuteRecipeCommand = new AsyncRelayCommand(ExecuteRecipe, CanExecuteRecipe);
+        }
+
+        private Task ExecuteRecipe()
+        {
+            throw new NotImplementedException();
+        }
+
+        private bool CanExecuteRecipe()
+        {
+            throw new NotImplementedException();
         }
 
         // Private methods
         private async Task SelectRecipe()
         {
-            RunRecipe = await _recipeSelect.SelectRecipe();
+            Recipe = await _recipeSelect.SelectRecipe();
         }
     }
 }
