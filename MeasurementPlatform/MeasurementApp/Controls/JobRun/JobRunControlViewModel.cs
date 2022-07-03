@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MeasurementApp.Controls.JobRun
@@ -20,6 +21,8 @@ namespace MeasurementApp.Controls.JobRun
         private readonly ILogger _logger;
         private readonly RecipeSelectService _recipeSelect;
         private readonly JobRunner _jobRunner;
+        private CancellationTokenSource _tokenSource;
+        private CancellationToken _cancelToken;
 
         // Public properties
         private ScanRecipe _recipe;
@@ -37,6 +40,9 @@ namespace MeasurementApp.Controls.JobRun
 
         public IAsyncRelayCommand SelectRecipeCommand { get; private set; }
         public IAsyncRelayCommand RunJobCommand { get; private set; }
+        public RelayCommand StopJobCommand { get; private set; }
+
+        public bool IsRunning => _jobRunner.IsRunning;
 
         public JobRunControlViewModel(IServiceProvider service, ILogger<JobRunControlViewModel> logger)
         {
@@ -47,6 +53,18 @@ namespace MeasurementApp.Controls.JobRun
             _jobRunner = _service.GetService(typeof(JobRunner)) as JobRunner;
             SelectRecipeCommand = new AsyncRelayCommand(SelectRecipe);
             RunJobCommand = new AsyncRelayCommand(RunJob, CanRunJob);
+            StopJobCommand = new RelayCommand(StopJob, CanStopJob);
+            _tokenSource = new CancellationTokenSource();
+        }
+
+        private bool CanStopJob()
+        {
+            return IsRunning;
+        }
+
+        private void StopJob()
+        {
+            _tokenSource.Cancel();
         }
 
         private async Task RunJob()
@@ -54,7 +72,17 @@ namespace MeasurementApp.Controls.JobRun
             try
             {
                 _jobRunner.Job = new Job(Recipe);
-                await _jobRunner.ExecuteJob();
+                _tokenSource = new CancellationTokenSource();
+                var t =  _jobRunner.ExecuteJob(_tokenSource.Token);
+                StopJobCommand.NotifyCanExecuteChanged();
+                RunJobCommand.NotifyCanExecuteChanged();
+                await t;
+            }
+            catch(OperationCanceledException ex)
+            {
+                await App.MainRoot.MessageDialogAsync("Cancel Success", "The job was successfully cancelled");
+                StopJobCommand.NotifyCanExecuteChanged();
+                RunJobCommand.NotifyCanExecuteChanged();
             }
             catch(Exception ex)
             {
@@ -65,7 +93,7 @@ namespace MeasurementApp.Controls.JobRun
 
         private bool CanRunJob()
         {
-            return Recipe != null;
+            return Recipe != null && !IsRunning;
         }
 
         // Private methods
