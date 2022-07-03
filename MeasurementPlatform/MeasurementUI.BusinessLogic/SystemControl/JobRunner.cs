@@ -39,7 +39,7 @@ namespace MeasurementUI.BusinessLogic.SystemControl
             _controller = _service.GetService(typeof(SystemController)) as SystemController ?? throw new ArgumentNullException("service");
         }
 
-        public async Task ExecuteJob(CancellationToken token)
+        public async Task ExecuteJob(CancellationToken token, IProgress<double> progress)
         {
             token.ThrowIfCancellationRequested();
             if (Job != null)
@@ -48,6 +48,7 @@ namespace MeasurementUI.BusinessLogic.SystemControl
                 _logger.LogInformation("Job Starting: {Recipe}", Job.Recipe.Name);
                 List<(double x, double y)> locs = Job.Recipe.GetScanPoints();
                 Job.Result.ResultData.Clear();
+                int i = 0;
                 foreach (var loc in locs)
                 {
                     if(token.IsCancellationRequested)
@@ -55,14 +56,16 @@ namespace MeasurementUI.BusinessLogic.SystemControl
                         IsRunning = false;
                         token.ThrowIfCancellationRequested();
                     }
-                   
+                    
                     await _controller!.MoveTo(loc.x, loc.y, StageControl.Model.BlockingType.ExternallyBlocking, this); // TODO add better controller null check
                     var counts = await _controller.GetEncoderCounts(this);
                     var volts = await _controller.GetVolts(this);
+                    progress.Report(100.0 * (double)i / (double)locs.Count);
                     if (counts != null && volts != null)
                     {
                         Job.Result.ResultData.Add(new Sample(counts.Item1, counts.Item2, volts.Value));
                     }
+                    i++;
                 }
             }
             else

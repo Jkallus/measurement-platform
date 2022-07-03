@@ -44,11 +44,33 @@ namespace MeasurementApp.Controls.JobRun
 
         public bool IsRunning => _jobRunner.IsRunning;
 
+
+        private string _progressText;
+        public string ProgressText
+        {
+            get => _progressText;
+            set => SetProperty(ref _progressText, value);
+        }
+        private double _progress;
+        public double Progress
+        {
+            get => _progress;
+            set
+            {
+                if(SetProperty(ref _progress, value))
+                {
+                    ProgressText = _progress.ToString("0.00") + "%";
+                }
+            }
+        }
+
         public JobRunControlViewModel(IServiceProvider service, ILogger<JobRunControlViewModel> logger)
         {
             _service = service;
             _logger = logger;
             _recipe = null;
+            _progress = 0;
+            _progressText = "N/A";
             _recipeSelect = _service.GetService(typeof(RecipeSelectService)) as RecipeSelectService;
             _jobRunner = _service.GetService(typeof(JobRunner)) as JobRunner;
             SelectRecipeCommand = new AsyncRelayCommand(SelectRecipe);
@@ -73,7 +95,7 @@ namespace MeasurementApp.Controls.JobRun
             {
                 _jobRunner.Job = new Job(Recipe);
                 _tokenSource = new CancellationTokenSource();
-                var t =  _jobRunner.ExecuteJob(_tokenSource.Token);
+                var t =  _jobRunner.ExecuteJob(_tokenSource.Token, new Progress<double>(ProgressHandler));
                 StopJobCommand.NotifyCanExecuteChanged();
                 RunJobCommand.NotifyCanExecuteChanged();
                 await t;
@@ -81,6 +103,8 @@ namespace MeasurementApp.Controls.JobRun
             catch(OperationCanceledException ex)
             {
                 await App.MainRoot.MessageDialogAsync("Cancel Success", "The job was successfully cancelled");
+                Progress = 0.0;
+                ProgressText = "N/A";
                 StopJobCommand.NotifyCanExecuteChanged();
                 RunJobCommand.NotifyCanExecuteChanged();
             }
@@ -91,15 +115,25 @@ namespace MeasurementApp.Controls.JobRun
             
         }
 
-        private bool CanRunJob()
-        {
-            return Recipe != null && !IsRunning;
-        }
+        
 
         // Private methods
         private async Task SelectRecipe()
         {
             Recipe = await _recipeSelect.SelectRecipe();
+        }
+
+        private bool CanRunJob()
+        {
+            return Recipe != null && !IsRunning;
+        }
+
+        private void ProgressHandler(double percent)
+        {
+            App.MainWindow.DispatcherQueue.TryEnqueue(() =>
+            {
+                Progress = percent;
+            });
         }
     }
 }
