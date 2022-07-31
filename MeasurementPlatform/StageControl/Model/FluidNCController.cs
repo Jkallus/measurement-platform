@@ -70,6 +70,7 @@ namespace StageControl.Model
         public void Disconnect()
         {
             _statusTimer.Stop();
+            _serial.SendSerialData("$MD");
             _serial.Disconnect();
             _controllerState = LifetimeFNCState.Unknown;
             OnFNCStateChanged(new FNCStateChangedEventArgs(ControllerState));
