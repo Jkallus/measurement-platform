@@ -26,7 +26,7 @@ namespace MeasurementUI.BusinessLogic.Services
             _logger = logger;
             _file = _service.GetService(typeof(IFileService)) as IFileService ?? throw new ArgumentNullException("IFileService is null");
             _recipes = new List<ScanRecipe>();
-            _storageDirectory = "C:\\temp\\data";
+            _storageDirectory = Path.Combine(Environment.GetEnvironmentVariable("MEASUREAPP_DIR")!, "recipes\\");
             LoadAllRecipes();
             _logger.LogInformation("Recipe Manager constructed");
         }

@@ -30,6 +30,7 @@ using MeasurementUI.BusinessLogic.Services;
 using MeasurementApp.Controls.RecipeManagement;
 using MeasurementApp.Controls.JobRun;
 using MeasurementApp.Services.RecipeSelect;
+using System.Diagnostics;
 
 // To learn more about WinUI3, see: https://docs.microsoft.com/windows/apps/winui/winui3/.
 namespace MeasurementApp
@@ -43,10 +44,11 @@ namespace MeasurementApp
         // https://docs.microsoft.com/dotnet/core/extensions/logging
         private static readonly IHost _host = Host
             .CreateDefaultBuilder()
-            .ConfigureAppConfiguration((builder) =>
+            .ConfigureAppConfiguration((context, builder) =>
             {
-                builder.SetBasePath(System.AppDomain.CurrentDomain.BaseDirectory)
-                .AddJsonFile("machineconfig.json", optional: false, reloadOnChange: false)
+                var basePath = Environment.GetEnvironmentVariable("MEASUREAPP_DIR");
+                builder.SetBasePath(basePath)
+                .AddJsonFile("settings\\machineconfig.json", optional: false, reloadOnChange: false)
                 .Build();
             })
             .UseSerilog()
@@ -110,7 +112,7 @@ namespace MeasurementApp
                 services.AddTransient<PositionReadoutControlViewModel>();
                 services.AddTransient<RecipeManagementControlViewModel>();
                 services.AddTransient<ExampleControlViewModel>();
-                services.AddTransient<JobRunControlViewModel>();
+                services.AddSingleton<JobRunControlViewModel>();
                 services.AddTransient<RecipeSelectContentDialogViewModel>();
                 
                 services.AddSingleton<ScanDisplayControlViewModel>();
@@ -132,37 +134,19 @@ namespace MeasurementApp
 
         public App()
         {
-            var configuration = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json")
-                .Build();
+            InitializeComponent();
+            InitializeSetup();
+        }
 
-            Log.Logger = new LoggerConfiguration()
-                .ReadFrom.Configuration(configuration)
-                .CreateLogger();
-
-            try
-            {
-                Log.Information("Application Starting Up");
-                InitializeComponent();
-                UnhandledException += App_UnhandledException;
-            }
-            catch(Exception ex)
-            {
-                Log.Fatal(ex, "The application failed to start correctly");
-                Log.CloseAndFlush();
-            }
-            finally
-            {
-                
-                
-            }
-
-            
-            
+        ~App()
+        {
+            Log.Information("Application shutting down");
         }
 
         private void App_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
+            Log.Error(e.Exception, "Unhandled exception caught in App_UnhandledException");
+            Environment.Exit(-1);
             // TODO: Log and handle exceptions as appropriate.
             // For more details, see https://docs.microsoft.com/windows/winui/api/microsoft.ui.xaml.unhandledexceptioneventargs.
         }
@@ -175,5 +159,71 @@ namespace MeasurementApp
             MainRoot = MainWindow.Content as FrameworkElement; // Content should be the shell page which is a framework element
             
         }
+
+        private void InitializeSetup()
+        {
+            bool logInit = false;
+            try
+            {
+                string measureAppDir = Environment.GetEnvironmentVariable("MEASUREAPP_DIR");
+                if (string.IsNullOrEmpty(measureAppDir))
+                {
+                    throw new Exception("Environment variable MEASUREAPP_DIR null or empty");
+                }
+
+                if (!Directory.Exists(measureAppDir))
+                {
+                    throw new Exception($"MeasureApp directory ({measureAppDir}) does not exist");
+                }
+
+                string appsettingsPath = Path.Combine(measureAppDir, "settings\\appsettings.json");
+                if (!File.Exists(appsettingsPath))
+                {
+                    throw new Exception($"appsettings.json does not exist at: {appsettingsPath}");
+                }
+
+                var configuration = new ConfigurationBuilder()
+                    .AddJsonFile(appsettingsPath)
+                    .Build();
+
+                Log.Logger = new LoggerConfiguration()
+                    .ReadFrom.Configuration(configuration)
+                    .CreateLogger();
+
+                logInit = true;
+
+                Log.Information("Application Starting Up");
+                Log.Information($"Running out of {Directory.GetCurrentDirectory()}");
+
+                var process = Process.GetCurrentProcess();
+                string fullPath = process.MainModule.FileName;
+                Log.Information($"Launched out of {fullPath}");
+
+                UnhandledException += App_UnhandledException;
+
+                using (Process p = Process.GetCurrentProcess())
+                {
+                    p.PriorityClass = ProcessPriorityClass.High;
+                }
+            }
+            catch (Exception ex)
+            {
+                if (logInit)
+                {
+                    Log.Fatal(ex, "The application failed to start correctly");
+                    Log.CloseAndFlush();
+                }
+                else
+                {
+                    Environment.Exit(-1);
+                }
+            }
+            finally
+            {
+
+            }
+        }
+
+       
     }
 }
