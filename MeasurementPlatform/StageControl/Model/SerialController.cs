@@ -43,10 +43,18 @@ namespace StageControl.Model
 
         public void Connect()
         {
-            port.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
-            port.RtsEnable = false;
-            port.Open();
-            triggerReboot();
+            try
+            {
+                port.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
+                port.RtsEnable = false;
+                port.Open();
+                triggerReboot();
+            }
+            catch(System.UnauthorizedAccessException ex)
+            {
+                _logger.LogError(ex.Message);
+            }
+            
         }
 
         public void SendSerialData(string str)
@@ -71,6 +79,7 @@ namespace StageControl.Model
         {
             if(SerialDataItemReceived != null)
             {
+                _logger.LogDebug($"SerialDataItemReceived: {e.Item!.Data}");
                 EventHandler<SerialDataItemReceivedEventArgs> handler = SerialDataItemReceived;
                 handler(this, e);
             }
@@ -113,6 +122,8 @@ namespace StageControl.Model
                     SerialDataItem item = new SerialDataItem(currentMessage.Substring(0, endIndex), DateTime.Now, SerialDataType.MSGINFO);
                     OnSerialDataItemReceived(new SerialDataItemReceivedEventArgs(item));
                     currentMessage = currentMessage.Remove(0, endIndex);
+                    if (currentMessage.StartsWith(SerialDataConsts.Newline))
+                        currentMessage = currentMessage.Remove(0, 1);
                     continue;
                 }
                 else if (currentMessage.StartsWith(SerialDataConsts.MSGDBGMessageMarker) && currentMessage.Contains(SerialDataConsts.MSGEndMarker))
@@ -129,10 +140,10 @@ namespace StageControl.Model
                 }
                 else if(currentMessage.StartsWith(SerialDataConsts.FNCEntryPromptMessageMarker) && currentMessage.Contains(SerialDataConsts.LineBreak))
                 {
-                    int endIndex = currentMessage.IndexOf(SerialDataConsts.LineBreak);
-                    SerialDataItem item = new SerialDataItem(currentMessage.Substring(0, endIndex + 2), DateTime.Now, SerialDataType.FNCEntryPrompt);
+                    int endIndex = currentMessage.IndexOf(SerialDataConsts.Newline);
+                    SerialDataItem item = new SerialDataItem(currentMessage.Substring(0, endIndex + 1), DateTime.Now, SerialDataType.FNCEntryPrompt);
                     OnSerialDataItemReceived(new SerialDataItemReceivedEventArgs(item));
-                    currentMessage = currentMessage.Remove(0, endIndex + 2);
+                    currentMessage = currentMessage.Remove(0, endIndex + 1);
                     continue;
                 }
                 else if(currentMessage.StartsWith(SerialDataConsts.StatusStartMessageMarker) && currentMessage.Contains(SerialDataConsts.StatusEndMessageMarker))
