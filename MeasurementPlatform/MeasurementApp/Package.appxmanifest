@@ -8,7 +8,7 @@
   IgnorableNamespaces="uap rescap genTemplate">
 
   <Identity
-    Name="E762C329-C223-42FE-95C2-E26E0904E201"
+    Name="MeasurementApp"
     Publisher="CN=Josh"
     Version="1.0.0.0" />
 

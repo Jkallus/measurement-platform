@@ -13,6 +13,8 @@
     <ApplicationIcon>Assets\target.ico</ApplicationIcon>
     <StartupObject>MeasurementApp.Program</StartupObject>
     <SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
+    <PackageCertificateThumbprint>0AAC351B12D5DE1337D7C09B6A82D71C722BA546</PackageCertificateThumbprint>
+    <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
     <Optimize>False</Optimize>
