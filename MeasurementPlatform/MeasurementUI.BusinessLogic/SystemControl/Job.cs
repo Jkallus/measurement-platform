@@ -15,7 +15,7 @@ namespace MeasurementUI.BusinessLogic.SystemControl
         public Job(ScanRecipe recipe)
         {
             Recipe = recipe;
-            Result = new ScanData();
+            Result = new ScanData(recipe.XSamples, recipe.YSamples);
         }
     }
 }

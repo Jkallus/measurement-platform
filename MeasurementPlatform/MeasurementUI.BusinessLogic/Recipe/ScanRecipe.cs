@@ -33,6 +33,13 @@ namespace MeasurementUI.BusinessLogic.Recipe
             get => new ScanDimension(XDimension.Value * YDimension.Value, Units.SquareMillimeters);
         }
 
+        [JsonIgnore]
+        public int XSamples => (int)(XDimension.Value / (ScanPitch.Value / 1000.0));
+
+        [JsonIgnore]
+        public int YSamples => (int)(YDimension.Value / (ScanPitch.Value / 1000.0));
+
+
         public ScanRecipe(string name, PositionCoordinate bottomLeft, PositionCoordinate topLeft, PositionCoordinate topRight, PositionCoordinate bottomRIght, ScanDimension scanPitch)
         {
             Name = name;
@@ -60,15 +67,29 @@ namespace MeasurementUI.BusinessLogic.Recipe
             int xSampleCount = (int)(XDimension.Value / (ScanPitch.Value / 1000.0));
             int ySampleCount = (int)(YDimension.Value / (ScanPitch.Value / 1000.0));
 
-            double xPoint = BottomLeft.X;
-            double yPoint = BottomLeft.Y;
+            double xMin = BottomLeft.X;
+            double yMin = BottomLeft.Y;
+            double xMax = BottomRight.X;
+
+            bool leftToRight = true;
 
             for (int ySamples = 0; ySamples < ySampleCount; ySamples++)
             {
-                for (int xSamples = 0; xSamples < xSampleCount; xSamples++)
+                if(leftToRight)
                 {
-                    points.Add((xPoint + (xSamples * (ScanPitch.Value / 1000.0)), yPoint + (ySamples * (ScanPitch.Value / 1000.0))));
+                    for (int xSamples = 0; xSamples < xSampleCount; xSamples++)
+                    {
+                        points.Add((xMin + (xSamples * (ScanPitch.Value / 1000.0)), yMin + (ySamples * (ScanPitch.Value / 1000.0))));
+                    }
                 }
+                else
+                {
+                    for(int xSamples = 0; xSamples < xSampleCount; xSamples++)
+                    {
+                        points.Add((xMax - (xSamples * (ScanPitch.Value / 1000.0)), yMin + (ySamples * (ScanPitch.Value / 1000.0))));
+                    }
+                }
+                leftToRight = !leftToRight; // flip direction each row
             }
 
             return points;

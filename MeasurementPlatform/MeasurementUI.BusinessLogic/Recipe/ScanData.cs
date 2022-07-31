@@ -8,11 +8,11 @@ namespace MeasurementUI.BusinessLogic.Recipe
 {
     public struct Sample
     {
-        int Xcounts { get; set; }
-        int Ycounts { get; set; }
-        double Volts { get; set; }
+        public int Xcounts { get; set; }
+        public int Ycounts { get; set; }
+        public double Volts { get; set; }
 
-        double ScaledValue
+        public double ScaledValue
         {
             get => (1.0f / (0.023f * Volts + 0.0046f)) - 8;
         }
@@ -34,9 +34,14 @@ namespace MeasurementUI.BusinessLogic.Recipe
             set => _resultData = value;
         }
 
-        public ScanData(int initialCapacity = 0)
+        public int XAxisSampleCount { get; set; }
+        public int YAxisSampleCount { get; set; }
+
+        public ScanData(int xcount, int ycount)
         {
-            _resultData = new List<Sample>(initialCapacity);
+            _resultData = new List<Sample>(xcount * ycount);
+            XAxisSampleCount = xcount;
+            YAxisSampleCount = ycount;
         }
     }
 }

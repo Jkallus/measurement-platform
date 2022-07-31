@@ -99,6 +99,7 @@ namespace MeasurementApp.Controls.JobRun
                 StopJobCommand.NotifyCanExecuteChanged();
                 RunJobCommand.NotifyCanExecuteChanged();
                 await t;
+                Progress = 100.0;
             }
             catch(OperationCanceledException ex)
             {
@@ -111,6 +112,12 @@ namespace MeasurementApp.Controls.JobRun
             catch(Exception ex)
             {
                 await App.MainRoot.MessageDialogAsync("Exception", ex.Message);
+            }
+            finally
+            {
+                
+                StopJobCommand.NotifyCanExecuteChanged();
+                RunJobCommand.NotifyCanExecuteChanged();
             }
             
         }
