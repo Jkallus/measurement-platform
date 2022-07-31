@@ -37,6 +37,10 @@ namespace DAQ.Model
                 _port.Open();
                 _port.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
             }
+            catch(System.UnauthorizedAccessException ex)
+            {
+                _logger.LogError(ex.Message);
+            }
             catch(System.IO.FileNotFoundException ex)
             {
                 _logger.LogError(ex.Message);

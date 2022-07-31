@@ -80,6 +80,11 @@ namespace DAQ.Model
                 {
                     tcs.SetResult();
                 }
+                else if(e.Response.ErrorCode == ErrorCode.AlreadyInitialized)
+                {
+                    _logger.LogWarning("DAQ already initialized. Previous disconnect did not deinitialize DAQ");
+                    tcs.SetResult();
+                }
                 else
                 {
                     tcs.SetException(new DAQException(e.Response.ErrorCode));
