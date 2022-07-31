@@ -121,6 +121,7 @@ namespace MeasurementUI.BusinessLogic.SystemControl
         {
             if(_hwBusy)
             {
+                _systemLogger.LogWarning("Resource requested by {Caller} but in use by {Owner}", caller.ToString(), _hwOwner.ToString());
                 throw new ResourceBusyException(_hwOwner!);
             }
             else
