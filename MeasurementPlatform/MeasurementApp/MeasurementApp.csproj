@@ -134,4 +134,8 @@
   <ItemGroup Condition="'$(DisableMsixProjectCapabilityAddedByProject)'!='true' and '$(EnablePreviewMsixTooling)'=='true'">
     <ProjectCapability Include="Msix" />
   </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="robocopy $(ProjectDir) &quot;%25MEASUREAPP_SETTINGS_DIR%25&quot; appsettings.json machineconfig.json&#xD;&#xA;if %25errorlevel%25 leq 1 exit 0 else exit %25errorlevel%25" />
+  </Target>
 </Project>
