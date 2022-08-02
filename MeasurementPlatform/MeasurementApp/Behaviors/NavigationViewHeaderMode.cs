@@ -1,9 +1,8 @@
-﻿namespace MeasurementApp.Behaviors
+﻿namespace MeasurementApp.Behaviors;
+
+public enum NavigationViewHeaderMode
 {
-    public enum NavigationViewHeaderMode
-    {
-        Always,
-        Never,
-        Minimal
-    }
+    Always,
+    Never,
+    Minimal
 }

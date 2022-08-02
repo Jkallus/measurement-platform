@@ -5,16 +5,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MeasurementApp.Controls
-{
-    public class StageTargetPositionChangedMessage: ValueChangedMessage<(float XCoordinate, float YCoordinate)>
-    {
-        public StageTargetPositionChangedMessage((float XCoordinate, float YCoordinate) value) : base(value)
-        {
-            TargetLocation = value;
-        }
+namespace MeasurementApp.Controls;
 
-        public (float XCoordinate, float YCoordinate) TargetLocation { get; set; }
-        
+public class StageTargetPositionChangedMessage: ValueChangedMessage<(float XCoordinate, float YCoordinate)>
+{
+    public StageTargetPositionChangedMessage((float XCoordinate, float YCoordinate) value) : base(value)
+    {
+        TargetLocation = value;
     }
+
+    public (float XCoordinate, float YCoordinate) TargetLocation { get; set; }
+    
 }

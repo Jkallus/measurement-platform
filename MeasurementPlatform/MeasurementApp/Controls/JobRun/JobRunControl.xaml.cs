@@ -16,15 +16,14 @@ using Windows.Foundation.Collections;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
-namespace MeasurementApp.Controls.JobRun
+namespace MeasurementApp.Controls.JobRun;
+
+public sealed partial class JobRunControl : UserControl
 {
-    public sealed partial class JobRunControl : UserControl
+    public JobRunControlViewModel ViewModel { get; set; }
+    public JobRunControl()
     {
-        public JobRunControlViewModel ViewModel { get; set; }
-        public JobRunControl()
-        {
-            ViewModel = App.GetService<JobRunControlViewModel>();
-            this.InitializeComponent();
-        }
+        ViewModel = App.GetService<JobRunControlViewModel>();
+        this.InitializeComponent();
     }
 }

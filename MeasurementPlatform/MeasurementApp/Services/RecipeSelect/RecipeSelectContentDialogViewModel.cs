@@ -1,5 +1,5 @@
-﻿using MeasurementUI.BusinessLogic.Recipe;
-using MeasurementUI.BusinessLogic.Services;
+﻿using MeasurementApp.BusinessLogic.Recipe;
+using MeasurementApp.BusinessLogic.Services;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using System;
 using System.Collections.Generic;
@@ -8,44 +8,40 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MeasurementApp.Services.RecipeSelect
-{
-    public class RecipeSelectContentDialogViewModel : ObservableObject
-    {
-        private readonly IServiceProvider _service;
-        private readonly IRecipeManager _recipeManager;
+namespace MeasurementApp.Services.RecipeSelect;
 
-        private ScanRecipe _selection;
-        public ScanRecipe Selection
+public class RecipeSelectContentDialogViewModel : ObservableObject
+{
+    private readonly IServiceProvider _service;
+    private readonly IRecipeManager _recipeManager;
+
+    private ScanRecipe _selection;
+    public ScanRecipe Selection
+    {
+        get => _selection;
+        set
         {
-            get { return _selection; }
-            set 
+            if (SetProperty(ref _selection, value))
             {
-                if(SetProperty(ref _selection, value))
-                {
-                    OnPropertyChanged("CanOpen");
-                }
+                OnPropertyChanged("CanOpen");
             }
         }
+    }
 
-        public bool CanOpen
-        {
-            get => Selection != null;
-        }
+    public bool CanOpen => Selection != null;
 
-        private ObservableCollection<ScanRecipe> _recipes;
-        public ObservableCollection<ScanRecipe> Recipes
-        {
-            get => _recipes;
-            set => SetProperty(ref _recipes, value);
-        }
+    private ObservableCollection<ScanRecipe> _recipes;
+    public ObservableCollection<ScanRecipe> Recipes
+    {
+        get => _recipes;
+        set => SetProperty(ref _recipes, value);
+    }
 
 
-        public RecipeSelectContentDialogViewModel(IServiceProvider service)
-        {
-            _service = service;
-            _recipeManager = _service.GetService(typeof(IRecipeManager)) as IRecipeManager;
-            Recipes = new(_recipeManager.GetRecipes());
-        }
+    public RecipeSelectContentDialogViewModel(IServiceProvider service)
+    {
+        _service = service;
+        _recipeManager = _service.GetService(typeof(IRecipeManager)) as IRecipeManager ?? throw new Exception("Recipe manager is null");
+        _recipes = new(_recipeManager.GetRecipes());
     }
 }

@@ -1,6 +1,6 @@
 ﻿using MeasurementApp.Contracts.Services;
-using MeasurementUI.BusinessLogic.Recipe;
-using MeasurementUI.BusinessLogic.Services;
+using MeasurementApp.BusinessLogic.Recipe;
+using MeasurementApp.BusinessLogic.Services;
 using Microsoft.Extensions.Logging;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
@@ -12,75 +12,74 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MeasurementApp.Controls.RecipeManagement
+namespace MeasurementApp.Controls.RecipeManagement;
+
+public class RecipeManagementControlViewModel: ObservableObject
 {
-    public class RecipeManagementControlViewModel: ObservableObject
+    // Private member variables
+    private readonly ILogger<RecipeManagementControlViewModel> _logger;
+    private readonly IServiceProvider _service;
+    private readonly IRecipeManager _recipeManager;
+    private readonly INavigationService _navigation;
+
+    // Public properties
+    private ObservableCollection<ScanRecipe> _recipes;
+    public ObservableCollection<ScanRecipe> Recipes
     {
-        // Private member variables
-        private readonly ILogger<RecipeManagementControlViewModel> _logger;
-        private readonly IServiceProvider _service;
-        private readonly IRecipeManager _recipeManager;
-        private readonly INavigationService _navigation;
+        get => _recipes;
+        set => SetProperty(ref _recipes, value);
+    }
 
-        // Public properties
-        private ObservableCollection<ScanRecipe> _recipes;
-        public ObservableCollection<ScanRecipe> Recipes
-        {
-            get => _recipes;
-            set => SetProperty(ref _recipes, value);
-        }
+    public RelayCommand AddRecipeCommand { get; private set; }
+    public RelayCommand<ScanRecipe> RemoveRecipeCommand { get; private set; }
+    public RelayCommand<ScanRecipe> EditRecipeCommand { get; private set; }
 
-        public RelayCommand AddRecipeCommand { get; private set; }
-        public RelayCommand<ScanRecipe> RemoveRecipeCommand { get; private set; }
-        public RelayCommand<ScanRecipe> EditRecipeCommand { get; private set; }
+    //private ScanRecipe _selectedRecipe;
+    //public ScanRecipe SelectedRecipe
+    //{
+    //    get => _selectedRecipe;
+    //    set => SetProperty(ref _selectedRecipe, value);
+    //}
 
-        //private ScanRecipe _selectedRecipe;
-        //public ScanRecipe SelectedRecipe
-        //{
-        //    get => _selectedRecipe;
-        //    set => SetProperty(ref _selectedRecipe, value);
-        //}
+    // Constructor
+    public RecipeManagementControlViewModel(ILogger<RecipeManagementControlViewModel> logger, IServiceProvider service)
+    {
+        _logger = logger;
+        _service = service;
+        _recipeManager = _service.GetService(typeof(IRecipeManager)) as IRecipeManager ?? throw new Exception("IRecipeManager is null");
+        _navigation = _service.GetService(typeof(INavigationService)) as INavigationService ?? throw new Exception("INavigationService is null");
+        Recipes = new ObservableCollection<ScanRecipe>(_recipeManager.GetRecipes());
+        _logger.LogInformation("RecipeManagementControlViewModel constructed");
+        AddRecipeCommand = new RelayCommand(AddRecipe);
+        RemoveRecipeCommand = new RelayCommand<ScanRecipe>(RemoveRecipe, CanRemoveRecipe);
+        EditRecipeCommand = new RelayCommand<ScanRecipe>(EditRecipe, CanEditRecipe);
+    }
 
-        // Constructor
-        public RecipeManagementControlViewModel(ILogger<RecipeManagementControlViewModel> logger, IServiceProvider service)
-        {
-            _logger = logger;
-            _service = service;
-            _recipeManager = _service.GetService(typeof(IRecipeManager)) as IRecipeManager;
-            _navigation = _service.GetService(typeof(INavigationService)) as INavigationService;
-            Recipes = new ObservableCollection<ScanRecipe>(_recipeManager.GetRecipes());
-            _logger.LogInformation("RecipeManagementControlViewModel constructed");
-            AddRecipeCommand = new RelayCommand(AddRecipe);
-            RemoveRecipeCommand = new RelayCommand<ScanRecipe>(RemoveRecipe, CanRemoveRecipe);
-            EditRecipeCommand = new RelayCommand<ScanRecipe>(EditRecipe, CanEditRecipe);
-        }
+    private void EditRecipe(ScanRecipe obj)
+    {
+        _navigation.NavigateTo("MeasurementApp.ViewModels.RecipeSetupViewModel");
+        WeakReferenceMessenger.Default.Send<EditRecipeMessage>(new EditRecipeMessage(obj));
+    }
 
-        private void EditRecipe(ScanRecipe obj)
-        {
-            _navigation.NavigateTo("MeasurementApp.ViewModels.RecipeSetupViewModel");
-            WeakReferenceMessenger.Default.Send<EditRecipeMessage>(new EditRecipeMessage(obj));
-        }
+    private bool CanEditRecipe(ScanRecipe obj)
+    {
+        return obj != null;
+    }
 
-        private bool CanEditRecipe(ScanRecipe obj)
-        {
-            return obj != null;
-        }
+    private void RemoveRecipe(ScanRecipe obj)
+    {
+        _recipeManager.RemoveRecipe(obj);
+        Recipes = new(_recipeManager.GetRecipes());
+        
+    }
 
-        private void RemoveRecipe(ScanRecipe obj)
-        {
-            _recipeManager.RemoveRecipe(obj);
-            Recipes = new(_recipeManager.GetRecipes());
-            
-        }
+    private bool CanRemoveRecipe(ScanRecipe obj)
+    {
+        return obj != null;
+    }
 
-        private bool CanRemoveRecipe(ScanRecipe obj)
-        {
-            return obj != null;
-        }
-
-        private void AddRecipe()
-        {
-            _navigation.NavigateTo("MeasurementApp.ViewModels.RecipeSetupViewModel");
-        }
+    private void AddRecipe()
+    {
+        _navigation.NavigateTo("MeasurementApp.ViewModels.RecipeSetupViewModel");
     }
 }

@@ -5,10 +5,12 @@
   xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
   xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
   xmlns:genTemplate="http://schemas.microsoft.com/appx/developer/templatestudio"
+  xmlns:com="http://schemas.microsoft.com/appx/manifest/com/windows10"
+  xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10"
   IgnorableNamespaces="uap rescap genTemplate">
 
   <Identity
-    Name="MeasurementApp"
+    Name="6E57027C-5F0E-45FC-A621-C61DCDD8ED8F"
     Publisher="CN=Josh"
     Version="1.0.0.0" />
 
@@ -41,6 +43,17 @@
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
       </uap:VisualElements>
       <Extensions>
+          <desktop:Extension Category="windows.toastNotificationActivation">
+              <desktop:ToastNotificationActivation ToastActivatorCLSID="811793E5-41B5-4107-ACA1-997620EA011F" />
+          </desktop:Extension>
+
+          <com:Extension Category="windows.comServer">
+              <com:ComServer>
+                  <com:ExeServer Executable="MeasurementApp.exe" Arguments="----AppNotificationActivated:" DisplayName="Toast activator">
+                      <com:Class Id="811793E5-41B5-4107-ACA1-997620EA011F" DisplayName="Toast activator"/>
+                  </com:ExeServer>
+              </com:ComServer>
+          </com:Extension>
       </Extensions>
     </Application>
   </Applications>
@@ -51,8 +64,8 @@
 
   <genTemplate:Metadata>
     <genTemplate:Item Name="generator" Value="Template Studio"/>
-    <genTemplate:Item Name="wizardVersion" Version="v5.0" />
-    <genTemplate:Item Name="projectType" Value="SplitView" />
+    <genTemplate:Item Name="wizardVersion" Version="v5.2" />
+    <genTemplate:Item Name="projectType" Value="NavView" />
     <genTemplate:Item Name="framework" Value="MVVMToolkit" />
     <genTemplate:Item Name="platform" Value="WinUI" />
     <genTemplate:Item Name="appmodel" Value="Desktop" />

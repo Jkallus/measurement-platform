@@ -1,4 +1,4 @@
-{
+﻿{
   "profiles": {
     "MeasurementApp (Package)": {
       "commandName": "MsixPackage"
@@ -8,13 +8,11 @@
     },
     "MeasurementApp (Simulation)": {
       "commandName": "MsixPackage",
-      "commandLineArgs": "Simulation",
-      "nativeDebugging": true
+      "commandLineArgs": "Simulation"
     },
     "MeasurementApp (Hardware)": {
       "commandName": "MsixPackage",
-      "commandLineArgs": "Hardware",
-      "nativeDebugging": false
+      "commandLineArgs": "Hardware"
     }
   }
 }

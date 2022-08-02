@@ -16,16 +16,15 @@ using Windows.Foundation.Collections;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
-namespace MeasurementApp.Controls
-{
-    public sealed partial class StageGraphicalControl : UserControl
-    {
-        public StageGraphicalControlViewModel ViewModel { get; set; }
+namespace MeasurementApp.Controls;
 
-        public StageGraphicalControl()
-        {
-            ViewModel = App.GetService<StageGraphicalControlViewModel>();
-            this.InitializeComponent();
-        }
+public sealed partial class StageGraphicalControl : UserControl
+{
+    public StageGraphicalControlViewModel ViewModel { get; set; }
+
+    public StageGraphicalControl()
+    {
+        ViewModel = App.GetService<StageGraphicalControlViewModel>();
+        this.InitializeComponent();
     }
 }

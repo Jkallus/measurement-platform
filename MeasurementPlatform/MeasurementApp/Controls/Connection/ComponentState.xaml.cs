@@ -16,48 +16,47 @@ using Windows.Foundation.Collections;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
-namespace MeasurementApp.Controls
+namespace MeasurementApp.Controls;
+
+public sealed partial class ComponentState : UserControl
 {
-    public sealed partial class ComponentState : UserControl
+    public ComponentState()
     {
-        public ComponentState()
-        {
-            this.InitializeComponent();
-        }
-
-
-
-
-
-        public Brush StatusColor
-        {
-            get { return (Brush)GetValue(StatusColorProperty); }
-            set { SetValue(StatusColorProperty, value); }
-        }
-
-        public static readonly DependencyProperty StatusColorProperty = DependencyProperty.Register("StatusColor", typeof(Brush), typeof(ComponentState), new PropertyMetadata(null));
-
-        public string ComponentStatus
-        {
-            get { return (string)GetValue(ComponentStatusProperty); }
-            set { SetValue(ComponentStatusProperty, value); }
-        }
-
-        // Using a DependencyProperty as the backing store for ComponentStatus.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty ComponentStatusProperty =
-            DependencyProperty.Register("ComponentStatus", typeof(string), typeof(ComponentState), new PropertyMetadata(null));
-
-
-
-
-        public string ComponentName
-        {
-            get { return (string)GetValue(ComponentNameProperty); }
-            set { SetValue(ComponentNameProperty, value); }
-        }
-
-        // Using a DependencyProperty as the backing store for ComponentName.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty ComponentNameProperty =
-            DependencyProperty.Register("ComponentName", typeof(string), typeof(ComponentState), new PropertyMetadata(null));
+        this.InitializeComponent();
     }
+
+
+
+
+
+    public Brush StatusColor
+    {
+        get { return (Brush)GetValue(StatusColorProperty); }
+        set { SetValue(StatusColorProperty, value); }
+    }
+
+    public static readonly DependencyProperty StatusColorProperty = DependencyProperty.Register("StatusColor", typeof(Brush), typeof(ComponentState), new PropertyMetadata(null));
+
+    public string ComponentStatus
+    {
+        get { return (string)GetValue(ComponentStatusProperty); }
+        set { SetValue(ComponentStatusProperty, value); }
+    }
+
+    // Using a DependencyProperty as the backing store for ComponentStatus.  This enables animation, styling, binding, etc...
+    public static readonly DependencyProperty ComponentStatusProperty =
+        DependencyProperty.Register("ComponentStatus", typeof(string), typeof(ComponentState), new PropertyMetadata(null));
+
+
+
+
+    public string ComponentName
+    {
+        get { return (string)GetValue(ComponentNameProperty); }
+        set { SetValue(ComponentNameProperty, value); }
+    }
+
+    // Using a DependencyProperty as the backing store for ComponentName.  This enables animation, styling, binding, etc...
+    public static readonly DependencyProperty ComponentNameProperty =
+        DependencyProperty.Register("ComponentName", typeof(string), typeof(ComponentState), new PropertyMetadata(null));
 }

@@ -1,13 +1,12 @@
 ﻿using System;
 
-using Microsoft.Toolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace MeasurementApp.ViewModels
+namespace MeasurementApp.ViewModels;
+
+public class DAQDiagnosticsViewModel : ObservableRecipient
 {
-    public class DAQDiagnosticsViewModel : ObservableRecipient
+    public DAQDiagnosticsViewModel()
     {
-        public DAQDiagnosticsViewModel()
-        {
-        }
     }
 }

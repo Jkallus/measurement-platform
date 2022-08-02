@@ -1,9 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿namespace MeasurementApp.Contracts.Services;
 
-namespace MeasurementApp.Contracts.Services
+public interface IActivationService
 {
-    public interface IActivationService
-    {
-        Task ActivateAsync(object activationArgs);
-    }
+    Task ActivateAsync(object activationArgs);
 }

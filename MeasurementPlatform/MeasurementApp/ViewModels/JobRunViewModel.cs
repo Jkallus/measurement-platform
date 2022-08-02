@@ -1,12 +1,11 @@
-﻿using Microsoft.Toolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace MeasurementApp.ViewModels
+namespace MeasurementApp.ViewModels;
+
+public class JobRunViewModel: ObservableRecipient
 {
-    public class JobRunViewModel: ObservableRecipient
+    public JobRunViewModel()
     {
-        public JobRunViewModel()
-        {
 
-        }
     }
 }

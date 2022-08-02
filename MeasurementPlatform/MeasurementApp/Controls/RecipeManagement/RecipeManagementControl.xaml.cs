@@ -16,15 +16,14 @@ using Windows.Foundation.Collections;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
-namespace MeasurementApp.Controls.RecipeManagement
+namespace MeasurementApp.Controls.RecipeManagement;
+
+public sealed partial class RecipeManagementControl : UserControl
 {
-    public sealed partial class RecipeManagementControl : UserControl
+    public RecipeManagementControlViewModel ViewModel { get; set; }
+    public RecipeManagementControl()
     {
-        public RecipeManagementControlViewModel ViewModel { get; set; }
-        public RecipeManagementControl()
-        {
-            ViewModel = App.GetService<RecipeManagementControlViewModel>();
-            this.InitializeComponent();
-        }
+        ViewModel = App.GetService<RecipeManagementControlViewModel>();
+        this.InitializeComponent();
     }
 }

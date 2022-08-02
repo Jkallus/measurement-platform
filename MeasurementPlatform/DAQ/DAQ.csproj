@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MeasurementUI.Core\MeasurementUI.Core.csproj" />
+    <ProjectReference Include="..\MeasurementApp.Core\MeasurementApp.Core.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,4 +1,4 @@
-﻿using MeasurementUI.BusinessLogic.SystemControl;
+﻿using MeasurementApp.BusinessLogic.SystemControl;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using System;
 using System.Collections.Generic;
@@ -7,84 +7,83 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MeasurementApp.Controls
+namespace MeasurementApp.Controls;
+
+public class ReadoutItem: ObservableObject
 {
-    public class ReadoutItem: ObservableObject
+    private string _field;
+    public string Field
     {
-        private string _field;
-        public string Field
-        {
-            get { return _field; }
-            set { SetProperty(ref _field, value); }
-        }
-
-        private string _value;
-        public string Value
-        {
-            get { return _value; }
-            set { SetProperty(ref _value, value); }
-        }
-
-        public ReadoutItem(string field, string value)
-        {
-            _field = field;
-            _value = value;
-        }
+        get { return _field; }
+        set { SetProperty(ref _field, value); }
     }
 
-    public class PositionReadoutControlViewModel: ObservableObject
+    private string _value;
+    public string Value
     {
-        private readonly IServiceProvider _serviceProvider;
-        private readonly SystemController _systemController;
+        get { return _value; }
+        set { SetProperty(ref _value, value); }
+    }
 
-        private ObservableCollection<ReadoutItem> _items;
-        public ObservableCollection<ReadoutItem> Items
-        {
-            get { return _items; }
-            set { SetProperty(ref _items, value); }
-        }
+    public ReadoutItem(string field, string value)
+    {
+        _field = field;
+        _value = value;
+    }
+}
 
-        public PositionReadoutControlViewModel(IServiceProvider serviceProvider)
-        {
-            _serviceProvider = serviceProvider;
-            _systemController = _serviceProvider.GetService(typeof(SystemController)) as SystemController;
-            _items = new ObservableCollection<ReadoutItem>();
-            Items.Add(new ReadoutItem("X Position", "Unknown"));
-            Items.Add(new ReadoutItem("Y Position", "Unknown"));
-            Items.Add(new ReadoutItem("Stage Homed", _systemController.MotionController.IsHomed.ToString()));
-            
-            _systemController.MotionController.PositionChanged += MotionController_PositionChanged;
-            _systemController.MotionController.HomingComplete += MotionController_HomingComplete;
-            _systemController.MotionController.StateChanged += MotionController_StateChanged;
-        }
+public class PositionReadoutControlViewModel: ObservableObject
+{
+    private readonly IServiceProvider _serviceProvider;
+    private readonly SystemController _systemController;
 
-        private void MotionController_StateChanged(object sender, StageControl.Events.FNCStateChangedEventArgs e)
-        {
-            App.MainRoot.DispatcherQueue.TryEnqueue(() =>
-            {
-                Items[0].Value = "Unknown";
-                Items[1].Value = "Unknown";
-                Items[2].Value = _systemController.MotionController.IsHomed.ToString();
-            });
-        }
+    private ObservableCollection<ReadoutItem> _items;
+    public ObservableCollection<ReadoutItem> Items
+    {
+        get { return _items; }
+        set { SetProperty(ref _items, value); }
+    }
 
-        private void MotionController_HomingComplete(object? sender, EventArgs e)
-        {
-            App.MainRoot.DispatcherQueue.TryEnqueue(() =>
-            {
-                Items[2].Value = _systemController.MotionController.IsHomed.ToString();
-            });
-            
-        }
+    public PositionReadoutControlViewModel(IServiceProvider serviceProvider)
+    {
+        _serviceProvider = serviceProvider;
+        _systemController = _serviceProvider.GetService(typeof(SystemController)) as SystemController ?? throw new Exception("SystemController is null");
+        _items = new ObservableCollection<ReadoutItem>();
+        Items.Add(new ReadoutItem("X Position", "Unknown"));
+        Items.Add(new ReadoutItem("Y Position", "Unknown"));
+        Items.Add(new ReadoutItem("Stage Homed", _systemController.MotionController.IsHomed.ToString()));
+        
+        _systemController.MotionController.PositionChanged += MotionController_PositionChanged;
+        _systemController.MotionController.HomingComplete += MotionController_HomingComplete;
+        _systemController.MotionController.StateChanged += MotionController_StateChanged;
+    }
 
-        private void MotionController_PositionChanged(object? sender, StageControl.Events.PositionChangedEventArgs e)
+    private void MotionController_StateChanged(object sender, StageControl.Events.FNCStateChangedEventArgs e)
+    {
+        App.MainRoot.DispatcherQueue.TryEnqueue(() =>
         {
-            App.MainRoot.DispatcherQueue.TryEnqueue(() =>
-            {
-                Items[0].Value = e.X.ToString("0.000");
-                Items[1].Value = e.Y.ToString("0.000");
-            });
-            
-        }
+            Items[0].Value = "Unknown";
+            Items[1].Value = "Unknown";
+            Items[2].Value = _systemController.MotionController.IsHomed.ToString();
+        });
+    }
+
+    private void MotionController_HomingComplete(object? sender, EventArgs e)
+    {
+        App.MainRoot.DispatcherQueue.TryEnqueue(() =>
+        {
+            Items[2].Value = _systemController.MotionController.IsHomed.ToString();
+        });
+        
+    }
+
+    private void MotionController_PositionChanged(object? sender, StageControl.Events.PositionChangedEventArgs e)
+    {
+        App.MainRoot.DispatcherQueue.TryEnqueue(() =>
+        {
+            Items[0].Value = e.X.ToString("0.000");
+            Items[1].Value = e.Y.ToString("0.000");
+        });
+        
     }
 }

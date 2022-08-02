@@ -1,9 +1,6 @@
-﻿using System;
+﻿namespace MeasurementApp.Contracts.Services;
 
-namespace MeasurementApp.Contracts.Services
+public interface IPageService
 {
-    public interface IPageService
-    {
-        Type GetPageType(string key);
-    }
+    Type GetPageType(string key);
 }

@@ -4,22 +4,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MeasurementApp.Controls.Enums
+namespace MeasurementApp.Controls.Enums;
+
+public enum MotionDirection
 {
-    public enum MotionDirection
-    {
-        YPos,
-        XPos,
-        YNeg,
-        XNeg,
-    }
-
-    public enum StepSize
-    {
-        FiftyThousand,
-        TenThousand,
-        OneThousand,
-        Custom
-    }
-
+    YPos,
+    XPos,
+    YNeg,
+    XNeg,
 }
+
+public enum StepSize
+{
+    FiftyThousand,
+    TenThousand,
+    OneThousand,
+    Custom
+}
+

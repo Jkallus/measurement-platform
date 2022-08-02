@@ -1,11 +1,8 @@
-﻿using System.Threading.Tasks;
+﻿namespace MeasurementApp.Activation;
 
-namespace MeasurementApp.Activation
+public interface IActivationHandler
 {
-    public interface IActivationHandler
-    {
-        bool CanHandle(object args);
+    bool CanHandle(object args);
 
-        Task HandleAsync(object args);
-    }
+    Task HandleAsync(object args);
 }

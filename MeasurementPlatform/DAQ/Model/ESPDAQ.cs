@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.IO.Ports;
 using DAQ.Enums;
 using DAQ.Interfaces;
-using MeasurementUI.Core.Models;
+using MeasurementApp.Core.Models;
 using Microsoft.Extensions.Logging;
 
 namespace DAQ.Model

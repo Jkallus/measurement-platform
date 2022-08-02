@@ -1,14 +1,10 @@
 ﻿using Microsoft.Windows.ApplicationModel.Resources;
 
-namespace MeasurementApp.Helpers
-{
-    internal static class ResourceExtensions
-    {
-        private static ResourceLoader _resourceLoader = new ResourceLoader();
+namespace MeasurementApp.Helpers;
 
-        public static string GetLocalized(this string resourceKey)
-        {
-            return _resourceLoader.GetString(resourceKey);
-        }
-    }
+public static class ResourceExtensions
+{
+    private static readonly ResourceLoader _resourceLoader = new();
+
+    public static string GetLocalized(this string resourceKey) => _resourceLoader.GetString(resourceKey);
 }

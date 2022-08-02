@@ -123,17 +123,14 @@
   <data name="AppDescription" xml:space="preserve">
     <value>MeasurementApp</value>
   </data>
-  <data name="Shell_Home.Content" xml:space="preserve">
-    <value>Home</value>
-  </data>
-  <data name="Shell_StageDiagnostics.Content" xml:space="preserve">
-    <value>Stage Diagnostics</value>
+  <data name="Shell_Main.Content" xml:space="preserve">
+    <value>Main</value>
   </data>
   <data name="Shell_DAQDiagnostics.Content" xml:space="preserve">
     <value>DAQ Diagnostics</value>
   </data>
-  <data name="Shell_RecipeSetup.Content" xml:space="preserve">
-    <value>Recipe Setup</value>
+  <data name="Shell_Home.Content" xml:space="preserve">
+    <value>Home</value>
   </data>
   <data name="Shell_JobRun.Content" xml:space="preserve">
     <value>Job Run</value>
@@ -143,5 +140,11 @@
   </data>
   <data name="Shell_RecipeManager.Content" xml:space="preserve">
     <value>Recipe Manager</value>
+  </data>
+  <data name="Shell_RecipeSetup.Content" xml:space="preserve">
+    <value>Recipe Setup</value>
+  </data>
+  <data name="Shell_StageDiagnostics.Content" xml:space="preserve">
+    <value>Stage Diagnostics</value>
   </data>
 </root>

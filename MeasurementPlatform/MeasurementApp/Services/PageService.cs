@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-using Microsoft.Toolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 
 using MeasurementApp.Contracts.Services;
 using MeasurementApp.ViewModels;
@@ -10,57 +6,56 @@ using MeasurementApp.Views;
 
 using Microsoft.UI.Xaml.Controls;
 
-namespace MeasurementApp.Services
+namespace MeasurementApp.Services;
+
+public class PageService : IPageService
 {
-    public class PageService : IPageService
+    private readonly Dictionary<string, Type> _pages = new();
+
+    public PageService()
     {
-        private readonly Dictionary<string, Type> _pages = new Dictionary<string, Type>();
+        Configure<HomeViewModel, HomePage>();
+        Configure<StageDiagnosticsViewModel, StageDiagnosticsPage>();
+        Configure<DAQDiagnosticsViewModel, DAQDiagnosticsPage>();
+        Configure<RecipeSetupViewModel, RecipeSetupPage>();
+        Configure<JobRunViewModel, JobRunPage>();
+        Configure<LogViewerViewModel, LogViewerPage>();
+        Configure<RecipeManagerViewModel, RecipeManagerPage>();
+    }
 
-        public PageService()
+    public Type GetPageType(string key)
+    {
+        Type? pageType;
+        lock (_pages)
         {
-            Configure<HomeViewModel, HomePage>();
-            Configure<StageDiagnosticsViewModel, StageDiagnosticsPage>();
-            Configure<DAQDiagnosticsViewModel, DAQDiagnosticsPage>();
-            Configure<RecipeSetupViewModel, RecipeSetupPage>();
-            Configure<JobRunViewModel, JobRunPage>();
-            Configure<LogViewerViewModel, LogViewerPage>();
-            Configure<RecipeManagerViewModel, RecipeManagerPage>();
+            if (!_pages.TryGetValue(key, out pageType))
+            {
+                throw new ArgumentException($"Page not found: {key}. Did you forget to call PageService.Configure?");
+            }
         }
 
-        public Type GetPageType(string key)
+        return pageType;
+    }
+
+    private void Configure<VM, V>()
+        where VM : ObservableObject
+        where V : Page
+    {
+        lock (_pages)
         {
-            Type pageType;
-            lock (_pages)
+            var key = typeof(VM).FullName!;
+            if (_pages.ContainsKey(key))
             {
-                if (!_pages.TryGetValue(key, out pageType))
-                {
-                    throw new ArgumentException($"Page not found: {key}. Did you forget to call PageService.Configure?");
-                }
+                throw new ArgumentException($"The key {key} is already configured in PageService");
             }
 
-            return pageType;
-        }
-
-        private void Configure<VM, V>()
-            where VM : ObservableObject
-            where V : Page
-        {
-            lock (_pages)
+            var type = typeof(V);
+            if (_pages.Any(p => p.Value == type))
             {
-                var key = typeof(VM).FullName;
-                if (_pages.ContainsKey(key))
-                {
-                    throw new ArgumentException($"The key {key} is already configured in PageService");
-                }
-
-                var type = typeof(V);
-                if (_pages.Any(p => p.Value == type))
-                {
-                    throw new ArgumentException($"This type is already configured with key {_pages.First(p => p.Value == type).Key}");
-                }
-
-                _pages.Add(key, type);
+                throw new ArgumentException($"This type is already configured with key {_pages.First(p => p.Value == type).Key}");
             }
+
+            _pages.Add(key, type);
         }
     }
 }

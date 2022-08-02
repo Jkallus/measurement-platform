@@ -16,15 +16,14 @@ using Windows.Foundation.Collections;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
-namespace MeasurementApp.Controls.RecipeSetup
+namespace MeasurementApp.Controls.RecipeSetup;
+
+public sealed partial class ScanSettingsControl : UserControl
 {
-    public sealed partial class ScanSettingsControl : UserControl
+    ScanSettingsControlViewModel ViewModel { get; set; }
+    public ScanSettingsControl()
     {
-        ScanSettingsControlViewModel ViewModel { get; set; }
-        public ScanSettingsControl()
-        {
-            ViewModel = App.GetService<ScanSettingsControlViewModel>();
-            this.InitializeComponent();
-        }
+        ViewModel = App.GetService<ScanSettingsControlViewModel>();
+        this.InitializeComponent();
     }
 }

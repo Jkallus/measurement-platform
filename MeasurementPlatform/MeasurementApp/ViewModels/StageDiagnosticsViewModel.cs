@@ -1,13 +1,12 @@
 ﻿using System;
 
-using Microsoft.Toolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace MeasurementApp.ViewModels
+namespace MeasurementApp.ViewModels;
+
+public class StageDiagnosticsViewModel : ObservableRecipient
 {
-    public class StageDiagnosticsViewModel : ObservableRecipient
+    public StageDiagnosticsViewModel()
     {
-        public StageDiagnosticsViewModel()
-        {
-        }
     }
 }

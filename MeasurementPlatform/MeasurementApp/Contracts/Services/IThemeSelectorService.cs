@@ -1,17 +1,17 @@
-﻿using System.Threading.Tasks;
+﻿using Microsoft.UI.Xaml;
 
-using Microsoft.UI.Xaml;
+namespace MeasurementApp.Contracts.Services;
 
-namespace MeasurementApp.Contracts.Services
+public interface IThemeSelectorService
 {
-    public interface IThemeSelectorService
+    ElementTheme Theme
     {
-        ElementTheme Theme { get; }
-
-        Task InitializeAsync();
-
-        Task SetThemeAsync(ElementTheme theme);
-
-        Task SetRequestedThemeAsync();
+        get;
     }
+
+    Task InitializeAsync();
+
+    Task SetThemeAsync(ElementTheme theme);
+
+    Task SetRequestedThemeAsync();
 }
