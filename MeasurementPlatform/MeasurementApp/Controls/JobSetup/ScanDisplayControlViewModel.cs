@@ -30,17 +30,17 @@ public class ScanDisplayControlViewModel: ObservableObject
     private const int topRightIdx = 2;
     private const int bottomRightIdx = 3;
 
-    ScatterSeries dragPoints;
-    RectangleAnnotation samplingBox;
+    ScatterSeries? dragPoints;
+    RectangleAnnotation? samplingBox;
 
     // Public properties
     
     public ViewResolvingPlotModel Model { get; set; }
 
-    PositionCoordinate BottomLeft { get; set; }
-    PositionCoordinate TopLeft { get; set; }
-    PositionCoordinate TopRight { get; set; }
-    PositionCoordinate BottomRight { get; set; }
+    PositionCoordinate? BottomLeft { get; set; }
+    PositionCoordinate? TopLeft { get; set; }
+    PositionCoordinate? TopRight { get; set; }
+    PositionCoordinate? BottomRight { get; set; }
 
     // Constructor
     public ScanDisplayControlViewModel(IServiceProvider service, ILogger<ScanDisplayControlViewModel> logger)
@@ -79,6 +79,8 @@ public class ScanDisplayControlViewModel: ObservableObject
     // Private methods
     void SendUpdate()
     {
+        if (dragPoints == null)
+            throw new Exception("Dragpoints became null after init");
         BottomLeft = new PositionCoordinate(dragPoints.Points[bottomLeftIdx].X, dragPoints.Points[bottomLeftIdx].Y);
         TopLeft = new PositionCoordinate(dragPoints.Points[topLeftIdx].X, dragPoints.Points[topLeftIdx].Y);
         TopRight = new PositionCoordinate(dragPoints.Points[topRightIdx].X, dragPoints.Points[topRightIdx].Y);
@@ -173,6 +175,7 @@ public class ScanDisplayControlViewModel: ObservableObject
 
         int indexOfPointToMove = -1;
 
+#pragma warning disable CS0618 // Type or member is obsolete
         dragPoints.MouseDown += (s, e) =>
         {
             if(e.ChangedButton == OxyMouseButton.Left)
@@ -188,6 +191,7 @@ public class ScanDisplayControlViewModel: ObservableObject
                 e.Handled = true;
             }
         };
+
 
         dragPoints.MouseMove += (s, e) =>
         {
@@ -248,6 +252,7 @@ public class ScanDisplayControlViewModel: ObservableObject
             e.Handled = true;
         };
 
+#pragma warning restore CS0618 // Type or member is obsolete
         model.Series.Add(dragPoints);
 
         return model;

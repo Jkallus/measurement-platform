@@ -2,8 +2,10 @@
 using MeasurementApp.BusinessLogic.Recipe;
 using MeasurementApp.BusinessLogic.Services;
 using Microsoft.Extensions.Logging;
-using Microsoft.Toolkit.Mvvm.ComponentModel;
-using Microsoft.Toolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+//using Microsoft.Toolkit.Mvvm.ComponentModel;
+//using Microsoft.Toolkit.Mvvm.Input;
 using Microsoft.Toolkit.Mvvm.Messaging;
 using System;
 using System.Collections.Generic;
@@ -48,32 +50,37 @@ public class RecipeManagementControlViewModel: ObservableObject
         _service = service;
         _recipeManager = _service.GetService(typeof(IRecipeManager)) as IRecipeManager ?? throw new Exception("IRecipeManager is null");
         _navigation = _service.GetService(typeof(INavigationService)) as INavigationService ?? throw new Exception("INavigationService is null");
-        Recipes = new ObservableCollection<ScanRecipe>(_recipeManager.GetRecipes());
+        _recipes = new ObservableCollection<ScanRecipe>();
         _logger.LogInformation("RecipeManagementControlViewModel constructed");
         AddRecipeCommand = new RelayCommand(AddRecipe);
         RemoveRecipeCommand = new RelayCommand<ScanRecipe>(RemoveRecipe, CanRemoveRecipe);
         EditRecipeCommand = new RelayCommand<ScanRecipe>(EditRecipe, CanEditRecipe);
     }
 
-    private void EditRecipe(ScanRecipe obj)
+    private void EditRecipe(ScanRecipe? obj)
     {
-        _navigation.NavigateTo("MeasurementApp.ViewModels.RecipeSetupViewModel");
-        WeakReferenceMessenger.Default.Send<EditRecipeMessage>(new EditRecipeMessage(obj));
+        if (obj != null)
+        {
+            _navigation.NavigateTo("MeasurementApp.ViewModels.RecipeSetupViewModel");
+            WeakReferenceMessenger.Default.Send<EditRecipeMessage>(new EditRecipeMessage(obj));
+        }
     }
 
-    private bool CanEditRecipe(ScanRecipe obj)
+    private bool CanEditRecipe(ScanRecipe? obj)
     {
         return obj != null;
     }
 
-    private void RemoveRecipe(ScanRecipe obj)
+    private void RemoveRecipe(ScanRecipe? obj)
     {
-        _recipeManager.RemoveRecipe(obj);
-        Recipes = new(_recipeManager.GetRecipes());
-        
+        if(obj != null)
+        {
+            _recipeManager.RemoveRecipe(obj);
+            Recipes = new(_recipeManager.GetRecipes());
+        }
     }
 
-    private bool CanRemoveRecipe(ScanRecipe obj)
+    private bool CanRemoveRecipe(ScanRecipe? obj)
     {
         return obj != null;
     }

@@ -50,9 +50,9 @@ public class StageGraphicalControlViewModel: ObservableObject
         Model = CustomPlot();
     }
 
-    private void MotionController_PositionChanged(object sender, PositionChangedEventArgs e)
+    private void MotionController_PositionChanged(object? sender, PositionChangedEventArgs e)
     { // TODO fix null reference exception on app exit that happens here
-        App.MainRoot.DispatcherQueue.TryEnqueue(() =>
+        App.MainRoot!.DispatcherQueue.TryEnqueue(() =>
         {
             (Model.Series[0] as ScatterSeries)!.Points[0] = new ScatterPoint(e.X, e.Y);
             Model.InvalidatePlot(false);

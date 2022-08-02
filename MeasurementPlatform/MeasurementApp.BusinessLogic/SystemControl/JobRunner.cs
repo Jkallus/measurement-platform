@@ -10,9 +10,6 @@ public class JobRunner: ObservableObject
     private readonly IServiceProvider _service;
     private readonly ILogger<JobRunner> _logger;
     private readonly SystemController? _controller;
-    private event EventHandler<EventArgs> jobStopped;
-    private CancellationTokenSource _cancelTokenSource;
-    private CancellationToken _cancelToken;
 
     // Public properties
     private Job? _job;
@@ -33,8 +30,6 @@ public class JobRunner: ObservableObject
     {
         _service = service;
         _logger = logger;
-        _cancelTokenSource = new CancellationTokenSource();
-        _cancelToken = _cancelTokenSource.Token;
         _controller = _service.GetService(typeof(SystemController)) as SystemController ?? throw new ArgumentNullException("service");
     }
 
@@ -72,13 +67,5 @@ public class JobRunner: ObservableObject
             // TODO add job null case
         }
         IsRunning = false;
-    }
-
-    protected void OnJobStopped(EventArgs e)
-    {
-        if(jobStopped != null)
-        {
-            jobStopped(this, e);
-        }
     }
 }

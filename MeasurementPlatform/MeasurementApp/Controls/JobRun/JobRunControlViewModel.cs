@@ -22,11 +22,10 @@ public class JobRunControlViewModel: ObservableObject
     private readonly RecipeSelectService _recipeSelect;
     private readonly JobRunner _jobRunner;
     private CancellationTokenSource _tokenSource;
-    private CancellationToken _cancelToken;
 
     // Public properties
-    private ScanRecipe _recipe;
-    public ScanRecipe Recipe
+    private ScanRecipe? _recipe;
+    public ScanRecipe? Recipe
     {
         get => _recipe;
         set
@@ -93,7 +92,7 @@ public class JobRunControlViewModel: ObservableObject
     {
         try
         {
-            _jobRunner.Job = new Job(Recipe);
+            _jobRunner.Job = new Job(Recipe!);
             _tokenSource = new CancellationTokenSource();
             var t =  _jobRunner.ExecuteJob(_tokenSource.Token, new Progress<double>(ProgressHandler));
             StopJobCommand.NotifyCanExecuteChanged();
@@ -103,7 +102,7 @@ public class JobRunControlViewModel: ObservableObject
         }
         catch(OperationCanceledException ex)
         {
-            await App.MainRoot.MessageDialogAsync("Cancel Success", "The job was successfully cancelled");
+            await App.MainRoot!.MessageDialogAsync("Cancel Success", "The job was successfully cancelled");
             _logger.LogInformation(ex.Message);
             Progress = 0.0;
             ProgressText = "N/A";
@@ -112,7 +111,7 @@ public class JobRunControlViewModel: ObservableObject
         }
         catch(Exception ex)
         {
-            await App.MainRoot.MessageDialogAsync("Exception", ex.Message);
+            await App.MainRoot!.MessageDialogAsync("Exception", ex.Message);
         }
         finally
         {

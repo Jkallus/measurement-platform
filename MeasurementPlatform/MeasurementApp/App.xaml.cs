@@ -54,7 +54,7 @@ public partial class App : Application
     }
 
     public static WindowEx MainWindow { get; } = new MainWindow();
-    public static FrameworkElement MainRoot { get; private set; } // used to get a XamlRoot for content dialog extension methods
+    public static FrameworkElement? MainRoot { get; private set; } // used to get a XamlRoot for content dialog extension methods
 
     public App()
     {

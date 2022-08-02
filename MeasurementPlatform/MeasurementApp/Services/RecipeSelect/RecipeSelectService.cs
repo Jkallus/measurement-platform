@@ -20,7 +20,7 @@ public class RecipeSelectService
         var dialog = new RecipeSelectContentDialog
         {
             Title = "Select Recipe",
-            XamlRoot = App.MainRoot.XamlRoot,
+            XamlRoot = App.MainRoot!.XamlRoot,
             RequestedTheme = App.MainRoot.RequestedTheme,
             PrimaryButtonText = "Open",
             SecondaryButtonText = "Cancel"

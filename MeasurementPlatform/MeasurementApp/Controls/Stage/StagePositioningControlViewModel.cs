@@ -29,7 +29,7 @@ public class StagePositioningControlViewModel: ObservableRecipient
     private StepSize _stepSize;
     public StepSize StepSize
     {
-        get { return _stepSize; }
+        get => _stepSize;
         set
         {
             if (SetProperty(ref _stepSize, value))
@@ -60,8 +60,8 @@ public class StagePositioningControlViewModel: ObservableRecipient
     private string _customSize;
     public string CustomSize
     {
-        get { return _customSize; }
-        set { SetProperty(ref _customSize, value); }
+        get => _customSize;
+        set => SetProperty(ref _customSize, value);
     }
 
     private bool isBusy;
@@ -80,10 +80,7 @@ public class StagePositioningControlViewModel: ObservableRecipient
     }
 
     private (float XCoordinate, float YCoordinate) _targetPosition;
-    public string TargetPosition
-    {
-        get => $"{_targetPosition.XCoordinate.ToString("0.000")}, {_targetPosition.YCoordinate.ToString("0.000")}";
-    }
+    public string TargetPosition => $"{_targetPosition.XCoordinate.ToString("0.000")}, {_targetPosition.YCoordinate.ToString("0.000")}";
 
     private int _stepSizeButtonIndex;
     public int StepSizeButtonIndex
@@ -127,7 +124,7 @@ public class StagePositioningControlViewModel: ObservableRecipient
         _systemController.MotionController.StateChanged += MotionController_StateChanged;
         WeakReferenceMessenger.Default.Register<StageTargetPositionChangedMessage>(this, (r, m) =>
         {
-            App.MainRoot.DispatcherQueue.TryEnqueue(() =>
+            App.MainRoot!.DispatcherQueue.TryEnqueue(() =>
             {
                 _targetPosition = m.TargetLocation;
                 OnPropertyChanged("TargetPosition");
@@ -160,16 +157,16 @@ public class StagePositioningControlViewModel: ObservableRecipient
         else return true;
     }
 
-    private void MotionController_StateChanged(object sender, FNCStateChangedEventArgs e)
+    private void MotionController_StateChanged(object? sender, FNCStateChangedEventArgs e)
     {
         MotionCommand.NotifyCanExecuteChanged();
         HomeCommand.NotifyCanExecuteChanged();
         GoToTargetCommand.NotifyCanExecuteChanged();
     }
 
-    private void MotionController_RuntimeError(object sender, RuntimeErrorEventArgs e)
+    private void MotionController_RuntimeError(object? sender, RuntimeErrorEventArgs e)
     {
-        App.MainRoot.DispatcherQueue.TryEnqueue(async () =>
+        App.MainRoot!.DispatcherQueue.TryEnqueue(async () =>
         {
             await App.MainRoot.MessageDialogAsync("Motion Error", e.Message);
         });

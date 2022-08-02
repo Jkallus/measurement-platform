@@ -99,7 +99,7 @@ public class DAQDiagnosticsControlViewModel: ObservableObject
         }
         catch (DAQException ex)
         {
-            await App.MainRoot.MessageDialogAsync("DAQError", ex.Message);
+            await App.MainRoot!.MessageDialogAsync("DAQError", ex.Message);
         }
     }
 
@@ -122,7 +122,7 @@ public class DAQDiagnosticsControlViewModel: ObservableObject
         }
         catch (DAQException ex)
         {
-            await App.MainRoot.MessageDialogAsync("DAQError", ex.Message);
+            await App.MainRoot!.MessageDialogAsync("DAQError", ex.Message);
         }
     }
 
@@ -152,7 +152,7 @@ public class DAQDiagnosticsControlViewModel: ObservableObject
         }
         catch (DAQException ex)
         {
-            await App.MainRoot.MessageDialogAsync("DAQError", ex.Message);
+            await App.MainRoot!.MessageDialogAsync("DAQError", ex.Message);
         }
     }
 
@@ -175,7 +175,7 @@ public class DAQDiagnosticsControlViewModel: ObservableObject
         }
         catch (DAQException ex)
         {
-            await App.MainRoot.MessageDialogAsync("DAQError", ex.Message);
+            await App.MainRoot!.MessageDialogAsync("DAQError", ex.Message);
         }
 
     }
@@ -200,7 +200,7 @@ public class DAQDiagnosticsControlViewModel: ObservableObject
             }
             else
             {
-                await App.MainRoot.MessageDialogAsync("DAQError", ex.Message);
+                await App.MainRoot!.MessageDialogAsync("DAQError", ex.Message);
             }
         }
     }

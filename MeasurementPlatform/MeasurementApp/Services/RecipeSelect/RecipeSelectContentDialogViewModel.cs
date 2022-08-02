@@ -15,10 +15,10 @@ public class RecipeSelectContentDialogViewModel : ObservableObject
     private readonly IServiceProvider _service;
     private readonly IRecipeManager _recipeManager;
 
-    private ScanRecipe _selection;
-    public ScanRecipe Selection
+    private ScanRecipe? _selection;
+    public ScanRecipe? Selection // TODO check what happens when binding to null here
     {
-        get => _selection;
+        get => _selection; 
         set
         {
             if (SetProperty(ref _selection, value))

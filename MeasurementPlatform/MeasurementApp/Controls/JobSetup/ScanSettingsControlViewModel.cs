@@ -28,10 +28,10 @@ public class ScanSettingsControlViewModel: ObservableRecipient
     private string _recipeName;
     public string RecipeName
     {
-        get { return _recipeName; }
-        set 
+        get => _recipeName;
+        set
         {
-            if(SetProperty(ref _recipeName, value))
+            if (SetProperty(ref _recipeName, value))
             {
                 SaveRecipeCommand.NotifyCanExecuteChanged();
             }
@@ -66,20 +66,11 @@ public class ScanSettingsControlViewModel: ObservableRecipient
         set => SetProperty(ref _bottomRight, value);
     }
 
-    public ScanDimension XDimension
-    {
-        get => new ScanDimension(BottomRight.X - BottomLeft.X, Units.Millimeters);
-    }
+    public ScanDimension XDimension => new ScanDimension(BottomRight.X - BottomLeft.X, Units.Millimeters);
 
-    public ScanDimension YDimension
-    {
-        get => new ScanDimension(TopLeft.Y - BottomLeft.Y, Units.Millimeters);
-    }
+    public ScanDimension YDimension => new ScanDimension(TopLeft.Y - BottomLeft.Y, Units.Millimeters);
 
-    public ScanDimension ScanArea
-    {
-        get => new ScanDimension(XDimension.Value * YDimension.Value, Units.SquareMillimeters);
-    }
+    public ScanDimension ScanArea => new ScanDimension(XDimension.Value * YDimension.Value, Units.SquareMillimeters);
 
 
     private double _sliderValue;
@@ -131,11 +122,8 @@ public class ScanSettingsControlViewModel: ObservableRecipient
         get => _ySampleCount;
         set => SetProperty(ref _ySampleCount, value);
     }
-    
-    public int TotalSampleCount
-    {
-        get => XSampleCount * YSampleCount;
-    }
+
+    public int TotalSampleCount => XSampleCount * YSampleCount;
 
     public RelayCommand SaveRecipeCommand { get; private set; }
 
@@ -159,7 +147,7 @@ public class ScanSettingsControlViewModel: ObservableRecipient
 
         WeakReferenceMessenger.Default.Register<ScanAreaSelectionMessage>(this, (r, m) =>
         {
-            App.MainRoot.DispatcherQueue.TryEnqueue(() =>
+            App.MainRoot!.DispatcherQueue.TryEnqueue(() =>
             {
                 BottomLeft = m.Value.bottomLeft;
                 TopLeft = m.Value.topLeft;
@@ -177,7 +165,7 @@ public class ScanSettingsControlViewModel: ObservableRecipient
 
         WeakReferenceMessenger.Default.Register<EditRecipeMessage>(this, (r, m) =>
         {
-            App.MainRoot.DispatcherQueue.TryEnqueue(() =>
+            App.MainRoot!.DispatcherQueue.TryEnqueue(() =>
             {
                 BottomLeft = m.Recipe.BottomLeft;
                 TopLeft = m.Recipe.TopLeft;
@@ -208,6 +196,8 @@ public class ScanSettingsControlViewModel: ObservableRecipient
         if(_isEditing)
         {
             _logger.LogInformation("Updating recipe");
+            if (_oldRecipe == null)
+                throw new Exception("_oldRecipe is null while saving an edit");
             _recipeManager.UpdateRecipe(_oldRecipe, new ScanRecipe(RecipeName, BottomLeft, TopLeft, TopRight, BottomRight, ScanPitch));
             _oldRecipe = null;
         }

@@ -14,15 +14,15 @@ public class ReadoutItem: ObservableObject
     private string _field;
     public string Field
     {
-        get { return _field; }
-        set { SetProperty(ref _field, value); }
+        get => _field;
+        set => SetProperty(ref _field, value);
     }
 
     private string _value;
     public string Value
     {
-        get { return _value; }
-        set { SetProperty(ref _value, value); }
+        get => _value;
+        set => SetProperty(ref _value, value);
     }
 
     public ReadoutItem(string field, string value)
@@ -40,8 +40,8 @@ public class PositionReadoutControlViewModel: ObservableObject
     private ObservableCollection<ReadoutItem> _items;
     public ObservableCollection<ReadoutItem> Items
     {
-        get { return _items; }
-        set { SetProperty(ref _items, value); }
+        get => _items;
+        set => SetProperty(ref _items, value);
     }
 
     public PositionReadoutControlViewModel(IServiceProvider serviceProvider)
@@ -58,9 +58,9 @@ public class PositionReadoutControlViewModel: ObservableObject
         _systemController.MotionController.StateChanged += MotionController_StateChanged;
     }
 
-    private void MotionController_StateChanged(object sender, StageControl.Events.FNCStateChangedEventArgs e)
+    private void MotionController_StateChanged(object? sender, StageControl.Events.FNCStateChangedEventArgs e)
     {
-        App.MainRoot.DispatcherQueue.TryEnqueue(() =>
+        App.MainRoot!.DispatcherQueue.TryEnqueue(() =>
         {
             Items[0].Value = "Unknown";
             Items[1].Value = "Unknown";
@@ -70,7 +70,7 @@ public class PositionReadoutControlViewModel: ObservableObject
 
     private void MotionController_HomingComplete(object? sender, EventArgs e)
     {
-        App.MainRoot.DispatcherQueue.TryEnqueue(() =>
+        App.MainRoot!.DispatcherQueue.TryEnqueue(() =>
         {
             Items[2].Value = _systemController.MotionController.IsHomed.ToString();
         });
@@ -79,7 +79,7 @@ public class PositionReadoutControlViewModel: ObservableObject
 
     private void MotionController_PositionChanged(object? sender, StageControl.Events.PositionChangedEventArgs e)
     {
-        App.MainRoot.DispatcherQueue.TryEnqueue(() =>
+        App.MainRoot!.DispatcherQueue.TryEnqueue(() =>
         {
             Items[0].Value = e.X.ToString("0.000");
             Items[1].Value = e.Y.ToString("0.000");

@@ -41,10 +41,10 @@ public class ConnectionControlViewModel : ObservableObject
     private bool _isBusy;
     public bool IsBusy
     {
-        get { return _isBusy; }
+        get => _isBusy;
         set
         {
-            if(SetProperty(ref _isBusy, value))
+            if (SetProperty(ref _isBusy, value))
             {
                 ConnectCommand.NotifyCanExecuteChanged();
                 DisconnectCommand.NotifyCanExecuteChanged();
@@ -52,24 +52,18 @@ public class ConnectionControlViewModel : ObservableObject
         }
     }
 
-    public ModuleInitializationState DAQInitializationState { get => _systemController.DAQInitializationState; }
-    public ModuleInitializationState MotionControllerInitializationState { get => _systemController.MotionControllerInitializationState; }
+    public ModuleInitializationState DAQInitializationState => _systemController.DAQInitializationState;
+    public ModuleInitializationState MotionControllerInitializationState => _systemController.MotionControllerInitializationState;
 
-    public string MotionControllerStatus
-    {
-        get => _systemController.MotionControllerStatus;
-    }
+    public string MotionControllerStatus => _systemController.MotionControllerStatus;
 
-    public string DAQStatus
-    {
-        get => _systemController.DAQStatus;
-    }
+    public string DAQStatus => _systemController.DAQStatus;
 
 
     // Private Methods
     private void SystemController_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        App.MainRoot.DispatcherQueue.TryEnqueue(() =>
+        App.MainRoot!.DispatcherQueue.TryEnqueue(() =>
         {
             OnPropertyChanged(e.PropertyName); // assumes property names are same in model and viewmodel and viewmodel is using model as backing
         });
@@ -86,12 +80,12 @@ public class ConnectionControlViewModel : ObservableObject
         catch(DAQException ex)
         {
             _logger.LogError(ex, "Error on connect");
-            await App.MainRoot.MessageDialogAsync("DAQError", ex.Message);
+            await App.MainRoot!.MessageDialogAsync("DAQError", ex.Message);
         }
         catch(FileNotFoundException ex)
         {
             _logger.LogDebug(ex.Message);
-            await App.MainRoot.MessageDialogAsync("Serial Port Error", ex.Message);
+            await App.MainRoot!.MessageDialogAsync("Serial Port Error", ex.Message);
          }
         finally
         {
@@ -111,7 +105,7 @@ public class ConnectionControlViewModel : ObservableObject
 
     private async Task OnDisconnect()
     {
-        bool? b = await App.MainRoot.ConfirmationDialogAsync("Are you sure you want to disconnect?");
+        bool? b = await App.MainRoot!.ConfirmationDialogAsync("Are you sure you want to disconnect?");
 
         if(b == true)
         {

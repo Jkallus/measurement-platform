@@ -23,7 +23,7 @@ public sealed partial class RecipeSelectContentDialog : ContentDialog
 {
     public RecipeSelectContentDialogViewModel ViewModel { get; private set; }
 
-    public ScanRecipe Selection => ViewModel.Selection;
+    public ScanRecipe? Selection => ViewModel.Selection;
     public RecipeSelectContentDialog()
     {
         ViewModel = App.GetService<RecipeSelectContentDialogViewModel>();
