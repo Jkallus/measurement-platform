@@ -117,6 +117,7 @@ public class StagePositioningControlViewModel: ObservableRecipient
         _stepSize = StepSize.TenThousand;
         _customSize = "25000";
         _realStepSize = 10000;
+        _stepSizeButtonIndex = 1;
         HomeCommand = new AsyncRelayCommand<HomingAxes>(OnHomeRequested, CanHome);
         MotionCommand = new AsyncRelayCommand<MotionDirection>(OnMotionRequested, CanPerformMotion);
         GoToTargetCommand = new AsyncRelayCommand(OnGoToTargetRequested, CanGoToTarget);
