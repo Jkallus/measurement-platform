@@ -69,7 +69,7 @@ public class SystemController: ObservableObject, ISystemController
         MotionController = _serviceProvider.GetService(typeof(IMachineControl)) as IMachineControl ?? throw new ArgumentNullException("MachineController", "MachineController instance was null"); ;
         MotionController.StateChanged += MotionController_StateChanged;
         MotionController.UnexpectedRestart += MotionController_UnexpectedRestart;
-        _motionControllerStatus = "";
+        _motionControllerStatus = FNCMachineControl.ConvertControllerStateToStatus(LifetimeFNCState.Unknown);
 
         DAQ = _serviceProvider.GetService(typeof(IDAQ)) as IDAQ ?? throw new ArgumentNullException("IDAQ", "IDAQ instance was null");
         DAQ.StateChanged += DAQ_StateChanged;
