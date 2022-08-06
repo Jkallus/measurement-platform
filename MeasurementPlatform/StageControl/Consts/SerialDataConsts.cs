@@ -14,7 +14,7 @@ namespace StageControl.Consts
         public const string LineBreak = "\r\n"; // CR LF
         public const string MSGINFOMessageMarker = "[MSG:INFO: ";
         public const string MSGDBGMessageMarker = "[MSG:DBG: ";
-        public const string FNCEntryPromptMessageMarker = "Grbl 3.5 [FluidNC v3.5.0 (wifi) '$' for help]";
+        public const string FNCEntryPromptMessageMarker = "Grbl 3.5 [FluidNC v3.5.1 (wifi) '$' for help]";
         public const string MSGEndMarker = "]";
         public const string StatusStartMessageMarker = "<";
         public const string StatusEndMessageMarker = ">";
