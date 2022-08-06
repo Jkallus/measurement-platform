@@ -4,11 +4,6 @@ using MeasurementApp.Services;
 using MeasurementApp.BusinessLogic.SystemControl;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MeasurementApp.Controls;
 
@@ -16,8 +11,7 @@ public class DAQDiagnosticsControlViewModel: ObservableObject
 {
     // Private member variables
     private readonly IServiceProvider _serviceProvider;
-    private IDAQ _daq;
-
+    private readonly IDAQ _daq;
 
     // Constructor
     public DAQDiagnosticsControlViewModel(IServiceProvider serviceProvider)
@@ -30,6 +24,19 @@ public class DAQDiagnosticsControlViewModel: ObservableObject
         GetCountCommand = new AsyncRelayCommand(GetCount, CanGetCount);
         ResetEncoderCommand = new AsyncRelayCommand(ResetEncoder, CanResetEncoder);
         GetScaledValueCommand = new AsyncRelayCommand(GetScaledValue, CanGetScaledValue);
+        _daq.StateChanged += (object? sender, DAQStateEventArgs e) =>
+        {
+            App.MainWindow.DispatcherQueue.TryEnqueue(() =>
+            {
+                InitializeCommand.NotifyCanExecuteChanged();
+                DeinitializeCommand.NotifyCanExecuteChanged();
+                GetVoltageCommand.NotifyCanExecuteChanged();
+                GetCountCommand.NotifyCanExecuteChanged();
+                ResetEncoderCommand.NotifyCanExecuteChanged();
+                GetScaledValueCommand.NotifyCanExecuteChanged();
+                OnPropertyChanged("Initialized");
+            });            
+        };
     }
 
     // Public Properties
@@ -44,44 +51,30 @@ public class DAQDiagnosticsControlViewModel: ObservableObject
     public float ScaledValue
     {
         get => _scaledValue;
-        set
-        {
-            SetProperty(ref _scaledValue, value);
-        }
+        set => SetProperty(ref _scaledValue, value);
     }
 
-
-    private bool _initialized;
-    public bool Initialized
-    {
-        get { return _initialized; }
-        set
-        {
-            SetProperty(ref _initialized, value);
-            NotifyInitialized();
-        }
-    }
+    public bool Initialized => _daq.Initialized;
 
     private long _xcount;
     public long XCount
     {
-        get { return _xcount; }
-        set { SetProperty(ref _xcount, value); }
+        get => _xcount;
+        set => SetProperty(ref _xcount, value);
     }
 
     private long _ycount;
     public long YCount
     {
-        get { return _ycount; }
-        set { SetProperty(ref _ycount, value); }
+        get => _ycount;
+        set => SetProperty(ref _ycount, value);
     }
-
 
     private double _voltage;
     public double Voltage
     {
-        get { return _voltage; }
-        set { SetProperty(ref _voltage, value); }
+        get => _voltage;
+        set => SetProperty(ref _voltage, value);
     }
 
     // Private methods
@@ -126,16 +119,6 @@ public class DAQDiagnosticsControlViewModel: ObservableObject
         }
     }
 
-    private void NotifyInitialized()
-    {
-        InitializeCommand.NotifyCanExecuteChanged();
-        DeinitializeCommand.NotifyCanExecuteChanged();
-        GetVoltageCommand.NotifyCanExecuteChanged();
-        GetCountCommand.NotifyCanExecuteChanged();
-        ResetEncoderCommand.NotifyCanExecuteChanged();
-        GetScaledValueCommand.NotifyCanExecuteChanged();
-    }
-
     private bool CanGetCount()
     {
         return _daq.Initialized;
@@ -145,7 +128,6 @@ public class DAQDiagnosticsControlViewModel: ObservableObject
     {
         try
         {
-
             var counts = await _daq.GetEncoderCounts();
             XCount = counts.Item1;
             YCount = counts.Item2;
@@ -164,7 +146,6 @@ public class DAQDiagnosticsControlViewModel: ObservableObject
     private async Task Deinitialize()
     {
         await _daq.Deinitialize();
-        Initialized = false;
     }
 
     private async Task GetVoltage()
@@ -177,7 +158,6 @@ public class DAQDiagnosticsControlViewModel: ObservableObject
         {
             await App.MainRoot!.MessageDialogAsync("DAQError", ex.Message);
         }
-
     }
 
     private bool CanGetVoltage()
@@ -190,13 +170,12 @@ public class DAQDiagnosticsControlViewModel: ObservableObject
         try
         {
             await _daq.Initialize();
-            Initialized = true;
         }
         catch (DAQException ex)
         {
             if (ex.DAQError == DAQ.Enums.ErrorCode.AlreadyInitialized)
             {
-                Initialized = true;
+                // TODO remove this case
             }
             else
             {
