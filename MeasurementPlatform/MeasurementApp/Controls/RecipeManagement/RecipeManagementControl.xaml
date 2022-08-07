@@ -22,7 +22,7 @@
             <GridView.ItemTemplate>
                 <DataTemplate>
                     <Grid>
-                        <Border Background="LightGray" Width="160" Height="70" CornerRadius="10">
+                        <Border Background="{ThemeResource  SurfaceStrokeColorDefault}" Width="160" Height="70" CornerRadius="10">
                             <TextBlock Text="{Binding Name}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20 0 20 0"/>
                         </Border>
                     </Grid>

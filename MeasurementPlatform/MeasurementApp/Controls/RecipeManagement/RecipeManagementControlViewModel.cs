@@ -50,7 +50,7 @@ public class RecipeManagementControlViewModel: ObservableObject
         _service = service;
         _recipeManager = _service.GetService(typeof(IRecipeManager)) as IRecipeManager ?? throw new Exception("IRecipeManager is null");
         _navigation = _service.GetService(typeof(INavigationService)) as INavigationService ?? throw new Exception("INavigationService is null");
-        _recipes = new ObservableCollection<ScanRecipe>();
+        _recipes = new ObservableCollection<ScanRecipe>(_recipeManager.GetRecipes());
         _logger.LogInformation("RecipeManagementControlViewModel constructed");
         AddRecipeCommand = new RelayCommand(AddRecipe);
         RemoveRecipeCommand = new RelayCommand<ScanRecipe>(RemoveRecipe, CanRemoveRecipe);
