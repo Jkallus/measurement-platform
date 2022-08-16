@@ -17,6 +17,17 @@ namespace DAQ.Model
         }
 
         public override string ToString() => ((int)MessageType).ToString() + ";";
-        
+    }
+
+    public class ParameterCommand<T> : Command
+    {
+        public T Parameter { get; set; }
+
+        public ParameterCommand(MessageType type, T parameter): base(type)
+        {
+            Parameter = parameter;
+        }
+
+        public override string ToString() => ((int)MessageType).ToString() + ";" + Parameter!.ToString() + ";";
     }
 }

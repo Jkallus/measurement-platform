@@ -29,11 +29,19 @@ public class ESPDAQController
     private Command? _currentCommand; // pending command
     private bool _initCommandPending; // are we waiting for a response to an init or deinit command
     private readonly ILogger<ESPDAQController> _logger;
+    
 
     // Public properties
-    //public event EventHandler<EventArgs>? InitializationComplete;
     public event EventHandler<ResponseReceivedEventArgs>? CommandComplete;
     public event EventHandler<DAQStateEventArgs>? StateChanged;
+
+    private bool _isStreaming;
+    public bool IsStreaming
+    {
+        get => _isStreaming;
+        private set => _isStreaming = value;
+    }
+
 
     private bool _isInitialized;
     public bool IsInitialized
@@ -46,32 +54,37 @@ public class ESPDAQController
         }
     }
 
-
-
-
-    // Constructors
-    //public ESPDAQController(): this(new SerialConfig("COM6"))
-    //{
-    //}
-
     public ESPDAQController(SerialConfig serialConfig, ILogger<ESPDAQController> middleLogger, ILogger<SerialController> bottomLogger)
     {
         _logger = middleLogger;
         _serial = new SerialController(serialConfig, bottomLogger);
         _serial.ResponseReceived += _serial_ResponseReceived;
         _initCommandPending = false;
-        IsInitialized = false;
+        _isInitialized = false;
+        _isStreaming = false;
     }
 
     private void _serial_ResponseReceived(object? sender, ResponseReceivedEventArgs e)
     {
         if (e.Response != null)
         {
-            if(_currentCommand != null && _currentCommand.MessageType == e.Response.MessageType)
+            if(_currentCommand != null && _currentCommand.MessageType == e.Response.MessageType) // check that its responding to type of most recent command
             {
                 if (_initCommandPending)
                     CheckInitialized(e);
                     _initCommandPending = false;
+
+                if (e.Response.MessageType == MessageType.StartStream && e.Response.ErrorCode == ErrorCode.Success)
+                {
+                    IsStreaming = true;
+                    OnStateChanged(new DAQStateEventArgs(DAQState.Streaming));
+                }
+
+                if (e.Response.MessageType == MessageType.StopStream && e.Response.ErrorCode == ErrorCode.Success)
+                {
+                    IsStreaming = false;
+                    OnStateChanged(new DAQStateEventArgs(DAQState.Initialized));
+                }
 
                 OnCommandComplete(e);
             }
@@ -95,6 +108,7 @@ public class ESPDAQController
             _initCommandPending = true;
         if(cmd.MessageType == MessageType.Initialize)
             OnStateChanged(new DAQStateEventArgs(DAQState.Initializing));
+
         _serial.SendSerialData(cmd.ToString());
         _currentCommand = cmd;
     }

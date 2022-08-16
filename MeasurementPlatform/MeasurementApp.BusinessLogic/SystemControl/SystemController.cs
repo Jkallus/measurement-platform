@@ -259,6 +259,9 @@ public class SystemController: ObservableObject, ISystemController
             case DAQState.Initialized:
                 DAQInitializationState = ModuleInitializationState.Initialized;
                 break;
+            case DAQState.Streaming:
+                DAQInitializationState = ModuleInitializationState.Initialized;
+                break;
         }
     }
 

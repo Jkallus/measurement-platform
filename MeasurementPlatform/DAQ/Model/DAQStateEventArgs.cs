@@ -26,6 +26,8 @@ namespace DAQ.Model
                     return "DAQ Initializing";
                 case DAQState.Initialized:
                     return "DAQ Initialized";
+                case DAQState.Streaming:
+                    return "DAQ Streaming";
                 default:
                     throw new Exception("Invalid DAQState value");
             }

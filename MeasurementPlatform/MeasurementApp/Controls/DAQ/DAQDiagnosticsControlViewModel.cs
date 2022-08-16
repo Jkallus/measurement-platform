@@ -13,39 +13,47 @@ public class DAQDiagnosticsControlViewModel: ObservableObject
     private readonly IServiceProvider _serviceProvider;
     private readonly IDAQ _daq;
 
-    // Constructor
-    public DAQDiagnosticsControlViewModel(IServiceProvider serviceProvider)
-    {
-        _serviceProvider = serviceProvider;
-        _daq = ((_serviceProvider.GetService(typeof(SystemController)) as SystemController) ?? throw new Exception("System controller is null")).DAQ; // grab DAQ instance from the systemcontroller
-        InitializeCommand = new AsyncRelayCommand(Initialize, CanInitialize);
-        DeinitializeCommand = new AsyncRelayCommand(Deinitialize, CanDeinitialize);
-        GetVoltageCommand = new AsyncRelayCommand(GetVoltage, CanGetVoltage);
-        GetCountCommand = new AsyncRelayCommand(GetCount, CanGetCount);
-        ResetEncoderCommand = new AsyncRelayCommand(ResetEncoder, CanResetEncoder);
-        GetScaledValueCommand = new AsyncRelayCommand(GetScaledValue, CanGetScaledValue);
-        _daq.StateChanged += (object? sender, DAQStateEventArgs e) =>
-        {
-            App.MainWindow.DispatcherQueue.TryEnqueue(() =>
-            {
-                InitializeCommand.NotifyCanExecuteChanged();
-                DeinitializeCommand.NotifyCanExecuteChanged();
-                GetVoltageCommand.NotifyCanExecuteChanged();
-                GetCountCommand.NotifyCanExecuteChanged();
-                ResetEncoderCommand.NotifyCanExecuteChanged();
-                GetScaledValueCommand.NotifyCanExecuteChanged();
-                OnPropertyChanged("Initialized");
-            });            
-        };
-    }
 
     // Public Properties
-    public IAsyncRelayCommand InitializeCommand { get; set; }
-    public IAsyncRelayCommand DeinitializeCommand { get; set; }
-    public IAsyncRelayCommand GetVoltageCommand { get; set; }
-    public IAsyncRelayCommand GetCountCommand { get; set; }
-    public IAsyncRelayCommand ResetEncoderCommand { get; set; }
-    public IAsyncRelayCommand GetScaledValueCommand { get; set; }
+    public IAsyncRelayCommand InitializeCommand
+    {
+        get; set;
+    }
+    public IAsyncRelayCommand DeinitializeCommand
+    {
+        get; set;
+    }
+    public IAsyncRelayCommand GetVoltageCommand
+    {
+        get; set;
+    }
+    public IAsyncRelayCommand GetCountCommand
+    {
+        get; set;
+    }
+    public IAsyncRelayCommand ResetEncoderCommand
+    {
+        get; set;
+    }
+    public IAsyncRelayCommand GetScaledValueCommand
+    {
+        get; set;
+    }
+    public IAsyncRelayCommand StartStreamCommand
+    {
+        get; set;
+    }
+    public IAsyncRelayCommand StopStreamCommand
+    {
+        get; set;
+    }
+
+    private int _sampleRate;
+    public int SampleRate
+    {
+        get => _sampleRate;
+        set => SetProperty(ref _sampleRate, value);
+    }
 
     private float _scaledValue;
     public float ScaledValue
@@ -77,7 +85,76 @@ public class DAQDiagnosticsControlViewModel: ObservableObject
         set => SetProperty(ref _voltage, value);
     }
 
+    // Constructor
+    public DAQDiagnosticsControlViewModel(IServiceProvider serviceProvider)
+    {
+        _serviceProvider = serviceProvider;
+        _daq = ((_serviceProvider.GetService(typeof(SystemController)) as SystemController) ?? throw new Exception("System controller is null")).DAQ; // grab DAQ instance from the systemcontroller
+        InitializeCommand = new AsyncRelayCommand(Initialize, CanInitialize);
+        DeinitializeCommand = new AsyncRelayCommand(Deinitialize, CanDeinitialize);
+        GetVoltageCommand = new AsyncRelayCommand(GetVoltage, CanGetVoltage);
+        GetCountCommand = new AsyncRelayCommand(GetCount, CanGetCount);
+        ResetEncoderCommand = new AsyncRelayCommand(ResetEncoder, CanResetEncoder);
+        GetScaledValueCommand = new AsyncRelayCommand(GetScaledValue, CanGetScaledValue);
+        StartStreamCommand = new AsyncRelayCommand<int>(StartStream, CanStartStream);
+        StopStreamCommand = new AsyncRelayCommand(StopStream, CanStopStream);
+
+        _daq.StateChanged += (object? sender, DAQStateEventArgs e) =>
+        {
+            App.MainWindow.DispatcherQueue.TryEnqueue(() =>
+            {
+                InitializeCommand.NotifyCanExecuteChanged();
+                DeinitializeCommand.NotifyCanExecuteChanged();
+                GetVoltageCommand.NotifyCanExecuteChanged();
+                GetCountCommand.NotifyCanExecuteChanged();
+                ResetEncoderCommand.NotifyCanExecuteChanged();
+                GetScaledValueCommand.NotifyCanExecuteChanged();
+                StartStreamCommand.NotifyCanExecuteChanged();
+                StopStreamCommand.NotifyCanExecuteChanged();
+                OnPropertyChanged("Initialized");
+            });            
+        };
+    }
+
+
+
     // Private methods
+
+    private async Task StartStream(int sampleRate)
+    {
+        try
+        {
+            await _daq.StartStream(sampleRate);
+        }
+        catch (DAQException ex)
+        {
+            await App.MainRoot!.MessageDialogAsync("DAQError", ex.Message);
+        }
+    }
+
+    private bool CanStartStream(int sampleRate)
+    {
+        return _daq.Initialized && !_daq.IsStreaming;
+    }
+
+    private async Task StopStream()
+    {
+        try
+        {
+            await _daq.StopStream();
+        }
+        catch (DAQException ex)
+        {
+            await App.MainRoot!.MessageDialogAsync("DAQError", ex.Message);
+        }
+    }
+
+    private bool CanStopStream()
+    {
+        return _daq.IsStreaming;
+    }
+
+
     private bool CanGetScaledValue()
     {
         return _daq.Initialized;

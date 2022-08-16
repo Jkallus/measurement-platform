@@ -38,7 +38,6 @@ public class SerialController
             _logger.LogError(ex.Message);
             throw ex;
         }
-        
     }
 
     public void SendSerialData(string msg)
@@ -46,22 +45,12 @@ public class SerialController
         _port.Write(msg+"\r");
     }
 
-
-    // Constructors
-    //public SerialController(): this(new SerialConfig("COM6"))
-    //{
-
-    //}
-
     public SerialController(SerialConfig serialConf, ILogger<SerialController> bottomLogger)
     {
         _logger = bottomLogger;
         _currentMessage = "";
         _port = new SerialPort(serialConf.COM, serialConf.BaudRate, serialConf.Parity, serialConf.DataBits, serialConf.StopBits);
-        //this.Initialize();
     }
-
-    
 
     // Private methods
     private void DataReceivedHandler(object sender, SerialDataReceivedEventArgs e)
@@ -80,37 +69,55 @@ public class SerialController
         }
     }
 
+    private void HandleStreamData(string data)
+    {
+        string[] parts = data.Split(',');
+    }
+
     private void ParseData()
     {
-
-        if(_currentMessage.Contains("\n\r"))
+        bool canContinue = true;
+        while (canContinue)
         {
-            int endIndex = _currentMessage.IndexOf("\n\r"); // grab complete message not including \n\r
-            string message = _currentMessage.Substring(0, endIndex); // separate this message from any potential others coming next
-            _currentMessage = _currentMessage.Remove(0, endIndex + 2); // this message is sure to be processed so safe to remove from buffer, remove \n\r here
-
-            string[] parts = message.Split(';', StringSplitOptions.RemoveEmptyEntries);
-            MessageType type = (MessageType)Enum.Parse(typeof(MessageType), parts[0]);
-            ErrorCode errorCode = (ErrorCode)Enum.Parse(typeof(ErrorCode), parts[1]);
-            if(parts.Length > 2)
+            if (_currentMessage.Contains("\n\r"))
             {
-                switch (type)
+                int endIndex = _currentMessage.IndexOf("\n\r"); // grab complete message not including \n\r
+                string message = _currentMessage.Substring(0, endIndex); // separate this message from any potential others coming next
+                _currentMessage = _currentMessage.Remove(0, endIndex + 2); // this message is sure to be processed so safe to remove from buffer, remove \n\r here
+
+                string[] parts = message.Split(';', StringSplitOptions.RemoveEmptyEntries);
+                MessageType type = (MessageType)Enum.Parse(typeof(MessageType), parts[0]);
+                if (type == MessageType.StreamData)
                 {
-                    case MessageType.GetVoltage:
-                        float voltage = float.Parse(parts[2]);
-                        RaiseResponseReceivedEvent(new ResponseReceivedEventArgs(new DataResponse<float>(type, errorCode, voltage)));
-                        break;
-                    case MessageType.GetEncoderCounts:
-                        string[] counts = parts[2].Split(',', StringSplitOptions.TrimEntries);
-                        var data = Tuple.Create<int, int>(int.Parse(counts[0]), int.Parse(counts[1]));
-                        RaiseResponseReceivedEvent(new ResponseReceivedEventArgs(new DataResponse<Tuple<int, int>>(type, errorCode, data)));
-                        break;
+                    HandleStreamData(parts[1]);
+                    continue;
+                }
+
+                ErrorCode errorCode = (ErrorCode)Enum.Parse(typeof(ErrorCode), parts[1]);
+                if (parts.Length > 2)
+                {
+                    switch (type)
+                    {
+                        case MessageType.GetVoltage:
+                            float voltage = float.Parse(parts[2]);
+                            RaiseResponseReceivedEvent(new ResponseReceivedEventArgs(new DataResponse<float>(type, errorCode, voltage)));
+                            break;
+                        case MessageType.GetEncoderCounts:
+                            string[] counts = parts[2].Split(',', StringSplitOptions.TrimEntries);
+                            var data = Tuple.Create<int, int>(int.Parse(counts[0]), int.Parse(counts[1]));
+                            RaiseResponseReceivedEvent(new ResponseReceivedEventArgs(new DataResponse<Tuple<int, int>>(type, errorCode, data)));
+                            break;
+                    }
+                }
+                else
+                {
+                    RaiseResponseReceivedEvent(new ResponseReceivedEventArgs(new Response(type, errorCode)));
                 }
             }
             else
             {
-                RaiseResponseReceivedEvent(new ResponseReceivedEventArgs(new Response(type, errorCode)));
+                canContinue = false;
             }
-        }
+        }    
     }
 }

@@ -221,6 +221,8 @@ namespace DAQ.Model
 
         public bool Initialized => _controller.IsInitialized;
 
+        public bool IsStreaming => throw new NotImplementedException();
+
         public event EventHandler<DAQStateEventArgs>? StateChanged
         {
             add => this._controller.StateChanged += value;
@@ -307,5 +309,8 @@ namespace DAQ.Model
             _controller.SendCommand(cmd);
             return await tcs.Task;
         }
+
+        public Task StartStream(int sampleRate) => throw new NotImplementedException();
+        public Task StopStream() => throw new NotImplementedException();
     }
 }

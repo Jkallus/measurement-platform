@@ -19,6 +19,7 @@
             <RowDefinition Height="35"/>
             <RowDefinition Height="35"/>
             <RowDefinition Height="35"/>
+            <RowDefinition Height="35"/>
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Top">
@@ -27,10 +28,10 @@
         </StackPanel>
         <TextBox x:Name="Initialized" Text="{x:Bind ViewModel.Initialized, Mode=OneWay}" Grid.Row="0" Grid.Column="2" VerticalAlignment="Top" IsReadOnly="True"/>
 
-        <Button Content="Get Voltage Sample" Command="{x:Bind ViewModel.GetVoltageCommand}" Grid.Row="1" Grid.Column="0" VerticalAlignment="Top"/>
+        <Button Content="Get Voltage Sample" Command="{x:Bind ViewModel.GetVoltageCommand}" Grid.Row="1" Grid.Column="0" VerticalAlignment="Top" HorizontalAlignment="Stretch" Margin="0 0 5 0"/>
         <TextBox Text="{x:Bind ViewModel.Voltage, Mode=OneWay}" IsReadOnly="True" Grid.Row="1" Grid.Column="2" VerticalAlignment="Top"/>
 
-        <Button Content="Get Counter Value" Command="{x:Bind ViewModel.GetCountCommand}" Grid.Column="0" Grid.Row="2" VerticalAlignment="Top"/>
+        <Button Content="Get Counter Value" Command="{x:Bind ViewModel.GetCountCommand}" Grid.Column="0" Grid.Row="2" VerticalAlignment="Top" HorizontalAlignment="Stretch" Margin="0 0 5 0"/>
         <Grid Grid.Row="2" Grid.Column="3">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*"/>
@@ -40,9 +41,17 @@
             <TextBox Text="{x:Bind ViewModel.YCount, Mode=OneWay}" IsReadOnly="True" Grid.Column="1" VerticalAlignment="Top" Margin="5 0 0 0"/>
         </Grid>
 
-        <Button Content="Get Scaled Value" Command="{x:Bind ViewModel.GetScaledValueCommand}" Grid.Column="0" Grid.Row="3" VerticalAlignment="Top"/>
+        <Button Content="Get Scaled Value" Command="{x:Bind ViewModel.GetScaledValueCommand}" Grid.Column="0" Grid.Row="3" VerticalAlignment="Top" HorizontalAlignment="Stretch" Margin="0 0 5 0"/>
         <TextBox Text="{x:Bind ViewModel.ScaledValue, Mode=OneWay}" IsReadOnly="True" Grid.Row="3" Grid.Column="2" VerticalAlignment="Top"/>
-        <Button Content="Reset Counter Value" Command="{x:Bind ViewModel.ResetEncoderCommand}" Grid.Column="0" Grid.Row="4" VerticalAlignment="Top"/>
+
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Grid.Row="4" Grid.Column="0">
+            <Button Content="Start Stream" Command="{x:Bind ViewModel.StartStreamCommand}" CommandParameter="{x:Bind ViewModel.SampleRate, Mode=TwoWay}" Width="100" Margin="0 0 5 0"/>
+            <Button Content="Stop Stream" Command="{x:Bind ViewModel.StopStreamCommand}" Width="100"/>
+        </StackPanel>
+        <TextBox x:Name="SampleRate" Text="{x:Bind ViewModel.SampleRate, Mode=TwoWay}" Grid.Row="4" Grid.Column="2" HorizontalAlignment="Stretch"/>
+
+        <Button Content="Reset Counter Value" Command="{x:Bind ViewModel.ResetEncoderCommand}" Grid.Column="0" Grid.Row="5" VerticalAlignment="Top" HorizontalAlignment="Stretch" Margin="0 0 5 0"/>
+        
 
     </Grid>
 </UserControl>
