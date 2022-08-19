@@ -1,5 +1,5 @@
 ﻿using MeasurementApp.BusinessLogic.Recipe;
-using MeasurementApp.BusinessLogic.Services;
+using MeasurementApp.BusinessLogic.Services.RecipeManager;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using System;
 using System.Collections.Generic;

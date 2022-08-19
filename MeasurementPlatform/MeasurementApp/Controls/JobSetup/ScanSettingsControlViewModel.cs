@@ -1,7 +1,6 @@
 ﻿using MeasurementApp.Controls.RecipeManagement;
 using MeasurementApp.Core.Models;
 using MeasurementApp.BusinessLogic.Recipe;
-using MeasurementApp.BusinessLogic.Services;
 using Microsoft.Extensions.Logging;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
@@ -11,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MeasurementApp.BusinessLogic.Services.RecipeManager;
 
 namespace MeasurementApp.Controls.RecipeSetup;
 
