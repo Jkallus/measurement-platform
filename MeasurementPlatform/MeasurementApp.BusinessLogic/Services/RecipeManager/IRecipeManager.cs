@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MeasurementApp.BusinessLogic.Services;
+namespace MeasurementApp.BusinessLogic.Services.RecipeManager;
 
 public interface IRecipeManager
 {

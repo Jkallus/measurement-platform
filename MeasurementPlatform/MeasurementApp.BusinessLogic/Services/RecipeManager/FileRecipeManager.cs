@@ -7,20 +7,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MeasurementApp.BusinessLogic.Services;
+namespace MeasurementApp.BusinessLogic.Services.RecipeManager;
 
-public class RecipeManager : IRecipeManager
+public class FileRecipeManager : IRecipeManager
 {
     // Private members
     IServiceProvider _service;
-    ILogger<RecipeManager> _logger;
+    ILogger<FileRecipeManager> _logger;
     IFileService _file;
     private List<ScanRecipe> _recipes;
     private string _storageDirectory;
 
 
     // Constructor
-    public RecipeManager(IServiceProvider service, ILogger<RecipeManager> logger)
+    public FileRecipeManager(IServiceProvider service, ILogger<FileRecipeManager> logger)
     {
         _service = service;
         _logger = logger;
@@ -33,7 +33,7 @@ public class RecipeManager : IRecipeManager
 
     public void AddRecipe(ScanRecipe recipe)
     {
-        _file.Save<ScanRecipe>(_storageDirectory, recipe.Name, recipe);
+        _file.Save(_storageDirectory, recipe.Name, recipe);
         _recipes.Add(recipe);
         _logger.LogInformation($"Recipe {recipe.Name} added");
     }
@@ -59,12 +59,12 @@ public class RecipeManager : IRecipeManager
     // Private methods
     private void LoadAllRecipes()
     {
-        if(!Directory.Exists(_storageDirectory))
+        if (!Directory.Exists(_storageDirectory))
         {
             Directory.CreateDirectory(_storageDirectory);
         }
-        List<string> filenames = Directory.GetFiles(_storageDirectory).Select(file => Path.GetFileName(file)).ToList<string>();
-        foreach(string file in filenames)
+        List<string> filenames = Directory.GetFiles(_storageDirectory).Select(file => Path.GetFileName(file)).ToList();
+        foreach (string file in filenames)
         {
             _recipes.Add(_file.Read<ScanRecipe>(_storageDirectory, file));
         }
