@@ -38,7 +38,8 @@ public class ESPDAQController
     public event EventHandler<DAQStateEventArgs>? StateChanged;
 
     private readonly TransformBlock<RawSample, ProcessedSample> _processBlock;
-    public TransformBlock<RawSample, ProcessedSample> Stream => _processBlock;
+    private readonly BroadcastBlock<ProcessedSample> _publishBlock;
+    public ISourceBlock<ProcessedSample> Stream => _publishBlock;
 
     private bool _isStreaming;
     public bool IsStreaming
@@ -70,7 +71,13 @@ public class ESPDAQController
         _sampleProcessor = sampleProcessor;
         
         _processBlock = new TransformBlock<RawSample, ProcessedSample>(_sampleProcessor.ProcessSample);
+        _publishBlock = new BroadcastBlock<ProcessedSample>((ProcessedSample sample) =>
+        {
+            return new ProcessedSample(sample.XCoordinate, sample.YCoordinate, sample.Z);
+        });
+
         _serial.ParseBlock.LinkTo(_processBlock);
+        _processBlock.LinkTo(_publishBlock);
     }
 
     private void _serial_ResponseReceived(object? sender, ResponseReceivedEventArgs e)

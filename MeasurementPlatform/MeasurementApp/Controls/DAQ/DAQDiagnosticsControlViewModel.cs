@@ -189,7 +189,7 @@ public class DAQDiagnosticsControlViewModel: ObservableObject
 
     private bool CanGetScaledValue()
     {
-        return _daq.Initialized;
+        return _daq.Initialized && !_daq.IsStreaming;
     }
 
     private async Task GetScaledValue()
@@ -212,7 +212,7 @@ public class DAQDiagnosticsControlViewModel: ObservableObject
 
     private bool CanResetEncoder()
     {
-        return _daq.Initialized;
+        return _daq.Initialized && !_daq.IsStreaming;
     }
 
     private async Task ResetEncoder()
@@ -230,7 +230,7 @@ public class DAQDiagnosticsControlViewModel: ObservableObject
 
     private bool CanGetCount()
     {
-        return _daq.Initialized;
+        return _daq.Initialized && !_daq.IsStreaming;
     }
 
     private async Task GetCount()
@@ -249,7 +249,7 @@ public class DAQDiagnosticsControlViewModel: ObservableObject
 
     private bool CanDeinitialize()
     {
-        return _daq.Initialized;
+        return _daq.Initialized && !_daq.IsStreaming;
     }
 
     private async Task Deinitialize()
@@ -271,7 +271,7 @@ public class DAQDiagnosticsControlViewModel: ObservableObject
 
     private bool CanGetVoltage()
     {
-        return _daq.Initialized;
+        return _daq.Initialized && !_daq.IsStreaming;
     }
 
     private async Task Initialize()
@@ -295,6 +295,6 @@ public class DAQDiagnosticsControlViewModel: ObservableObject
 
     private bool CanInitialize()
     {
-        return !_daq.Initialized;
+        return !_daq.Initialized && !_daq.IsStreaming;
     }
 }
