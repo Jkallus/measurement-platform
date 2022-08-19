@@ -1,4 +1,5 @@
 ﻿using System.IO.Ports;
+using System.Threading.Tasks.Dataflow;
 using DAQ.Enums;
 using MeasurementApp.Core.Models;
 using Microsoft.Extensions.Logging;
@@ -18,6 +19,8 @@ public class SerialController
     // Public properties
     public event EventHandler<ResponseReceivedEventArgs>? ResponseReceived;
 
+    private readonly TransformBlock<string, RawSample> _parseBlock;
+    public TransformBlock<string, RawSample> ParseBlock { get => _parseBlock; }
 
     public bool IsSerialportInitialized => _port.IsOpen;
 
@@ -50,6 +53,15 @@ public class SerialController
         _logger = bottomLogger;
         _currentMessage = "";
         _port = new SerialPort(serialConf.COM, serialConf.BaudRate, serialConf.Parity, serialConf.DataBits, serialConf.StopBits);
+
+        _parseBlock = new TransformBlock<string, RawSample>((string msg) =>
+        {
+            string[] parts = msg.Split(',');
+            return new RawSample(int.Parse(parts[0]), int.Parse(parts[1]), double.Parse(parts[2]));
+        });
+
+
+           
     }
 
     // Private methods
@@ -69,10 +81,12 @@ public class SerialController
         }
     }
 
-    private void HandleStreamData(string data)
-    {
-        string[] parts = data.Split(',');
-    }
+    //private void HandleStreamData(string data)
+    //{
+    //    string[] parts = data.Split(',');
+    //    RawSample sample = new RawSample(int.Parse(parts[0]), int.Parse(parts[1]), double.Parse(parts[2]));
+    //    _rawBuffer.Post(sample);
+    //}
 
     private void ParseData()
     {
@@ -89,7 +103,7 @@ public class SerialController
                 MessageType type = (MessageType)Enum.Parse(typeof(MessageType), parts[0]);
                 if (type == MessageType.StreamData)
                 {
-                    HandleStreamData(parts[1]);
+                    _parseBlock.Post(parts[1]);
                     continue;
                 }
 

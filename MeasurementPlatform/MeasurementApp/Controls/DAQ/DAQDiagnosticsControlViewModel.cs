@@ -4,6 +4,8 @@ using MeasurementApp.Services;
 using MeasurementApp.BusinessLogic.SystemControl;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
+using System.Threading.Tasks.Dataflow;
+using Microsoft.Extensions.Logging;
 
 namespace MeasurementApp.Controls;
 
@@ -11,42 +13,21 @@ public class DAQDiagnosticsControlViewModel: ObservableObject
 {
     // Private member variables
     private readonly IServiceProvider _serviceProvider;
+    private readonly ILogger<DAQDiagnosticsControlViewModel> _logger;
     private readonly IDAQ _daq;
-
+    private readonly ActionBlock<ProcessedSample> _displayBlock;
+    private IDisposable? _link;
+    
 
     // Public Properties
-    public IAsyncRelayCommand InitializeCommand
-    {
-        get; set;
-    }
-    public IAsyncRelayCommand DeinitializeCommand
-    {
-        get; set;
-    }
-    public IAsyncRelayCommand GetVoltageCommand
-    {
-        get; set;
-    }
-    public IAsyncRelayCommand GetCountCommand
-    {
-        get; set;
-    }
-    public IAsyncRelayCommand ResetEncoderCommand
-    {
-        get; set;
-    }
-    public IAsyncRelayCommand GetScaledValueCommand
-    {
-        get; set;
-    }
-    public IAsyncRelayCommand StartStreamCommand
-    {
-        get; set;
-    }
-    public IAsyncRelayCommand StopStreamCommand
-    {
-        get; set;
-    }
+    public IAsyncRelayCommand InitializeCommand { get; set; }
+    public IAsyncRelayCommand DeinitializeCommand { get; set; }
+    public IAsyncRelayCommand GetVoltageCommand { get; set; }
+    public IAsyncRelayCommand GetCountCommand { get; set; }
+    public IAsyncRelayCommand ResetEncoderCommand { get; set; }
+    public IAsyncRelayCommand GetScaledValueCommand { get; set; }
+    public IAsyncRelayCommand StartStreamCommand { get; set; }
+    public IAsyncRelayCommand StopStreamCommand { get; set; }
 
     private int _sampleRate;
     public int SampleRate
@@ -55,8 +36,8 @@ public class DAQDiagnosticsControlViewModel: ObservableObject
         set => SetProperty(ref _sampleRate, value);
     }
 
-    private float _scaledValue;
-    public float ScaledValue
+    private double _scaledValue;
+    public double ScaledValue
     {
         get => _scaledValue;
         set => SetProperty(ref _scaledValue, value);
@@ -85,11 +66,44 @@ public class DAQDiagnosticsControlViewModel: ObservableObject
         set => SetProperty(ref _voltage, value);
     }
 
+    private double _xcoordinate;
+    public double XCoordinate
+    {
+        get => _xcoordinate;
+        set => SetProperty(ref _xcoordinate, value);
+    }
+
+    private double _ycoordinate;
+    public double YCoordinate
+    {
+        get => _ycoordinate;
+        set => SetProperty(ref _ycoordinate, value);
+    }
+
     // Constructor
-    public DAQDiagnosticsControlViewModel(IServiceProvider serviceProvider)
+    public DAQDiagnosticsControlViewModel(IServiceProvider serviceProvider, ILogger<DAQDiagnosticsControlViewModel> logger)
     {
         _serviceProvider = serviceProvider;
+        _logger = logger;
         _daq = ((_serviceProvider.GetService(typeof(SystemController)) as SystemController) ?? throw new Exception("System controller is null")).DAQ; // grab DAQ instance from the systemcontroller
+        _displayBlock = new ActionBlock<ProcessedSample>((ProcessedSample sample) =>
+        {
+            App.MainRoot!.DispatcherQueue.TryEnqueue(() =>
+            {
+                XCoordinate = sample.XCoordinate;
+                YCoordinate = sample.YCoordinate;
+                ScaledValue = sample.Z;
+            });
+        });
+
+        _voltage = double.NaN;
+        _sampleRate = 0;
+        _scaledValue = 0;
+        _xcoordinate = 0;
+        _ycoordinate = 0;
+        _xcount = 0;
+        _ycount = 0;
+
         InitializeCommand = new AsyncRelayCommand(Initialize, CanInitialize);
         DeinitializeCommand = new AsyncRelayCommand(Deinitialize, CanDeinitialize);
         GetVoltageCommand = new AsyncRelayCommand(GetVoltage, CanGetVoltage);
@@ -114,6 +128,8 @@ public class DAQDiagnosticsControlViewModel: ObservableObject
                 OnPropertyChanged("Initialized");
             });            
         };
+
+        _logger.LogInformation("Finished constructing DAQDiagnosticsControlViewModel");
     }
 
 
@@ -124,7 +140,22 @@ public class DAQDiagnosticsControlViewModel: ObservableObject
     {
         try
         {
+            _link = _daq.Stream.LinkTo(_displayBlock);
             await _daq.StartStream(sampleRate);
+            //await Task.Run(async () =>
+            //{
+            //    while(_daq.IsStreaming)
+            //    {
+            //        ProcessedSample sample = await _daq.Stream.ReceiveAsync();
+            //        App.MainRoot!.DispatcherQueue.TryEnqueue(async () =>
+            //        {
+                        
+            //            XCoordinate = sample.XCoordinate;
+            //            YCoordinate = sample.YCoordinate;
+            //            ScaledValue = sample.Z;
+            //        });
+            //    }
+            //});
         }
         catch (DAQException ex)
         {
@@ -142,6 +173,7 @@ public class DAQDiagnosticsControlViewModel: ObservableObject
         try
         {
             await _daq.StopStream();
+            _link!.Dispose();
         }
         catch (DAQException ex)
         {

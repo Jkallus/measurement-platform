@@ -8,6 +8,7 @@ using DAQ.Enums;
 using DAQ.Interfaces;
 using MeasurementApp.Core.Models;
 using Microsoft.Extensions.Logging;
+using System.Threading.Tasks.Dataflow;
 
 namespace DAQ.Model;
 
@@ -28,11 +29,13 @@ public class ESPDAQ: IDAQ
     public bool Initialized => _controller.IsInitialized;
     public bool IsStreaming => _controller.IsStreaming;
 
+    public ISourceBlock<ProcessedSample> Stream => _controller.Stream;
+
     // Constructor
-    public ESPDAQ(DAQSerialConfig serialConfig, ILogger<ESPDAQ> topLogger, ILogger<ESPDAQController> middleLogger, ILogger<SerialController> bottomLogger)
+    public ESPDAQ(DAQSerialConfig serialConfig, ILogger<ESPDAQ> topLogger, ILogger<ESPDAQController> middleLogger, ILogger<SerialController> bottomLogger, ISampleProcessor sampleProcessor)
     {
         _logger = topLogger;
-        _controller = new ESPDAQController(serialConfig, middleLogger, bottomLogger);
+        _controller = new ESPDAQController(serialConfig, middleLogger, bottomLogger, sampleProcessor);
     }
 
     // Public methods

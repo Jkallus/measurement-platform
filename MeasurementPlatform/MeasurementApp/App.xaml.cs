@@ -3,7 +3,7 @@ using DAQ.Interfaces;
 using DAQ.Model;
 using MeasurementApp.Activation;
 using MeasurementApp.BusinessLogic.Configuration;
-using MeasurementApp.BusinessLogic.Services;
+using MeasurementApp.BusinessLogic.Services.RecipeManager;
 using MeasurementApp.BusinessLogic.SystemControl;
 using MeasurementApp.Contracts.Services;
 using MeasurementApp.Controls;
@@ -83,12 +83,13 @@ public partial class App : Application
 
             // Application Custom Services
             services.AddSingleton<MachineConfiguration>(context.Configuration.GetSection("MachineConfig").Get<MachineConfiguration>());
-            services.AddSingleton<IRecipeManager, RecipeManager>();
+            services.AddSingleton<IRecipeManager, FileRecipeManager>();
             services.AddSingleton<JobRunner>();
             services.AddSingleton<RecipeSelectService>();
             services.AddSingleton<StageSerialConfig>(context.Configuration.GetSection("MachineConfig:StageSerialConfig").Get<StageSerialConfig>());
             services.AddSingleton<DAQSerialConfig>(context.Configuration.GetSection("MachineConfig:DAQSerialConfig").Get<DAQSerialConfig>());
             services.AddSingleton<StageConfig>(context.Configuration.GetSection("MachineConfig:StageConfig").Get<StageConfig>());
+            services.AddSingleton<ISampleProcessor, StandardSampleProcessor>();
             services.AddSingleton<SystemController>();
             services.AddSingleton(typeof(IDAQ), simulationMode ? typeof(ESPDAQSim) : typeof(ESPDAQ));
             services.AddSingleton(typeof(IMachineControl), simulationMode ? typeof(FNCMachineControlSim) : typeof(FNCMachineControl));
@@ -125,7 +126,7 @@ public partial class App : Application
 
             services.AddTransient<ConnectionControlViewModel>();
             services.AddTransient<StagePositioningControlViewModel>();
-            services.AddTransient<DAQDiagnosticsControlViewModel>();
+            services.AddSingleton<DAQDiagnosticsControlViewModel>();
             services.AddTransient<PositionReadoutControlViewModel>();
             services.AddTransient<RecipeManagementControlViewModel>();
             services.AddTransient<ExampleControlViewModel>();

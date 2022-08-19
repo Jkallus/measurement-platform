@@ -6,6 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using DAQ.Enums;
 using Microsoft.Extensions.Logging;
+using System.Threading.Tasks.Dataflow;
+using DAQ.Interfaces;
 
 namespace DAQ.Model;
 
@@ -29,11 +31,14 @@ public class ESPDAQController
     private Command? _currentCommand; // pending command
     private bool _initCommandPending; // are we waiting for a response to an init or deinit command
     private readonly ILogger<ESPDAQController> _logger;
-    
+    private readonly ISampleProcessor _sampleProcessor;
 
     // Public properties
     public event EventHandler<ResponseReceivedEventArgs>? CommandComplete;
     public event EventHandler<DAQStateEventArgs>? StateChanged;
+
+    private readonly TransformBlock<RawSample, ProcessedSample> _processBlock;
+    public TransformBlock<RawSample, ProcessedSample> Stream => _processBlock;
 
     private bool _isStreaming;
     public bool IsStreaming
@@ -54,7 +59,7 @@ public class ESPDAQController
         }
     }
 
-    public ESPDAQController(SerialConfig serialConfig, ILogger<ESPDAQController> middleLogger, ILogger<SerialController> bottomLogger)
+    public ESPDAQController(SerialConfig serialConfig, ILogger<ESPDAQController> middleLogger, ILogger<SerialController> bottomLogger, ISampleProcessor sampleProcessor)
     {
         _logger = middleLogger;
         _serial = new SerialController(serialConfig, bottomLogger);
@@ -62,6 +67,10 @@ public class ESPDAQController
         _initCommandPending = false;
         _isInitialized = false;
         _isStreaming = false;
+        _sampleProcessor = sampleProcessor;
+        
+        _processBlock = new TransformBlock<RawSample, ProcessedSample>(_sampleProcessor.ProcessSample);
+        _serial.ParseBlock.LinkTo(_processBlock);
     }
 
     private void _serial_ResponseReceived(object? sender, ResponseReceivedEventArgs e)
