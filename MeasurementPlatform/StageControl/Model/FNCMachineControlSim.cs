@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using StageControl.Consts;
 using Timer = System.Timers.Timer;
+using MeasurementApp.Core.Models;
 
 namespace StageControl.Model;
 

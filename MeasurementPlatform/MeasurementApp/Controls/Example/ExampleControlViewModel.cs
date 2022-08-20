@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using MeasurementApp.Core.Models;
+using Microsoft.Extensions.Logging;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using StageControl.Model;
 using System;

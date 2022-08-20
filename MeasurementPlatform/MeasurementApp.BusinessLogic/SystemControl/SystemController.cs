@@ -18,6 +18,7 @@ public class SystemController: ObservableObject, ISystemController
     private readonly IServiceProvider _serviceProvider;
     private readonly MachineConfiguration _machineConfiguration;
     private readonly ILogger<SystemController> _systemLogger;
+    private readonly ISampleProcessor _sampleProcessor;
     private bool _hwBusy;
     private object? _hwOwner;
    
@@ -58,14 +59,15 @@ public class SystemController: ObservableObject, ISystemController
 
 
     // Constructor
-    public SystemController(IServiceProvider serviceProvider, ILogger<SystemController> logger)
+    public SystemController(IServiceProvider serviceProvider, ILogger<SystemController> logger, ISampleProcessor sampleProcessor)
     {
         _serviceProvider = serviceProvider;
         _systemLogger = logger;
         _systemLogger.LogInformation("System Controller object constructed");
+        _sampleProcessor = sampleProcessor;
 
         _machineConfiguration = _serviceProvider.GetService(typeof(MachineConfiguration)) as MachineConfiguration ?? throw new ArgumentNullException("MachineConfiguration", "MachineConfiguration instance was null");
-        
+
         MotionController = _serviceProvider.GetService(typeof(IMachineControl)) as IMachineControl ?? throw new ArgumentNullException("MachineController", "MachineController instance was null"); ;
         MotionController.StateChanged += MotionController_StateChanged;
         MotionController.UnexpectedRestart += MotionController_UnexpectedRestart;
@@ -78,6 +80,7 @@ public class SystemController: ObservableObject, ISystemController
         _hwBusy = false;
         _hwOwner = null;
         _systemLogger.LogInformation("Constructor finished");
+        
     }
 
     public async Task Home(HomingAxes axes, object caller)
@@ -92,6 +95,10 @@ public class SystemController: ObservableObject, ISystemController
             _hwOwner = caller;
             _systemLogger.LogInformation("Homing {Axis}", axes.ToString());
             await MotionController.Home(axes);
+            _systemLogger.LogInformation("Resetting encoder counts after homing");
+            if (DAQ.IsStreaming)
+                await DAQ.StopStream();
+            await DAQ.ResetEncoder();
             _hwBusy = false;
             _hwOwner = null;
         }
@@ -171,6 +178,8 @@ public class SystemController: ObservableObject, ISystemController
         _hwOwner = caller;
         _systemLogger.LogInformation("Deinitializing system");
         MotionController.Deinitialize();
+        if (DAQ.IsStreaming)
+            await DAQ.StopStream();
         await DAQ.Deinitialize();
         _hwBusy = false;
         _hwOwner = caller;

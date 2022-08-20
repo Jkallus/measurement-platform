@@ -67,18 +67,10 @@ public class DAQDiagnosticsControlViewModel: ObservableObject
     }
 
     private double _xcoordinate;
-    public double XCoordinate
-    {
-        get => _xcoordinate;
-        set => SetProperty(ref _xcoordinate, value);
-    }
-
+    public string XCoordinate => $"{_xcoordinate.ToString("0.000")} mm";
+    
     private double _ycoordinate;
-    public double YCoordinate
-    {
-        get => _ycoordinate;
-        set => SetProperty(ref _ycoordinate, value);
-    }
+    public string YCoordinate =>  $"{_ycoordinate.ToString("0.000")} mm";
 
     // Constructor
     public DAQDiagnosticsControlViewModel(IServiceProvider serviceProvider, ILogger<DAQDiagnosticsControlViewModel> logger)
@@ -90,9 +82,11 @@ public class DAQDiagnosticsControlViewModel: ObservableObject
         {
             App.MainRoot!.DispatcherQueue.TryEnqueue(() =>
             {
-                XCoordinate = sample.XCoordinate;
-                YCoordinate = sample.YCoordinate;
+                _xcoordinate = sample.XCoordinate;
+                _ycoordinate = sample.YCoordinate;
                 ScaledValue = sample.Z;
+                OnPropertyChanged("XCoordinate");
+                OnPropertyChanged("YCoordinate");
             });
         });
 

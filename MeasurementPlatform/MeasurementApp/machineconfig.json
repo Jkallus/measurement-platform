@@ -16,7 +16,9 @@
     },
     "StageConfig": {
       "XAxisLength": 300,
-      "YAxisLength": 250
+      "YAxisLength": 250,
+      "XHomePosition": 300.00,
+      "YHomePosition": 0.00
     }
   }
 }

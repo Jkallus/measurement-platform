@@ -10,6 +10,7 @@ using StageControl.Events;
 using StageControl.Model;
 using System;
 using MeasurementApp.Core.Oxyplot;
+using MeasurementApp.Core.Models;
 
 namespace MeasurementApp.Controls;
 
