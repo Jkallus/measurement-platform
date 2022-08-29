@@ -139,7 +139,7 @@ public class StagePositioningControlViewModel: ObservableRecipient
         {
             IsBusy = true;
             //await _systemController.Jog( (int)(_targetPosition.XCoordinate * 1000), (int)(_targetPosition.YCoordinate * 1000), JogType.Absolute, this);
-            await _systemController.MoveTo(_targetPosition.XCoordinate, _targetPosition.YCoordinate, StageControl.Model.BlockingType.NonBlocking, this);
+            await _systemController.MoveTo((_targetPosition.XCoordinate, _targetPosition.YCoordinate), StageControl.Model.BlockingType.NonBlocking, this);
         }
         finally
         {

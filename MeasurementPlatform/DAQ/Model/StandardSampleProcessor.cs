@@ -32,6 +32,6 @@ public class StandardSampleProcessor : ISampleProcessor
 
     private double VoltsToZCoordinates(double volts)
     {
-        return (1.0f / (0.023f * volts + 0.0046f)) - 8;
+        return 10 - ((1.0f / (0.023f * volts + 0.0046f)) - 8);
     }
 }

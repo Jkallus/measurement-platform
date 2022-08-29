@@ -25,6 +25,13 @@ public class ScanSettingsControlViewModel: ObservableRecipient
     private ScanRecipe? _oldRecipe;
 
     // Public properties
+    private int _samplingRate;
+    public int SamplingRate
+    {
+        get => _samplingRate;
+        set => SetProperty(ref _samplingRate, value);
+    }
+
     private string _recipeName;
     public string RecipeName
     {
@@ -137,8 +144,9 @@ public class ScanSettingsControlViewModel: ObservableRecipient
         _topLeft = new PositionCoordinate(0, 0);
         _topRight = new PositionCoordinate(0, 0);
         _bottomRight = new PositionCoordinate(0, 0);
-        _scanPitch = new ScanDimension(1000, Units.Micrometers);
+        _scanPitch = new ScanDimension(1, Units.Millimeters);
         _sliderValue = 0.5;
+        _samplingRate = 10;
         _recipeName = "";
         _dataReceived = false;
         _isEditing = false;
@@ -171,7 +179,7 @@ public class ScanSettingsControlViewModel: ObservableRecipient
                 TopLeft = m.Recipe.TopLeft;
                 TopRight = m.Recipe.TopRight;
                 BottomRight = m.Recipe.BottomRight;
-                ScanPitch = m.Recipe.ScanPitch;
+                ScanPitch = m.Recipe.StaticAxisStepSize;
                 RecipeName = m.Recipe.Name;
                 _isEditing = true;
                 _oldRecipe = m.Recipe;
@@ -198,13 +206,13 @@ public class ScanSettingsControlViewModel: ObservableRecipient
             _logger.LogInformation("Updating recipe");
             if (_oldRecipe == null)
                 throw new Exception("_oldRecipe is null while saving an edit");
-            _recipeManager.UpdateRecipe(_oldRecipe, new ScanRecipe(RecipeName, BottomLeft, TopLeft, TopRight, BottomRight, ScanPitch));
+            _recipeManager.UpdateRecipe(_oldRecipe, new ScanRecipe(RecipeName, BottomLeft, TopLeft, TopRight, BottomRight, SamplingRate, ScanPitch));
             _oldRecipe = null;
         }
         else
         {
             _logger.LogInformation("Saving recipe");
-            _recipeManager.AddRecipe(new ScanRecipe(RecipeName, BottomLeft, TopLeft, TopRight, BottomRight, ScanPitch));
+            _recipeManager.AddRecipe(new ScanRecipe(RecipeName, BottomLeft, TopLeft, TopRight, BottomRight, SamplingRate, ScanPitch));
         }
         
         

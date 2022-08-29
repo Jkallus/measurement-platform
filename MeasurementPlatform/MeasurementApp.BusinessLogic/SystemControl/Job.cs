@@ -15,6 +15,6 @@ public class Job
     public Job(ScanRecipe recipe)
     {
         Recipe = recipe;
-        Result = new ScanData(recipe.XSamples, recipe.YSamples);
+        Result = new ScanData();
     }
 }

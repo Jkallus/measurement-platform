@@ -66,29 +66,12 @@
 
             <StackPanel Margin="0 20 0 0">
                 <TextBlock Text="Sampling Settings" FontSize="18"/>
+                <NumberBox Header="Sampling Rate (Hz)" SpinButtonPlacementMode="Inline" Width="200" HorizontalAlignment="Left" Value="{x:Bind ViewModel.SamplingRate, Mode=TwoWay}"/>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="Scan Pitch:" VerticalAlignment="Center" Margin="0 0 10 0" />
                     <Slider Minimum="0" Maximum="1" Width="100" Value="{x:Bind ViewModel.SliderValue, Mode=TwoWay}" VerticalAlignment="Center" StepFrequency="0.001" IsThumbToolTipEnabled="False" Margin="0 0 10 0"/>
                     <TextBlock Text="{x:Bind ViewModel.ScanPitch, Mode=OneWay}" VerticalAlignment="Center"/>
                 </StackPanel>
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-
-                    <TextBlock Text="X Sample Count:" Grid.Row="0" Grid.Column="0"/>
-                    <TextBlock Text="{x:Bind ViewModel.XSampleCount, Mode=OneWay}" Margin="5 0 0 0" Grid.Row="0" Grid.Column="1"/>
-                    <TextBlock Text="Y Sample Count:" Grid.Row="1" Grid.Column="0"/>
-                    <TextBlock Text="{x:Bind ViewModel.YSampleCount, Mode=OneWay}" Margin="5 0 0 0" Grid.Row="1" Grid.Column="1"/>
-                    <TextBlock Text="Total Sample Count:" Grid.Row="2" Grid.Column="0"/>
-                    <TextBlock Text="{x:Bind ViewModel.TotalSampleCount, Mode=OneWay}" Margin="5 0 0 0" Grid.Row="2" Grid.Column="1"/>
-                </Grid>
             </StackPanel>
 
             <Button Content="Save Recipe" Command="{x:Bind ViewModel.SaveRecipeCommand}" Margin="0 15 0 0"/>

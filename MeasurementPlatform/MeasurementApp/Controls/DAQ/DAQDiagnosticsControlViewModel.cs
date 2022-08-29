@@ -201,7 +201,7 @@ public class DAQDiagnosticsControlViewModel: ObservableObject
 
     private float ApplyScale(float volts)
     {
-        return (1.0f / (0.023f * volts + 0.0046f)) - 8;
+        return 10 - ((1.0f / (0.023f * volts + 0.0046f)) - 8);
     }
 
     private bool CanResetEncoder()

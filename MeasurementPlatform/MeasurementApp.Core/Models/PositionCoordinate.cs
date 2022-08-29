@@ -15,8 +15,18 @@ public class PositionCoordinate
         Y = y;
     }
 
+    public (double x, double y) AsTuple()
+    {
+        return (X, Y);
+    }
+
     public override string ToString()
     {
         return $"({X.ToString("0.000")}, {Y.ToString("0.000")})";
+    }
+
+    public PositionCoordinate Clone()
+    {
+        return this.MemberwiseClone() as PositionCoordinate;
     }
 }

@@ -121,7 +121,7 @@ public class SystemController: ObservableObject, ISystemController
         }
     }
 
-    public async Task MoveTo(double x, double y, BlockingType blocking, object caller)
+    public async Task MoveTo((double x, double y) loc, BlockingType blocking, object caller)
     {
         if(_hwBusy)
         {
@@ -132,14 +132,14 @@ public class SystemController: ObservableObject, ISystemController
         {
             _hwBusy = true;
             _hwOwner = caller;
-            _systemLogger.LogInformation("Moving to {Xcoords}, {Ycoords} in {Blocking} move",x, y, blocking.ToString());
+            _systemLogger.LogInformation("Moving to {Xcoords}, {Ycoords} in {Blocking} move", loc.x, loc.y, blocking.ToString());
             if(blocking == BlockingType.ExternallyBlocking)
             {
-                await MotionController.MoveTo(x, y);
+                await MotionController.MoveTo(loc.x, loc.y);
             }
             else
             {
-                await MotionController.MoveToNonBlocking(x, y);
+                await MotionController.MoveToNonBlocking(loc.x, loc.y);
             }
             _hwBusy = false;
             _hwOwner = null;

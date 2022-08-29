@@ -15,39 +15,32 @@ public class ScanRecipe
     public PositionCoordinate TopLeft { get; set; }
     public PositionCoordinate TopRight { get; set; }
     public PositionCoordinate BottomRight { get; set; }
-    public ScanDimension ScanPitch { get; set; }
+    public int SamplingRate { get; set; }
+
+    public ScanDimension StaticAxisStepSize { get; set; }
 
     [JsonIgnore]
-    public ScanDimension XDimension
+    public ScanDimension XDimension => new ScanDimension(BottomRight.X - BottomLeft.X, Units.Millimeters);
+    [JsonIgnore]
+    public ScanDimension YDimension => new ScanDimension(TopLeft.Y - BottomLeft.Y, Units.Millimeters);
+    [JsonIgnore]
+    public ScanDimension ScanArea => new ScanDimension(XDimension.Value * YDimension.Value, Units.SquareMillimeters);
+
+    [JsonIgnore]
+    public PositionCoordinate ScanStartLocation
     {
-        get => new ScanDimension(BottomRight.X - BottomLeft.X, Units.Millimeters);
-    }
-    [JsonIgnore]
-    public ScanDimension YDimension
-    {
-        get => new ScanDimension(TopLeft.Y - BottomLeft.Y, Units.Millimeters);
-    }
-    [JsonIgnore]
-    public ScanDimension ScanArea
-    {
-        get => new ScanDimension(XDimension.Value * YDimension.Value, Units.SquareMillimeters);
+        get => BottomRight;
     }
 
-    [JsonIgnore]
-    public int XSamples => (int)(XDimension.Value / (ScanPitch.Value / 1000.0));
-
-    [JsonIgnore]
-    public int YSamples => (int)(YDimension.Value / (ScanPitch.Value / 1000.0));
-
-
-    public ScanRecipe(string name, PositionCoordinate bottomLeft, PositionCoordinate topLeft, PositionCoordinate topRight, PositionCoordinate bottomRIght, ScanDimension scanPitch)
+    public ScanRecipe(string name, PositionCoordinate bottomLeft, PositionCoordinate topLeft, PositionCoordinate topRight, PositionCoordinate bottomRight, int samplingRate, ScanDimension staticAxisStepSize)
     {
         Name = name;
         BottomLeft = bottomLeft;
         TopLeft = topLeft;
         TopRight = topRight;
-        BottomRight = bottomRIght;
-        ScanPitch = scanPitch;
+        BottomRight = bottomRight;
+        SamplingRate = samplingRate;
+        StaticAxisStepSize = staticAxisStepSize;
     }
 
     public ScanRecipe()
@@ -57,43 +50,41 @@ public class ScanRecipe
         TopLeft = new(0, 0);
         TopRight = new(0, 0);
         BottomRight = new(0, 0);
-        ScanPitch = new(1, Units.Millimeters);
+        SamplingRate = 0;
+        StaticAxisStepSize = new ScanDimension(0.0, Units.Millimeters);
     }
 
-    public List<(double x, double y)> GetScanPoints()
+    public List<PositionCoordinate> GetPositions()
     {
-        List<(double x, double y)> points = new();
+        List<PositionCoordinate> positions = new List<PositionCoordinate>();
 
-        int xSampleCount = (int)(XDimension.Value / (ScanPitch.Value / 1000.0));
-        int ySampleCount = (int)(YDimension.Value / (ScanPitch.Value / 1000.0));
+        PositionCoordinate workingPosition = ScanStartLocation.Clone();
 
-        double xMin = BottomLeft.X;
-        double yMin = BottomLeft.Y;
-        double xMax = BottomRight.X;
+        bool onRightSide = true;
 
-        bool leftToRight = true;
-
-        for (int ySamples = 0; ySamples < ySampleCount; ySamples++)
+        while(workingPosition.Y < TopRight.Y)
         {
-            if(leftToRight)
+            positions.Add(workingPosition.Clone());
+            if (onRightSide)
             {
-                for (int xSamples = 0; xSamples < xSampleCount; xSamples++)
-                {
-                    points.Add((xMin + (xSamples * (ScanPitch.Value / 1000.0)), yMin + (ySamples * (ScanPitch.Value / 1000.0))));
-                }
+                workingPosition.X -= XDimension.Value;
+                onRightSide = false;
             }
             else
             {
-                for(int xSamples = 0; xSamples < xSampleCount; xSamples++)
-                {
-                    points.Add((xMax - (xSamples * (ScanPitch.Value / 1000.0)), yMin + (ySamples * (ScanPitch.Value / 1000.0))));
-                }
+                workingPosition.X += XDimension.Value;
+                onRightSide = true;
             }
-            leftToRight = !leftToRight; // flip direction each row
+            positions.Add(workingPosition.Clone());
+            workingPosition.Y += StaticAxisStepSize.Value;
         }
 
-        return points;
-        
+        workingPosition.Y = TopRight.Y;
+        positions.Add(workingPosition.Clone());
 
+        workingPosition.X += onRightSide ? (-XDimension.Value) : XDimension.Value;
+        positions.Add(workingPosition.Clone());
+
+        return positions;
     }
 }
