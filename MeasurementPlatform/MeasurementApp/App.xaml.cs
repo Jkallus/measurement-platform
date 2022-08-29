@@ -3,6 +3,8 @@ using DAQ.Interfaces;
 using DAQ.Model;
 using MeasurementApp.Activation;
 using MeasurementApp.BusinessLogic.Configuration;
+using MeasurementApp.BusinessLogic.Services.DataExportService;
+using MeasurementApp.BusinessLogic.Services.FilepathFinderService;
 using MeasurementApp.BusinessLogic.Services.RecipeManager;
 using MeasurementApp.BusinessLogic.SystemControl;
 using MeasurementApp.Contracts.Services;
@@ -68,6 +70,7 @@ public partial class App : Application
             string? basePath = Environment.GetEnvironmentVariable("MEASUREAPP_DIR");
             builder.SetBasePath(basePath)
             .AddJsonFile("settings\\machineconfig.json", optional: false, reloadOnChange: false)
+            .AddEnvironmentVariables()
             .Build();
         }).
         UseContentRoot(AppContext.BaseDirectory).
@@ -90,6 +93,8 @@ public partial class App : Application
             services.AddSingleton<DAQSerialConfig>(context.Configuration.GetSection("MachineConfig:DAQSerialConfig").Get<DAQSerialConfig>());
             services.AddSingleton<StageConfig>(context.Configuration.GetSection("MachineConfig:StageConfig").Get<StageConfig>());
             services.AddSingleton<ISampleProcessor, StandardSampleProcessor>();
+            services.AddSingleton<IPathfinder, DefaultFilepathFinder>();
+            services.AddSingleton<IDataExportService, DataExportServiceCSV>();
             services.AddSingleton<SystemController>();
             services.AddSingleton(typeof(IDAQ), simulationMode ? typeof(ESPDAQSim) : typeof(ESPDAQ));
             services.AddSingleton(typeof(IMachineControl), simulationMode ? typeof(FNCMachineControlSim) : typeof(FNCMachineControl));
