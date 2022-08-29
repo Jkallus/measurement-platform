@@ -64,7 +64,7 @@ namespace StageControl.Model
         public FNCMachineControl(StageSerialConfig serialConf, StageConfig stageConf, ILogger<FNCMachineControl> topLogger, ILogger<FluidNCController> middleLogger, ILogger<SerialController> bottomLogger)
         {
             _logger = topLogger;
-            controller = new FluidNCController(serialConf, middleLogger, bottomLogger);
+            controller = new FluidNCController(serialConf, stageConf, middleLogger, bottomLogger);
             state = new MachineState(stageConf);
             controller.RequestComplete += Controller_RequestComplete;
             controller.PositionChanged += Controller_PositionChanged;

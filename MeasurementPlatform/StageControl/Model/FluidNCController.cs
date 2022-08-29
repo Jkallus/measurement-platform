@@ -22,6 +22,7 @@ public class FluidNCController
     private bool _initPending;
     private Request? _activeRequest;
     private readonly double _compareThreshold;
+    private readonly StageConfig _stageConfig;
 
     // Public properties
     public event EventHandler<FNCStateChangedEventArgs>? FNCStateChanged;
@@ -50,9 +51,10 @@ public class FluidNCController
     }
 
     // Constructors
-    public FluidNCController(SerialConfig serialConf, ILogger<FluidNCController> middleLogger, ILogger<SerialController> bottomLogger)
+    public FluidNCController(SerialConfig serialConf, StageConfig stageConf, ILogger<FluidNCController> middleLogger, ILogger<SerialController> bottomLogger)
     {
         _logger = middleLogger;
+        _stageConfig = stageConf;
         _serial = new SerialController(serialConf, bottomLogger);
         _incomingMessages = new List<SerialDataItem>();
         _outgoingMessages = new List<SerialDataItem>();
@@ -121,7 +123,7 @@ public class FluidNCController
                 float y_mm = (float)jogRequest.Y / 1000;
 
                 reqText += "G21 ";
-                reqText += "F700 ";
+                reqText += $"F{_stageConfig.MaxSpeed} ";
                 reqText += $"X{x_mm.ToString("0.000")} ";
                 reqText += $"Y{y_mm.ToString("0.000")}";
 
@@ -138,7 +140,7 @@ public class FluidNCController
                 reqText += " G90 "; // always absolute coordinates
                 reqText += $"X{moveToRequest.X.ToString("0.000")} ";
                 reqText += $"Y{moveToRequest.Y.ToString("0.000")} ";
-                reqText += "F700";
+                reqText += $"F{_stageConfig.MaxSpeed}";
 
                 if(moveToRequest.Blocking == BlockingType.ExternallyBlocking)
                 {

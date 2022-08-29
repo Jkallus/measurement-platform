@@ -14,6 +14,8 @@ public class StageConfig
     public double XHomePosition { get; set; }
     public double YHomePosition { get; set; }
 
+    public int MaxSpeed { get; set; }
+
     public override string ToString()
     {
         return $"{XAxisLength} by {YAxisLength}";
